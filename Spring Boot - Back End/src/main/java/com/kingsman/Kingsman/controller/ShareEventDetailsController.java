@@ -41,7 +41,7 @@ public class ShareEventDetailsController {
                 "Detalles del evento:\n" +
                 "Fecha: " + event.getEventDate() + "\n" +
                 "Tiempo: " + event.getStartTime() + "\n" +
-                "Precio del billete: " + event.getTicketPrice() + "\n" + "\n" +
+                "Precio del ticket: " + event.getTicketPrice() + "\n" + "\n" +
                 "Esperamos verte allí.!\n" + "\n" +
                 "Best Regards,\n" +
                 "Restaurante, \nLos Patos, \nLo esperamos";

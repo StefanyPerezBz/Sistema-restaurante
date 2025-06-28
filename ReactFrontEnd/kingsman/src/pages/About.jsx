@@ -14,7 +14,7 @@ export default function About() {
           <div className='lg:basis-2/5'>
             <div className='relative rounded-2xl overflow-hidden shadow-2xl h-full min-h-[400px]'>
               <img 
-                src="../src/image/about.png" 
+                src="../src/image/about.jpg" 
                 alt='Restaurante Los Patos' 
                 className='w-full h-full object-cover transition-transform duration-500 hover:scale-105'
               />

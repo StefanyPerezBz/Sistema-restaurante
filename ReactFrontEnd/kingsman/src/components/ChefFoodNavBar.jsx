@@ -30,13 +30,13 @@ function ChefFoodNavBar() {
 
           <Navbar.Collapse>
             <Link to='/chef/foodMenu?tab=allFood'>
-              <Navbar.Link active={tab === 'allFood'}>All </Navbar.Link>
+              <Navbar.Link active={tab === 'allFood'}>Todo </Navbar.Link>
             </Link>
             <Link to='/chef/foodMenu?tab=mainDish'>
-              <Navbar.Link active={tab === 'mainDish'} > Main Dish </Navbar.Link>
+              <Navbar.Link active={tab === 'mainDish'} > Plato Principal </Navbar.Link>
             </Link>
             <Link to='/chef/foodMenu?tab=desert'>
-              <Navbar.Link active={tab === 'desert'} >Desert </Navbar.Link>
+              <Navbar.Link active={tab === 'desert'} >Postre </Navbar.Link>
             </Link>
           </Navbar.Collapse>
         </Navbar>

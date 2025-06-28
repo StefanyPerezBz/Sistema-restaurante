@@ -1,168 +1,465 @@
-import React from 'react'
-import { Accordion, Button, Label, Navbar} from "flowbite-react";
+// import React from 'react'
+// import { Accordion, Button, Label, Navbar} from "flowbite-react";
+// import { useEffect, useState } from 'react';
+// import axios from 'axios';
+// import { Badge } from 'flowbite-react';
+// import { Link } from 'react-router-dom';
+
+
+// export default function AvailableOrders() {
+//     const [orders, setOrders] = useState([]);
+
+
+//     useEffect(() => {
+
+//         fetchOrders();
+//     }, []);
+
+//     // Get today's date
+//     const today = new Date();
+
+//     // Format the date as YYYY-MM-DD
+//     const year = today.getFullYear();
+//     const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+//     const day = String(today.getDate()).padStart(2, '0');
+
+//     // Construct the date string in YYYY-MM-DD format
+//     const createdDate = `${year}-${month}-${day}`;
+//     console.log(createdDate);
+
+
+//     const fetchOrders = async () => {
+//         try {
+//             const response = await axios.get('http://localhost:8080/api/orders/created-date', {
+//                 params: {
+//                     createdDate: createdDate
+//                 }
+//             });
+//             setOrders(response.data);
+//         } catch (error) {
+//             console.error('Error al recuperar pedidos:', error);
+//         }
+//     };
+
+
+//     const updateStatusCancel = async (orderId) => {
+//         try {
+//             const response = await axios.put(`http://localhost:8080/api/orders/status-update/${orderId}/Canceled`);
+//             console.log(response.data);
+//         } catch (error) {
+//             console.error('Error al actualizar el estado del pedido:', error);
+//         }
+//         fetchOrders();
+//     }
+
+//     const updateStatusProcessing = async (orderId) => {
+//         try {
+//             const response = await axios.put(`http://localhost:8080/api/orders/status-update/${orderId}/Processing`);
+//             console.log(response.data);
+//         } catch (error) {
+//             console.error('Error al actualizar el estado del pedido:', error);
+//         }
+//         fetchOrders();
+//     }
+//     return (
+
+//         // Top buttons 
+//         <div className='w-full h-screen bg-gray-100'>
+//             <div className='m-5 rounded-xl shadow-md'>
+//                 <Navbar fluid rounded>
+//                     <Navbar.Collapse>
+//                         <Link to="/chef?tab=allOrders" >
+//                             <Button color="success" className=' bg-green-500' pill outline>
+//                                 Todo : {orders.length}
+//                             </Button>
+//                         </Link>
+//                         <Link to="/chef?tab=availableOrders" active>
+//                             <Button color="warning" pill >
+//                                Pedidos disponibles : {orders.filter(order => order.orderStatus === 'Pending').length}
+//                             </Button>
+//                         </Link>
+//                         <Link to="/chef?tab=preparingOrders" >
+//                             <Button color="purple" pill outline >
+//                                 Pedidos en preparación : {orders.filter(order => order.orderStatus === 'Processing').length}
+//                             </Button>
+//                         </Link>
+//                         <Link to="/chef?tab=finishedOrders">
+//                             <Button color="success" pill outline >
+//                                 Pedidos finalizados : {orders.filter(order => order.orderStatus === 'Ready').length}
+//                             </Button>
+//                         </Link>
+//                         <Link to="/chef?tab=canceledOrders">
+//                             <Button color="failure" pill outline>
+//                                 Pedidos cancelados : {orders.filter(order => order.orderStatus === 'Canceled').length}
+//                             </Button>
+//                         </Link>
+//                     </Navbar.Collapse>
+//                 </Navbar>
+//             </div>
+
+//             {/* Available Orders */}
+//             <Label className='text-2xl font-bold m-5'>Pedidos disponibles</Label>
+//             <div className='ml-5 mr-5 w-auto bg-white shadow-md rounded-2xl mt-5'>
+//                 <Accordion collapseAll>
+//                     {(orders.length  === 0)  ? (
+//                         <h3>No hay pedidos disponibles</h3>
+//                     ) : (
+//                         orders
+//                             .filter(order => order.orderStatus === 'Pending')
+//                             .map(order => (
+//                                 <Accordion.Panel key={order.orderId}>
+//                                     <Accordion.Title>
+//                                         <div className=" flex  justify-between ">
+//                                         <div className='mr-10 '>
+//                                                 <Badge size='l' color={order.orderStatus === 'Canceled' ? "failure" :
+//                                                     order.orderStatus === 'Finished' ? "success" : "warning"}>
+//                                                     {order.orderStatus === 'Canceled' ? "Canceled" :
+//                                                         order.orderStatus === 'Finished' ? "Finished" : "Pending"}
+//                                                 </Badge>
+//                                             </div>
+//                                             <div className='space-x-16 w-full'>
+//                                                 <Label className=''> Número de orden #{order.orderId}</Label>
+//                                                 <Label >Número de mesa: {order.tableNumber}</Label>
+//                                                 <Label >Mesero: {order.firstName}</Label>
+//                                                 <Label >Item : {order.foodName}</Label>
+                                                
+
+//                                             </div>
+                                            
+//                                         </div>
+
+//                                     </Accordion.Title>
+//                                     <Accordion.Content>
+//                                         <div className='flex flex-row justify-between'>
+//                                             <div className='basis-2/5'>
+//                                             <Label className="mb-4"> Nombre del cliente : {order.cusName}   </Label>
+//                                             </div>
+//                                             <div className='basis-2/5'>
+//                                             <Label className="ml-5"> <label className=' text-red-500'>Nota especial: </label> {order.specialNote} </Label>
+//                                             </div>
+
+//                                             {order.orderStatus === 'Canceled' ? (
+//                                                 <Badge size='l' color="failure">Cancelado</Badge>
+//                                             ) : order.orderStatus === 'Finished' ? (
+//                                                 <Badge size='l' color="success">Finalizado</Badge>
+//                                             ) : (
+//                                                 <>
+//                                                     <Button color="purple" className='m-4 bg-purple-500' onClick={() => updateStatusProcessing(order.orderId)}>
+//                                                         Preparar
+//                                                     </Button>
+//                                                     <Button color="failure" className='m-4  bg-red-600' onClick={() => updateStatusCancel(order.orderId)}>
+//                                                         Cancelar
+//                                                     </Button>
+//                                                 </>
+//                                             )}
+
+//                                         </div>
+
+//                                     </Accordion.Content>
+//                                 </Accordion.Panel>
+//                             )))}
+//                 </Accordion>
+
+//             </div>
+//         </div>
+
+
+//     )
+// }
+
+import React from 'react';
+import { Accordion, Button, Label, Navbar, Badge } from "flowbite-react";
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Badge } from 'flowbite-react';
 import { Link } from 'react-router-dom';
-
+import DataTable from 'react-data-table-component';
+import Swal from 'sweetalert2';
 
 export default function AvailableOrders() {
     const [orders, setOrders] = useState([]);
-
+    const [pending, setPending] = useState(true);
+    const [viewMode, setViewMode] = useState('table'); // 'table' or 'accordion'
+    const [filteredOrders, setFilteredOrders] = useState([]);
 
     useEffect(() => {
-
         fetchOrders();
     }, []);
 
-    // Get today's date
-    const today = new Date();
+    useEffect(() => {
+        // Filter orders to only show Pending status
+        const availableOrders = orders.filter(order => order.orderStatus === 'Pending');
+        setFilteredOrders(availableOrders);
+    }, [orders]);
 
-    // Format the date as YYYY-MM-DD
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(today.getDate()).padStart(2, '0');
-
-    // Construct the date string in YYYY-MM-DD format
-    const createdDate = `${year}-${month}-${day}`;
-    console.log(createdDate);
-
+    const getTodayDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
     const fetchOrders = async () => {
         try {
+            setPending(true);
             const response = await axios.get('http://localhost:8080/api/orders/created-date', {
                 params: {
-                    createdDate: createdDate
+                    createdDate: getTodayDate()
                 }
             });
             setOrders(response.data);
+            setPending(false);
         } catch (error) {
             console.error('Error al recuperar pedidos:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudieron cargar los pedidos',
+                confirmButtonColor: '#3085d6'
+            });
+            setPending(false);
         }
     };
 
+    const handleStatusUpdate = async (orderId, status) => {
+        const actionText = {
+            'Processing': 'preparar',
+            'Canceled': 'cancelar'
+        }[status];
 
-    const updateStatusCancel = async (orderId) => {
-        try {
-            const response = await axios.put(`http://localhost:8080/api/orders/status-update/${orderId}/Canceled`);
-            console.log(response.data);
-        } catch (error) {
-            console.error('Error al actualizar el estado del pedido:', error);
-        }
-        fetchOrders();
-    }
+        const result = await Swal.fire({
+            title: `¿Estás seguro de ${actionText} este pedido?`,
+            text: `El estado cambiará a "${status}"`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `Sí, ${actionText}`,
+            cancelButtonText: 'Cancelar'
+        });
 
-    const updateStatusProcessing = async (orderId) => {
-        try {
-            const response = await axios.put(`http://localhost:8080/api/orders/status-update/${orderId}/Processing`);
-            console.log(response.data);
-        } catch (error) {
-            console.error('Error al actualizar el estado del pedido:', error);
+        if (result.isConfirmed) {
+            try {
+                await axios.put(`http://localhost:8080/api/orders/status-update/${orderId}/${status}`);
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: `Pedido marcado como ${status}`,
+                    confirmButtonColor: '#3085d6'
+                });
+                fetchOrders();
+            } catch (error) {
+                console.error(`Error al actualizar el estado del pedido a ${status}:`, error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `No se pudo ${actionText} el pedido`,
+                    confirmButtonColor: '#3085d6'
+                });
+            }
         }
-        fetchOrders();
-    }
+    };
+
+    const getStatusBadge = (status) => {
+        const statusMap = {
+            'Canceled': { color: "failure", text: "Cancelado" },
+            'Ready': { color: "success", text: "Terminado" },
+            'Processing': { color: "purple", text: "Preparando" },
+            'Pending': { color: "warning", text: "Pendiente" }
+        };
+        const { color, text } = statusMap[status] || { color: "gray", text: status };
+        return <Badge color={color} className="whitespace-nowrap">{text}</Badge>;
+    };
+
+    const columns = [
+        {
+            name: 'ID Pedido',
+            selector: row => `#${row.orderId}`,
+            sortable: true,
+            width: '100px'
+        },
+        {
+            name: 'Mesa',
+            selector: row => row.tableNumber,
+            sortable: true,
+            width: '80px'
+        },
+        {
+            name: 'Mesero',
+            selector: row => row.firstName,
+            sortable: true
+        },
+        {
+            name: 'Artículo',
+            selector: row => row.foodName,
+            sortable: true
+        },
+        {
+            name: 'Cliente',
+            selector: row => row.cusName,
+            sortable: true
+        },
+        {
+            name: 'Nota Especial',
+            cell: row => (
+                <span className={row.specialNote ? 'text-red-500' : 'text-gray-400'}>
+                    {row.specialNote || 'Ninguna'}
+                </span>
+            )
+        },
+        {
+            name: 'Acciones',
+            cell: row => (
+                <div className="flex space-x-2">
+                    <Button color="purple" size="sm" onClick={() => handleStatusUpdate(row.orderId, 'Processing')}>
+                        Preparar
+                    </Button>
+                    <Button color="failure" size="sm" onClick={() => handleStatusUpdate(row.orderId, 'Canceled')}>
+                        Cancelar
+                    </Button>
+                </div>
+            ),
+            width: '200px'
+        }
+    ];
+
+    const customStyles = {
+        rows: {
+            style: {
+                minHeight: '72px',
+            },
+        },
+        headCells: {
+            style: {
+                paddingLeft: '8px',
+                paddingRight: '8px',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                backgroundColor: '#f9fafb',
+            },
+        },
+        cells: {
+            style: {
+                paddingLeft: '8px',
+                paddingRight: '8px',
+            },
+        },
+    };
+
     return (
-
-        // Top buttons 
-        <div className='w-full h-screen bg-gray-100'>
-            <div className='m-5 rounded-xl shadow-md'>
+        <div className='w-full min-h-screen bg-gray-100 p-4'>
+            <div className='mb-5 rounded-xl shadow-md'>
                 <Navbar fluid rounded>
-                    <Navbar.Collapse>
-                        <Link to="/chef?tab=allOrders" >
-                            <Button color="success" className=' bg-green-500' pill outline>
-                                Todo : {orders.length}
+                    <Navbar.Collapse className="flex flex-wrap justify-center md:justify-start">
+                        <Link to="/chef?tab=allOrders" className="m-1">
+                            <Button color="success" className='bg-green-500' pill outline>
+                                Todo: {orders.length}
                             </Button>
                         </Link>
-                        <Link to="/chef?tab=availableOrders" active>
-                            <Button color="warning" pill >
-                               Pedidos disponibles : {orders.filter(order => order.orderStatus === 'Pending').length}
+                        <Link to="/chef?tab=availableOrders" className="m-1">
+                            <Button color="warning" pill active>
+                                Pendientes: {filteredOrders.length}
                             </Button>
                         </Link>
-                        <Link to="/chef?tab=preparingOrders" >
-                            <Button color="purple" pill outline >
-                                Pedidos en preparación : {orders.filter(order => order.orderStatus === 'Processing').length}
+                        <Link to="/chef?tab=preparingOrders" className="m-1">
+                            <Button color="purple" pill outline>
+                                En preparación: {orders.filter(order => order.orderStatus === 'Processing').length}
                             </Button>
                         </Link>
-                        <Link to="/chef?tab=finishedOrders">
-                            <Button color="success" pill outline >
-                                Pedidos finalizados : {orders.filter(order => order.orderStatus === 'Ready').length}
+                        <Link to="/chef?tab=finishedOrders" className="m-1">
+                            <Button color="success" pill outline>
+                                Terminados: {orders.filter(order => order.orderStatus === 'Ready').length}
                             </Button>
                         </Link>
-                        <Link to="/chef?tab=canceledOrders">
+                        <Link to="/chef?tab=canceledOrders" className="m-1">
                             <Button color="failure" pill outline>
-                                Pedidos cancelados : {orders.filter(order => order.orderStatus === 'Canceled').length}
+                                Cancelados: {orders.filter(order => order.orderStatus === 'Canceled').length}
                             </Button>
                         </Link>
+                        <div className="m-1">
+                            <Button 
+                                color={viewMode === 'table' ? 'blue' : 'gray'} 
+                                pill 
+                                onClick={() => setViewMode(viewMode === 'table' ? 'accordion' : 'table')}
+                            >
+                                {viewMode === 'table' ? 'Ver en Acordeón' : 'Ver en Tabla'}
+                            </Button>
+                        </div>
                     </Navbar.Collapse>
                 </Navbar>
             </div>
 
-            {/* Available Orders */}
-            <Label className='text-2xl font-bold m-5'>Pedidos disponibles</Label>
-            <div className='ml-5 mr-5 w-auto bg-white shadow-md rounded-2xl mt-5'>
-                <Accordion collapseAll>
-                    {(orders.length  === 0)  ? (
-                        <h3>No hay pedidos disponibles</h3>
+            <Label className='text-2xl font-bold mb-4'>Pedidos disponibles - {new Date().toLocaleDateString()}</Label>
+            
+            {viewMode === 'table' ? (
+                <div className="bg-white shadow-md rounded-2xl p-4 overflow-x-auto">
+                    {filteredOrders.length === 0 ? (
+                        <div className="text-center py-8">
+                            <p className="text-gray-500 text-lg">No hay pedidos disponibles</p>
+                        </div>
                     ) : (
-                        orders
-                            .filter(order => order.orderStatus === 'Pending')
-                            .map(order => (
+                        <DataTable
+                            columns={columns}
+                            data={filteredOrders}
+                            customStyles={customStyles}
+                            progressPending={pending}
+                            pagination
+                            responsive
+                            highlightOnHover
+                            noDataComponent={<div className="py-4">No hay pedidos disponibles</div>}
+                        />
+                    )}
+                </div>
+            ) : (
+                <div className='ml-5 mr-5 w-auto bg-white shadow-md rounded-2xl mt-5'>
+                    {filteredOrders.length === 0 ? (
+                        <div className="text-center py-8">
+                            <p className="text-gray-500 text-lg">No hay pedidos disponibles</p>
+                        </div>
+                    ) : (
+                        <Accordion collapseAll>
+                            {filteredOrders.map(order => (
                                 <Accordion.Panel key={order.orderId}>
                                     <Accordion.Title>
-                                        <div className=" flex  justify-between ">
-                                        <div className='mr-10 '>
-                                                <Badge size='l' color={order.orderStatus === 'Canceled' ? "failure" :
-                                                    order.orderStatus === 'Finished' ? "success" : "warning"}>
-                                                    {order.orderStatus === 'Canceled' ? "Canceled" :
-                                                        order.orderStatus === 'Finished' ? "Finished" : "Pending"}
-                                                </Badge>
+                                        <div className="flex justify-between">
+                                            <div className='mr-10'>
+                                                {getStatusBadge(order.orderStatus)}
                                             </div>
                                             <div className='space-x-16 w-full'>
-                                                <Label className=''> Número de orden #{order.orderId}</Label>
-                                                <Label >Número de mesa: {order.tableNumber}</Label>
-                                                <Label >Mesero: {order.firstName}</Label>
-                                                <Label >Item : {order.foodName}</Label>
-                                                
-
+                                                <Label>Número de orden #{order.orderId}</Label>
+                                                <Label>Número de mesa: {order.tableNumber}</Label>
+                                                <Label>Mesero: {order.firstName}</Label>
+                                                <Label>Item: {order.foodName}</Label>
                                             </div>
-                                            
                                         </div>
-
                                     </Accordion.Title>
                                     <Accordion.Content>
                                         <div className='flex flex-row justify-between'>
                                             <div className='basis-2/5'>
-                                            <Label className="mb-4"> Nombre del cliente : {order.cusName}   </Label>
+                                                <Label className="mb-4">Nombre del cliente: {order.cusName}</Label>
                                             </div>
                                             <div className='basis-2/5'>
-                                            <Label className="ml-5"> <label className=' text-red-500'>Nota especial: </label> {order.specialNote} </Label>
+                                                <Label className="ml-5">
+                                                    <label className='text-red-500'>Nota especial: </label>
+                                                    {order.specialNote || 'Ninguna'}
+                                                </Label>
                                             </div>
-
-                                            {order.orderStatus === 'Canceled' ? (
-                                                <Badge size='l' color="failure">Cancelado</Badge>
-                                            ) : order.orderStatus === 'Finished' ? (
-                                                <Badge size='l' color="success">Finalizado</Badge>
-                                            ) : (
-                                                <>
-                                                    <Button color="purple" className='m-4 bg-purple-500' onClick={() => updateStatusProcessing(order.orderId)}>
-                                                        Preparar
-                                                    </Button>
-                                                    <Button color="failure" className='m-4  bg-red-600' onClick={() => updateStatusCancel(order.orderId)}>
-                                                        Cancelar
-                                                    </Button>
-                                                </>
-                                            )}
-
+                                            <div className="flex space-x-2">
+                                                <Button color="purple" className='m-4 bg-purple-500' onClick={() => handleStatusUpdate(order.orderId, 'Processing')}>
+                                                    Preparar
+                                                </Button>
+                                                <Button color="failure" className='m-4 bg-red-600' onClick={() => handleStatusUpdate(order.orderId, 'Canceled')}>
+                                                    Cancelar
+                                                </Button>
+                                            </div>
                                         </div>
-
                                     </Accordion.Content>
                                 </Accordion.Panel>
-                            )))}
-                </Accordion>
-
-            </div>
+                            ))}
+                        </Accordion>
+                    )}
+                </div>
+            )}
         </div>
-
-
-    )
+    );
 }

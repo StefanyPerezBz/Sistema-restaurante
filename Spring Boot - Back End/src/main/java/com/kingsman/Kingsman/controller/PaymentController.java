@@ -41,11 +41,11 @@ public class PaymentController {
         return ResponseEntity.ok(updated);
     }
 
-//    // Endpoint para eliminar un pago por ID
-//    @DeleteMapping("/{paymentId}")
-//    public void deletePayment(@PathVariable int paymentId) {
-//        paymentService.deletePayment(paymentId);
-//    }
+    // Endpoint para eliminar un pago por ID
+    @DeleteMapping("/{paymentId}")
+    public void deletePayment(@PathVariable int paymentId) {
+        paymentService.deletePayment(paymentId);
+    }
 
     // Endpoint para recuperar un pago por ID
     @GetMapping("/{paymentId}")

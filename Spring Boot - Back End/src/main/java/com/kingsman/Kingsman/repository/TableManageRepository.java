@@ -13,4 +13,8 @@ public interface TableManageRepository extends JpaRepository<TableManage,Long> {
 
     // Metodo para buscar mesas según disponibilidad
     List<TableManage> findByTableAvailability(boolean availability);
+
+    //
+    TableManage findByTableNumber(int tableNumber);
+
 }

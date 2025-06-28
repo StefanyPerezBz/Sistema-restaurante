@@ -113,7 +113,7 @@ public class CustomerService {
     }
 
     private boolean isValidMobileNumber(String mobileNumber) {      //method verifies that the mobile number has exactly 10 digits and consists of numeric characters only.
-        return mobileNumber.length() == 10 && mobileNumber.matches("\\d+");
+        return mobileNumber.length() == 9 && mobileNumber.matches("\\d+");
     }
 
     private CustomerDTO convertToDTO(Customer customer) { //This method converts a Customer entity object into a CustomerDTO (Data Transfer Object)

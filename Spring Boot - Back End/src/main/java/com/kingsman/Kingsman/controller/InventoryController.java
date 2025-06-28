@@ -1,5 +1,6 @@
 package com.kingsman.Kingsman.controller;
 
+import com.kingsman.Kingsman.exception.DuplicateItemException;
 import com.kingsman.Kingsman.exception.ItemNotFoundExeption;
 import com.kingsman.Kingsman.model.InventoryItem;
 import com.kingsman.Kingsman.model.InventoryItemUsageLog;
@@ -13,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin("http://localhost:3000/")
@@ -25,8 +28,25 @@ public class InventoryController {
 
     @PostMapping("/add") //agregar el artículo del inventario
     public ResponseEntity<String> addItemToInventory(@RequestBody InventoryItem item) {
-        inventoryService.addItemInventory(item);
-        return ResponseEntity.ok("Ingrediente añadido al inventario con éxito");
+        //inventoryService.addItemInventory(item);
+        //return ResponseEntity.ok("Ingrediente añadido al inventario con éxito");
+
+        // Calcular totalPrice antes de guardar
+        try {
+            // Validación básica en el controlador
+            if (item.getItemName() == null || item.getItemName().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("El nombre del artículo es requerido");
+            }
+
+            inventoryService.addItemInventory(item);
+            return ResponseEntity.ok("Ingrediente añadido al inventario con éxito");
+        } catch (DuplicateItemException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error al agregar el ingrediente");
+        }
     }
     @GetMapping("/view") //ver todos los artículos del inventario
     public ResponseEntity<List<InventoryItem>> viewInventory(){
@@ -44,18 +64,31 @@ public class InventoryController {
     }
     @PutMapping("/edit/{itemId}")//editar elemento por id
     public ResponseEntity<String> editInventoryItem(@PathVariable long itemId, @RequestBody InventoryItem updateItem){
-        if(inventoryService.editInventoryItem(itemId,updateItem)){
-            return ResponseEntity.ok("Ingrediente de inventario actualizado exitosamente");
-        }else {
-            throw new ItemNotFoundExeption(itemId); //throw exception
-            //return ResponseEntity.notFound().build();
+        //if(inventoryService.editInventoryItem(itemId,updateItem)){
+            //return ResponseEntity.ok("Ingrediente de inventario actualizado exitosamente");
+        //}else {
+            //throw new ItemNotFoundExeption(itemId);
+        //}
+        // Calcular totalPrice antes de actualizar
+        try {
+            if (inventoryService.editInventoryItem(itemId, updateItem)) {
+                return ResponseEntity.ok("Ingrediente de inventario actualizado exitosamente");
+            } else {
+                throw new ItemNotFoundExeption(itemId);
+            }
+        } catch (DuplicateItemException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (ItemNotFoundExeption e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error al actualizar el artículo");
         }
     }
     @DeleteMapping("/delete/{itemId}")
     public ResponseEntity<String> deleteInventoryItem(@PathVariable long itemId){
         boolean success = inventoryService.deleteInventoryItemById(itemId);
         if(success){
-            return ResponseEntity.ok("Ingrediente de inventario eliminado correctamente");
+            return ResponseEntity.ok("Artículo de inventario eliminado correctamente");
         }else{
             throw new ItemNotFoundExeption(itemId);//throw exception
             //return ResponseEntity.notFound().build();
@@ -66,7 +99,7 @@ public class InventoryController {
     public ResponseEntity<String> useInventoryItem(@PathVariable long itemId, @PathVariable float quantity){
         boolean success = inventoryService.useInventoryItem(itemId,quantity);
         if (success){
-            return ResponseEntity.ok("ingrediente utilizado con éxito");
+            return ResponseEntity.ok("artículo utilizado con éxito");
         }else {
             throw new ItemNotFoundExeption(itemId);
         }
@@ -94,4 +127,18 @@ public class InventoryController {
         Float totalPrice = inventoryService.getTotalPriceForCurrentYear();
         return ResponseEntity.ok(totalPrice);
     }
+
+    //
+    @GetMapping("/check-name")
+    public ResponseEntity<Map<String, Boolean>> checkItemNameExists(@RequestParam String name) {
+        boolean exists = inventoryService.itemNameExists(name);
+        return ResponseEntity.ok(Collections.singletonMap("exists", exists));
+    }
+
+    @GetMapping("/check-name-edit")
+    public ResponseEntity<Map<String, Boolean>> checkItemNameForEdit(@RequestParam String name, @RequestParam Long id) {
+        boolean exists = inventoryService.itemNameExistsForEdit(name, id);
+        return ResponseEntity.ok(Collections.singletonMap("exists", exists));
+    }
+
 }

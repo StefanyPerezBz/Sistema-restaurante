@@ -1,214 +1,737 @@
-import React,  { useState } from 'react';
-import { Modal, Label, TextInput, Button, Alert } from 'flowbite-react';
+// import React,  { useState } from 'react';
+// import { Modal, Label, TextInput, Button, Alert } from 'flowbite-react';
+// import axios from 'axios';
+// import AddPositionModal from './AddPositionModal';
+
+// const allowedPositions = ['Waiter', 'Chef', 'Cashier'];
+
+// const UpdateEmployeeModal = ({ employee, handleClose }) => {
+//     if (!employee) {
+//         return null; // Handle case where employee prop is not yet available
+//     }
+
+//    const [formData, setFormData] = useState({
+//         username: employee.username || '',
+//         position: employee.position || '',
+//         email: employee.email || '',
+//         contact_number: employee.contact_number || '',
+//         address: employee.address || '',
+//         gender: employee.gender || '',
+//         uniform_size: employee.uniform_size || '',
+//         emergency_contact: employee.emergency_contact || ''
+//     });
+
+//     const [errorMessage, setErrorMessage] = useState('');
+//     const [emailErrorMessage, setEmailErrorMessage] = useState('');
+//     const [contactErrorMessage, setContactErrorMessage] = useState('');
+//     const [emergencyContactErrorMessage, setEmergencyContactErrorMessage] = useState('');
+//     const [showAddPositionModal, setShowAddPositionModal] = useState(false);
+//      const [positions, setPositions] = useState(() => {
+//         // Retrieve positions from local storage or use default positions
+//         const savedPositions = localStorage.getItem('positions');
+//         return savedPositions ? JSON.parse(savedPositions) : ['Cashier', 'Chef', 'Waiter', 'Kitchen Helper'];
+//     });
+
+//     const handleChange = (e) => {
+//         const { name, value } = e.target;
+//         let errorMessage = '';
+
+//         // Validate input based on field name
+//         if (name === 'contact_number' || name === 'emergency_contact') {
+//             if ( value !== '' && !/^\d+$/.test(value)) {
+//                 errorMessage('');
+//             }else if (name === 'contact_number'){
+//                 if(value.length > 10) {
+//                     errorMessage('');
+//                 }else if (value.length < 10) {
+//                     setContactErrorMessage('El número de móvil no debe tener menos de 10 dígitos');
+//                 }else{
+//                     setContactErrorMessage('');
+//                 }
+//             }else if (name === 'emergency_contact') {
+//                 if(value.length > 10) {
+//                     errorMessage('');
+//                 }else if (value.length < 10) {
+//                     setEmergencyContactErrorMessage('El número de teléfono móvil no debe tener menos de 10 dígitos');
+//                 }else{
+//                     setEmergencyContactErrorMessage('');
+//                 }
+//             }
+//         } else if (name === 'email') {
+//             if (!/\S+@\S+\.\S+/.test(value)) {
+//                 setEmailErrorMessage('Por favor, introduce una dirección de correo electrónico válida');
+//             } else {
+//                 setEmailErrorMessage('');
+//             }
+//         }
+
+//          if (value === 'Add New') {
+//             setShowAddPositionModal(true);
+//         } else {
+//             setShowAddPositionModal(false);
+//         }
+
+//         setFormData({ ...formData, [name]: value });
+//         setErrorMessage(errorMessage);
+//         console.log(formData);
+//     };
+
+//     const handleAddPosition = (newPosition) => {
+//         const updatedPositions = [...positions, newPosition];
+//         setPositions(updatedPositions);
+//         localStorage.setItem('positions', JSON.stringify(updatedPositions)); // Save positions to local storage
+//     };
+
+//     const handleShowAddPositionModal = () => {
+//             setShowAddPositionModal(true);
+//     };
+
+//     const handleCloseAddPositionModal = () => {
+//         setShowAddPositionModal(false);
+//     };
+
+
+//     const handleUpdateEmployee = async () => {
+//         try {
+//             const updatedEmployee = {
+//                 ...employee,
+//                 ...formData
+//             };
+
+//             await axios.put(`http://localhost:8080/api/user/updateEmployee/${employee.id}`, updatedEmployee);
+
+//             // Assuming successful update, you might want to handle UI changes or show a message
+//             console.log('Empleado actualizado exitosamente');
+//             handleClose(); // Close the modal after successful update
+//         } catch (error) {
+//             console.error('No se pudo actualizar el empleado', error);
+//             // Handle error state or display an error message
+//         }
+//     };
+
+
+//     return (
+//          <Modal show={true} size="md" onClose={handleClose} popup className="flex items-center justify-center">
+//             {/* Modal Content */}
+//             <Modal.Header>
+//                 <h1 className="text-3xl font-bold mb-4 text-center">Actualizar empleado</h1>
+//             </Modal.Header>
+//             <Modal.Body>
+//                 <form className="grid grid-cols-2 gap-4">
+//                     <div>
+//                         <Label value='First Name' />
+//                         <TextInput type='text' id='FirstName' value={employee.first_name || ''} name="first_name" readOnly />
+//                     </div>
+//                     <div>
+//                         <Label value='Last Name' />
+//                         <TextInput type='text' id='LastName' value={employee.last_name || ''}  name="last_name" readOnly  />
+//                     </div>
+//                     <div>
+//                         <Label value='Username*' />
+//                         <TextInput type='text' placeholder='Username' id='Username' value={formData.username || ''} onChange={handleChange} name="username" required disabled={!allowedPositions.includes(formData.position)}/>
+//                     </div>
+
+//                    <div>
+//                             <Label value='Position*' /> <br/>
+//                             <select id='Position' value={formData.position} onChange={handleChange} name='position' className='w-full' required>
+//                                 <option value='' >Seleccionar rol</option>
+//                                 {positions.map((position, index) => (
+//                                     <option key={index} value={position}>
+//                                         {position}
+//                                     </option>
+//                                 ))}
+//                                 <option value='Add New' >Agregar nuevo rol</option>
+//                             </select>
+//                         </div>
+
+//                     <div>
+//                         <Label value='Email*' />
+//                         <TextInput type='text' placeholder='Email' id='Email' value={formData.email} onChange={handleChange} name="email" required />
+//                         {emailErrorMessage && <span className="text-red-500 text-sm">{emailErrorMessage}</span>}
+//                     </div>
+//                     <div>
+//                         <Label value='Contact Number' />
+//                         <TextInput type='text' placeholder="Contact Number" id='Contact' value={formData.contact_number} onChange={handleChange} name="contact_number" />
+//                         {contactErrorMessage && <span className="text-red-500 text-sm">{contactErrorMessage}</span>}
+//                     </div>
+//                     <div>
+//                         <Label value='Address' />
+//                         <TextInput type='text' placeholder='Address' id='Address' value={formData.address} onChange={handleChange} name="address" />
+//                     </div>
+//                     <div>
+//                         <Label value='Gender' />
+//                         <select id='Gender' value={formData.gender} name='gender' className='w-full px-3 py-2 border rounded-md dark:bg-gray-700' readOnly>
+//                             <option value=''>Seleccionar sexo</option>
+//                             <option value='male'>Masculino</option>
+//                             <option value='female'>Femenino</option>
+//                             <option value='other'>Otro</option>
+//                         </select>
+//                     </div>
+//                     <div>
+//                         <Label value='Joined Date' />
+//                         <TextInput type='date' id='JoinedDate' value={employee.joined_date} name="joined_date" readOnly />
+//                     </div>
+//                     <div>
+//                         <Label value='Uniform Size' />
+//                         <select id='UniformSize' value={formData.uniform_size} name='uniform_size' onChange={handleChange} className='w-full px-3 py-2 border rounded-md dark:bg-gray-700' >
+//                             <option value=''>Seleccionar talla</option>
+//                             <option value='XS'>XS</option>
+//                             <option value='S'>S</option>
+//                             <option value='M'>M</option>
+//                             <option value='L'>L</option>
+//                             <option value='XL'>XL</option>
+//                         </select>
+//                     </div>
+//                     <div>
+//                         <Label value='Emergency Contact' />
+//                         <TextInput type='text' placeholder='Emergency Contact' id='EmergencyContact' value={formData.emergency_contact} onChange={handleChange} name="emergency_contact" />
+//                         {emergencyContactErrorMessage && <span className="text-red-500 text-sm">{emergencyContactErrorMessage}</span>}
+//                     </div>
+//                 </form>
+//             </Modal.Body>
+//             <Modal.Footer>
+//                 {/* <Button onClick={handleClose} className="bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 mr-2 rounded w-full">Close</Button> */}
+//                 <Button onClick={handleUpdateEmployee} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 ml-2 rounded w-full">Actualizar empleado</Button>
+//             </Modal.Footer>
+
+//             {errorMessage && (
+//                     <Alert className='mt-5' color='failure'>
+//                         {errorMessage}
+//                     </Alert>
+//                     )}
+
+//                      {/* Render AddPositionModal */}
+//                     {showAddPositionModal && (
+//                         <AddPositionModal
+//                             isOpen={handleShowAddPositionModal}
+//                             onClose={handleCloseAddPositionModal}
+//                             onAddPosition={handleAddPosition}
+//                         />
+//                     )}
+
+//         </Modal>
+//     );
+// };
+
+// export default UpdateEmployeeModal;
+
+import React, { useState, useEffect } from 'react';
+import { Modal, Label, TextInput, Button } from 'flowbite-react';
 import axios from 'axios';
-import AddPositionModal from './AddPositionModal';
+import Select from 'react-select';
+import Swal from 'sweetalert2';
 
-const allowedPositions = ['Waiter', 'Chef', 'Cashier'];
-
-const UpdateEmployeeModal = ({ employee, handleClose }) => {
-    if (!employee) {
-        return null; // Handle case where employee prop is not yet available
-    }
-
-   const [formData, setFormData] = useState({
-        username: employee.username || '',
-        position: employee.position || '',
-        email: employee.email || '',
-        contact_number: employee.contact_number || '',
-        address: employee.address || '',
-        gender: employee.gender || '',
-        uniform_size: employee.uniform_size || '',
-        emergency_contact: employee.emergency_contact || ''
+const UpdateEmployeeModal = ({ employee, handleClose, onUpdate }) => {
+    const [formData, setFormData] = useState({
+        first_name: '',
+        last_name: '',
+        username: '',
+        position: '',
+        contact_number: '',
+        gender: '',
+        joined_date: '',
+        email: '',
+        address: '',
+        uniform_size: '',
+        emergency_contact: '',
+        profilePicture: ''
     });
 
-    const [errorMessage, setErrorMessage] = useState('');
-    const [emailErrorMessage, setEmailErrorMessage] = useState('');
-    const [contactErrorMessage, setContactErrorMessage] = useState('');
-    const [emergencyContactErrorMessage, setEmergencyContactErrorMessage] = useState('');
-    const [showAddPositionModal, setShowAddPositionModal] = useState(false);
-     const [positions, setPositions] = useState(() => {
-        // Retrieve positions from local storage or use default positions
+    const [errors, setErrors] = useState({});
+    const [positions, setPositions] = useState([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (employee) {
+            // Formatear la fecha correctamente para el input date
+            const formatDate = (dateString) => {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                return date.toISOString().split('T')[0];
+            };
+
+            setFormData({
+                first_name: employee.first_name || '',
+                last_name: employee.last_name || '',
+                username: employee.username || '',
+                position: employee.position || '',
+                contact_number: employee.contact_number || '',
+                gender: employee.gender || '',
+                joined_date: formatDate(employee.joined_date) || '',
+                email: employee.email || '',
+                address: employee.address || '',
+                uniform_size: employee.uniform_size || '',
+                emergency_contact: employee.emergency_contact || '',
+                profilePicture: employee.profilePicture || ''
+            });
+        }
+
+        // Cargar posiciones desde localStorage o valores por defecto
         const savedPositions = localStorage.getItem('positions');
-        return savedPositions ? JSON.parse(savedPositions) : ['Cashier', 'Chef', 'Waiter', 'Kitchen Helper'];
-    });
+        const initialPositions = savedPositions ? JSON.parse(savedPositions) : [
+            { value: 'cashier', label: 'Cajero' },
+            { value: 'chef', label: 'Chef' },
+            { value: 'waiter', label: 'Mesero' },
+            { value: 'manager', label: 'Gerente' },
+            { value: 'admin', label: 'Administrador' }
+        ];
+        setPositions(initialPositions);
+    }, [employee]);
+
+    const validateField = (name, value) => {
+        let error = '';
+
+        switch (name) {
+            case 'first_name':
+            case 'last_name':
+                if (!value.trim()) {
+                    error = 'Este campo es requerido';
+                } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]+$/.test(value)) {
+                    error = 'Solo se permiten letras y algunos caracteres especiales';
+                } else if (value.length > 50) {
+                    error = 'Máximo 50 caracteres';
+                }
+                break;
+            case 'email':
+                if (value && !/\S+@\S+\.\S+/.test(value)) {
+                    error = 'Correo electrónico inválido';
+                } else if (value && value.length > 100) {
+                    error = 'Máximo 100 caracteres';
+                }
+                break;
+            case 'contact_number':
+            case 'emergency_contact':
+                if (value && !/^\d{9}$/.test(value)) {
+                    error = 'Debe tener 9 dígitos exactamente';
+                } else if (
+                    name === 'contact_number' && 
+                    value && 
+                    formData.emergency_contact && 
+                    value === formData.emergency_contact
+                ) {
+                    error = 'No puede ser igual al contacto de emergencia';
+                } else if (
+                    name === 'emergency_contact' && 
+                    value && 
+                    formData.contact_number && 
+                    value === formData.contact_number
+                ) {
+                    error = 'No puede ser igual al número de contacto';
+                }
+                break;
+            case 'position':
+                if (!value) {
+                    error = 'Este campo es requerido';
+                }
+                break;
+            case 'uniform_size':
+                if (value && !['XS', 'S', 'M', 'L', 'XL'].includes(value)) {
+                    error = 'Talla no válida';
+                }
+                break;
+            default:
+                break;
+        }
+        return error;
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        let errorMessage = '';
 
-        // Validate input based on field name
+        // Manejo especial para nombres y apellidos
+        if (name === 'first_name' || name === 'last_name') {
+            const processedValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]/g, '');
+            
+            setFormData(prev => ({
+                ...prev,
+                [name]: processedValue
+            }));
+
+            setErrors(prev => ({
+                ...prev,
+                [name]: validateField(name, processedValue)
+            }));
+            return;
+        }
+
+        // Manejo para campos numéricos (teléfonos)
         if (name === 'contact_number' || name === 'emergency_contact') {
-            if ( value !== '' && !/^\d+$/.test(value)) {
-                errorMessage('');
-            }else if (name === 'contact_number'){
-                if(value.length > 10) {
-                    errorMessage('');
-                }else if (value.length < 10) {
-                    setContactErrorMessage('El número de móvil no debe tener menos de 10 dígitos');
-                }else{
-                    setContactErrorMessage('');
-                }
-            }else if (name === 'emergency_contact') {
-                if(value.length > 10) {
-                    errorMessage('');
-                }else if (value.length < 10) {
-                    setEmergencyContactErrorMessage('El número de teléfono móvil no debe tener menos de 10 dígitos');
-                }else{
-                    setEmergencyContactErrorMessage('');
-                }
-            }
-        } else if (name === 'email') {
-            if (!/\S+@\S+\.\S+/.test(value)) {
-                setEmailErrorMessage('Por favor, introduce una dirección de correo electrónico válida');
-            } else {
-                setEmailErrorMessage('');
-            }
+            const processedValue = value.replace(/\D/g, '').slice(0, 9);
+            
+            setFormData(prev => ({
+                ...prev,
+                [name]: processedValue
+            }));
+
+            setErrors(prev => ({
+                ...prev,
+                [name]: validateField(name, processedValue)
+            }));
+            return;
         }
 
-         if (value === 'Add New') {
-            setShowAddPositionModal(true);
-        } else {
-            setShowAddPositionModal(false);
+        // Manejo estándar para otros campos
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        setErrors(prev => ({
+            ...prev,
+            [name]: validateField(name, value)
+        }));
+    };
+
+    const handleSelectChange = (name, selectedOption) => {
+        const value = selectedOption ? selectedOption.value : '';
+        
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        setErrors(prev => ({
+            ...prev,
+            [name]: validateField(name, value)
+        }));
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        let isValid = true;
+
+        // Campos requeridos
+        const requiredFields = ['first_name', 'last_name', 'position'];
+        requiredFields.forEach(field => {
+            newErrors[field] = validateField(field, formData[field]);
+            if (newErrors[field]) isValid = false;
+        });
+
+        // Campos opcionales pero con validación
+        const optionalFields = ['email', 'contact_number', 'emergency_contact', 'uniform_size'];
+        optionalFields.forEach(field => {
+            newErrors[field] = validateField(field, formData[field]);
+        });
+
+        setErrors(newErrors);
+        return isValid;
+    };
+
+    const handleUpdate = async () => {
+        if (!validateForm()) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Por favor corrige los errores en el formulario',
+                icon: 'error'
+            });
+            return;
         }
 
-        setFormData({ ...formData, [name]: value });
-        setErrorMessage(errorMessage);
-        console.log(formData);
-    };
+        setIsSubmitting(true);
 
-    const handleAddPosition = (newPosition) => {
-        const updatedPositions = [...positions, newPosition];
-        setPositions(updatedPositions);
-        localStorage.setItem('positions', JSON.stringify(updatedPositions)); // Save positions to local storage
-    };
-
-    const handleShowAddPositionModal = () => {
-            setShowAddPositionModal(true);
-    };
-
-    const handleCloseAddPositionModal = () => {
-        setShowAddPositionModal(false);
-    };
-
-
-    const handleUpdateEmployee = async () => {
         try {
-            const updatedEmployee = {
-                ...employee,
-                ...formData
+            // Preparar datos para enviar
+            const dataToSend = {
+                first_name: formData.first_name.trim(),
+                last_name: formData.last_name.trim(),
+                position: formData.position,
+                contact_number: formData.contact_number || null,
+                gender: formData.gender || null,
+                email: formData.email || null,
+                address: formData.address || null,
+                uniform_size: formData.uniform_size || null,
+                emergency_contact: formData.emergency_contact || null,
+                profilePicture: formData.profilePicture || null
             };
 
-            await axios.put(`http://localhost:8080/api/user/updateEmployee/${employee.id}`, updatedEmployee);
+            // Solo incluir campos que han cambiado
+            const changes = {};
+            Object.keys(dataToSend).forEach(key => {
+                if (JSON.stringify(dataToSend[key]) !== JSON.stringify(employee[key])) {
+                    changes[key] = dataToSend[key];
+                }
+            });
 
-            // Assuming successful update, you might want to handle UI changes or show a message
-            console.log('Empleado actualizado exitosamente');
-            handleClose(); // Close the modal after successful update
+            if (Object.keys(changes).length === 0) {
+                Swal.fire({
+                    title: 'Info',
+                    text: 'No se detectaron cambios para actualizar',
+                    icon: 'info'
+                });
+                return;
+            }
+
+            const response = await axios.put(
+                `http://localhost:8080/api/employees/update/${employee.id}`,
+                changes,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            Swal.fire({
+                title: '¡Éxito!',
+                text: 'Empleado actualizado correctamente',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            onUpdate();
+            handleClose();
         } catch (error) {
-            console.error('No se pudo actualizar el empleado', error);
-            // Handle error state or display an error message
+            console.error('Error al actualizar empleado:', error);
+            Swal.fire({
+                title: 'Error',
+                text: error.response?.data?.message || 'Error al actualizar empleado',
+                icon: 'error'
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-   
+    if (!employee) return null;
+
     return (
-         <Modal show={true} size="md" onClose={handleClose} popup className="flex items-center justify-center">
-            {/* Modal Content */}
+        <Modal show={true} size="xl" onClose={handleClose} popup>
             <Modal.Header>
-                <h1 className="text-3xl font-bold mb-4 text-center">Actualizar empleado</h1>
+                <h1 className="text-xl font-bold">Actualizar empleado</h1>
             </Modal.Header>
+
             <Modal.Body>
                 <form className="grid grid-cols-2 gap-4">
+                    {/* Nombre */}
                     <div>
-                        <Label value='First Name' />
-                        <TextInput type='text' id='FirstName' value={employee.first_name || ''} name="first_name" readOnly />
-                    </div>
-                    <div>
-                        <Label value='Last Name' />
-                        <TextInput type='text' id='LastName' value={employee.last_name || ''}  name="last_name" readOnly  />
-                    </div>
-                    <div>
-                        <Label value='Username*' />
-                        <TextInput type='text' placeholder='Username' id='Username' value={formData.username || ''} onChange={handleChange} name="username" required disabled={!allowedPositions.includes(formData.position)}/>
-                    </div>
-            
-                   <div>
-                            <Label value='Position*' /> <br/>
-                            <select id='Position' value={formData.position} onChange={handleChange} name='position' className='w-full' required>
-                                <option value='' >Seleccionar rol</option>
-                                {positions.map((position, index) => (
-                                    <option key={index} value={position}>
-                                        {position}
-                                    </option>
-                                ))}
-                                <option value='Add New' >Agregar nuevo rol</option>
-                            </select>
+                        <Label value='Nombres' />
+                        <div className="relative">
+                            <TextInput
+                                value={formData.first_name}
+                                onChange={handleChange}
+                                name="first_name"
+                                color={errors.first_name ? 'failure' : ''}
+                                helperText={errors.first_name && <span className="text-red-500">{errors.first_name}</span>}
+                                maxLength={50}
+                            />
+                            <div className="absolute right-2 bottom-2 text-xs text-gray-500">
+                                {formData.first_name.length}/50
+                            </div>
                         </div>
-                        
-                    <div>
-                        <Label value='Email*' />
-                        <TextInput type='text' placeholder='Email' id='Email' value={formData.email} onChange={handleChange} name="email" required />
-                        {emailErrorMessage && <span className="text-red-500 text-sm">{emailErrorMessage}</span>}
                     </div>
+
+                    {/* Apellido */}
                     <div>
-                        <Label value='Contact Number' />
-                        <TextInput type='text' placeholder="Contact Number" id='Contact' value={formData.contact_number} onChange={handleChange} name="contact_number" />
-                        {contactErrorMessage && <span className="text-red-500 text-sm">{contactErrorMessage}</span>}
+                        <Label value='Apellidos' />
+                        <div className="relative">
+                            <TextInput
+                                value={formData.last_name}
+                                onChange={handleChange}
+                                name="last_name"
+                                color={errors.last_name ? 'failure' : ''}
+                                helperText={errors.last_name && <span className="text-red-500">{errors.last_name}</span>}
+                                maxLength={50}
+                            />
+                            <div className="absolute right-2 bottom-2 text-xs text-gray-500">
+                                {formData.last_name.length}/50
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Usuario (no editable) */}
                     <div>
-                        <Label value='Address' />
-                        <TextInput type='text' placeholder='Address' id='Address' value={formData.address} onChange={handleChange} name="address" />
+                        <Label value='Usuario' />
+                        <TextInput
+                            value={formData.username}
+                            readOnly
+                            className="cursor-not-allowed bg-gray-100"
+                        />
                     </div>
+
+                    {/* Fecha de incorporación (no editable) */}
                     <div>
-                        <Label value='Gender' />
-                        <select id='Gender' value={formData.gender} name='gender' className='w-full px-3 py-2 border rounded-md dark:bg-gray-700' readOnly>
-                            <option value=''>Seleccionar sexo</option>
-                            <option value='male'>Masculino</option>
-                            <option value='female'>Femenino</option>
-                            <option value='other'>Otro</option>
-                        </select>
+                        <Label value='Fecha de incorporación' />
+                        <TextInput
+                            type='date'
+                            value={formData.joined_date}
+                            readOnly
+                            className="cursor-not-allowed bg-gray-100"
+                        />
                     </div>
+
+                    {/* Posición */}
                     <div>
-                        <Label value='Joined Date' />
-                        <TextInput type='date' id='JoinedDate' value={employee.joined_date} name="joined_date" readOnly />
+                        <Label value='Rol' />
+                        <Select
+                            options={positions}
+                            value={positions.find(option => option.value === formData.position)}
+                            onChange={(selected) => handleSelectChange('position', selected)}
+                            placeholder="Seleccionar rol"
+                            isSearchable
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    borderColor: errors.position ? '#dc2626' : base.borderColor,
+                                    minHeight: '42px'
+                                })
+                            }}
+                        />
+                        {errors.position && (
+                            <div className="text-red-500 text-sm mt-1">
+                                {errors.position}
+                            </div>
+                        )}
                     </div>
+
+                    {/* Email */}
                     <div>
-                        <Label value='Uniform Size' />
-                        <select id='UniformSize' value={formData.uniform_size} name='uniform_size' onChange={handleChange} className='w-full px-3 py-2 border rounded-md dark:bg-gray-700' >
-                            <option value=''>Seleccionar talla</option>
-                            <option value='XS'>XS</option>
-                            <option value='S'>S</option>
-                            <option value='M'>M</option>
-                            <option value='L'>L</option>
-                            <option value='XL'>XL</option>
-                        </select>
+                        <Label value='Correo electrónico' />
+                        <div className="relative">
+                            <TextInput
+                                type='email'
+                                value={formData.email}
+                                onChange={handleChange}
+                                name="email"
+                                color={errors.email ? 'failure' : ''}
+                                helperText={errors.email && <span className="text-red-500">{errors.email}</span>}
+                                maxLength={100}
+                            />
+                            <div className="absolute right-2 bottom-2 text-xs text-gray-500">
+                                {formData.email.length}/100
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Teléfono */}
                     <div>
-                        <Label value='Emergency Contact' />
-                        <TextInput type='text' placeholder='Emergency Contact' id='EmergencyContact' value={formData.emergency_contact} onChange={handleChange} name="emergency_contact" />
-                        {emergencyContactErrorMessage && <span className="text-red-500 text-sm">{emergencyContactErrorMessage}</span>}
+                        <Label value='Número de contacto' />
+                        <TextInput
+                            value={formData.contact_number}
+                            onChange={handleChange}
+                            name="contact_number"
+                            color={errors.contact_number ? 'failure' : ''}
+                            helperText={errors.contact_number && <span className="text-red-500">{errors.contact_number}</span>}
+                            maxLength={9}
+                            placeholder="987654321"
+                        />
+                    </div>
+
+                    {/* Dirección */}
+                    <div>
+                        <Label value='Dirección' />
+                        <div className="relative">
+                            <TextInput
+                                value={formData.address}
+                                onChange={handleChange}
+                                name="address"
+                                maxLength={200}
+                            />
+                            <div className="absolute right-2 bottom-2 text-xs text-gray-500">
+                                {formData.address.length}/200
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Género */}
+                    <div>
+                        <Label value='Sexo' />
+                        <Select
+                            options={[
+                                { value: 'male', label: 'Masculino' },
+                                { value: 'female', label: 'Femenino' },
+                                { value: 'other', label: 'Otro' }
+                            ]}
+                            value={[
+                                { value: 'male', label: 'Masculino' },
+                                { value: 'female', label: 'Femenino' },
+                                { value: 'other', label: 'Otro' }
+                            ].find(option => option.value === formData.gender)}
+                            onChange={(selected) => handleSelectChange('gender', selected)}
+                            placeholder="Seleccionar sexo"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    minHeight: '42px'
+                                })
+                            }}
+                        />
+                    </div>
+
+                    {/* Talla de uniforme */}
+                    <div>
+                        <Label value='Talla de uniforme' />
+                        <Select
+                            options={[
+                                { value: 'XS', label: 'XS' },
+                                { value: 'S', label: 'S' },
+                                { value: 'M', label: 'M' },
+                                { value: 'L', label: 'L' },
+                                { value: 'XL', label: 'XL' }
+                            ]}
+                            value={[
+                                { value: 'XS', label: 'XS' },
+                                { value: 'S', label: 'S' },
+                                { value: 'M', label: 'M' },
+                                { value: 'L', label: 'L' },
+                                { value: 'XL', label: 'XL' }
+                            ].find(option => option.value === formData.uniform_size)}
+                            onChange={(selected) => handleSelectChange('uniform_size', selected)}
+                            placeholder="Seleccionar talla"
+                            styles={{
+                                control: (base) => ({
+                                    ...base,
+                                    minHeight: '42px'
+                                })
+                            }}
+                        />
+                        {errors.uniform_size && (
+                            <div className="text-red-500 text-sm mt-1">
+                                {errors.uniform_size}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Contacto de emergencia */}
+                    <div>
+                        <Label value='Contacto de emergencia' />
+                        <TextInput
+                            value={formData.emergency_contact}
+                            onChange={handleChange}
+                            name="emergency_contact"
+                            color={errors.emergency_contact ? 'failure' : ''}
+                            helperText={errors.emergency_contact && <span className="text-red-500">{errors.emergency_contact}</span>}
+                            maxLength={9}
+                            placeholder="987654321"
+                        />
                     </div>
                 </form>
             </Modal.Body>
-            <Modal.Footer>
-                {/* <Button onClick={handleClose} className="bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 mr-2 rounded w-full">Close</Button> */}
-                <Button onClick={handleUpdateEmployee} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 ml-2 rounded w-full">Actualizar empleado</Button>
+
+            <Modal.Footer className="flex justify-end">
+                <Button 
+                    color="gray" 
+                    onClick={handleClose}
+                    className="mr-2"
+                >
+                    Cancelar
+                </Button>
+                <Button 
+                    onClick={handleUpdate}
+                    disabled={isSubmitting}
+                    gradientDuoTone="greenToBlue"
+                >
+                    {isSubmitting ? (
+                        <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Actualizando...
+                        </>
+                    ) : 'Actualizar empleado'}
+                </Button>
             </Modal.Footer>
-
-            {errorMessage && (
-                    <Alert className='mt-5' color='failure'>
-                        {errorMessage}
-                    </Alert>
-                    )}
-
-                     {/* Render AddPositionModal */}
-                    {showAddPositionModal && (
-                        <AddPositionModal
-                            isOpen={handleShowAddPositionModal}
-                            onClose={handleCloseAddPositionModal}
-                            onAddPosition={handleAddPosition}
-                        />
-                    )}
-
         </Modal>
     );
 };

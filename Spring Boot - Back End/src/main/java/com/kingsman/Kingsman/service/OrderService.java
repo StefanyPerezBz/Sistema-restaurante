@@ -135,7 +135,7 @@ public class OrderService {
                 // If the updated order item doesn't exist in the map, create a new one
                 OrderItem newOrderItem = convertToEntity(updatedOrderItem, existingOrder);
                 existingOrder.getOrderItems().add(newOrderItem);
-                System.out.println("New order item added: " + newOrderItem);
+                System.out.println("Nuevo artículo de pedido agregado: " + newOrderItem);
             }
         }
 
@@ -160,10 +160,10 @@ public class OrderService {
 
     public void deleteOrderItem(Long orderItemId) {
         // Find the order item by its ID
-        System.out.println("Deleted order item with ID : " + orderItemId);
+        System.out.println("Artículo de pedido eliminado con ID : " + orderItemId);
 
         OrderItem orderItem = orderItemRepository.findById(orderItemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order item not found with id: " + orderItemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Artículo del pedido no encontrado con id: " + orderItemId));
 
         // Delete the order item
         orderItemRepository.delete(orderItem);
@@ -196,12 +196,12 @@ public class OrderService {
 
     private Order getOrderIfExists(Long orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado con id: " + orderId));
     }
 
     private void setEmployeeForOrder(Order order, Long employeeId) {
         if (employeeId == null) {
-            throw new IllegalArgumentException("Employee ID is required for creating an order.");
+            throw new IllegalArgumentException("Se requiere la identificación del empleado para crear un pedido.");
         }
         Employee employee = new Employee();
         employee.setId(Math.toIntExact(employeeId));
@@ -291,14 +291,14 @@ public class OrderService {
     }
 
     public void crateOrderReadyWaiterNotification(Order order){
-        String title = "Order Ready";
+        String title = "Orden lista";
         String foodName = getOrderEmployeeFoodById(order.getOrderId()).stream()
                 .map(OrderEmployeeFoodDTO::getFoodName) // Extracting the foodName
                 .collect(Collectors.joining(", ")); // Joining them with a comma
 
-        String forWhoUser = order.getEmployee() != null ? order.getEmployee().getUsername() : "Unknown";;
+        String forWhoUser = order.getEmployee() != null ? order.getEmployee().getUsername() : "Desconocido";
 
-        String message = forWhoUser+ ", Order is ready ID: " + order.getOrderId() + ", Table Number : " + order.getTableNumber() + ", Food Name : " + foodName;
+        String message = forWhoUser+ ", El pedido está listo: " + order.getOrderId() + ", Número de mesa : " + order.getTableNumber() + ", Nombre del menu : " + foodName;
         boolean isRead = false;
         LocalDateTime createdAt = LocalDateTime.now();
         LocalDateTime updatedAt = createdAt;
@@ -317,7 +317,7 @@ public class OrderService {
     // Get Total After Discount For Current Month
     public Double getTotalAfterDiscountForCurrentMonth() {
         Double total = orderRepository.findTotalAfterDiscountForCurrentMonth();
-        System.out.println("Total after discount for current month: " + total); // Debugging
+        System.out.println("Total después del descuento del mes actual: " + total); // Debugging
         return total != null ? total : 0.0; // Handle null case gracefully if no orders exist
     }
 

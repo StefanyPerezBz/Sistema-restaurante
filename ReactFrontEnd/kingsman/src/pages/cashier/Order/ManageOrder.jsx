@@ -1,278 +1,331 @@
 import React, { useState, useEffect } from 'react';
+import DataTable from 'react-data-table-component';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 export default function ManageOrder() {
     const [orders, setOrders] = useState([]);
+    const [filteredOrders, setFilteredOrders] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchCriteria, setSearchCriteria] = useState('name');
     const [selectedStatus, setSelectedStatus] = useState('Ready');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(14);
+    const [loading, setLoading] = useState(true);
+    const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchOrders();
     }, []);
 
+    useEffect(() => {
+        filterOrders();
+    }, [orders, searchQuery, searchCriteria, selectedStatus]);
+
     const fetchOrders = async () => {
         try {
+            setLoading(true);
             const response = await fetch('http://localhost:8080/api/orders/all-orders-general');
             const data = await response.json();
 
-            // Function to format date in YYYY-MM-DD format
             const formatDate = (date) => {
                 return new Date(date).toLocaleDateString('es-PE', { timeZone: 'America/Lima' });
             };
-    
-            // Get today's date in Sri Lanka 
+
             const today = formatDate(new Date());
-    
-            // Filter orders for today
             const todayOrders = data.filter(order => {
-                // Convert order date to Sri Lanka timezone
                 const orderDate = formatDate(order.orderDateTime);
                 return orderDate === today;
             });
 
-            // Set the filtered orders
             setOrders(todayOrders);
         } catch (error) {
             console.error('Error fetching orders:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo cargar los pedidos',
+                confirmButtonColor: '#3085d6',
+            });
+        } finally {
+            setLoading(false);
         }
     };
 
-
-    const filteredOrders = orders.filter(order => {
-        // Check if the order status matches the selected status
-        if (selectedStatus !== 'All' && order.orderStatus !== selectedStatus) {
-            return false;
-        }
-    
-        // Check if search query is provided
-        if (searchQuery !== "") {
-            if (searchCriteria === 'id') {
-                return order.orderId.toString().includes(searchQuery);
-            } else if (searchCriteria === 'name') {
-                return order.customer && order.customer.cusName.toLowerCase().includes(searchQuery.toLowerCase());
-            } else if (searchCriteria === 'mobile') {
-                return order.customer && order.customer.cusMobile && order.customer.cusMobile.includes(searchQuery);
+    const filterOrders = () => {
+        let result = orders.filter(order => {
+            // Filter by status
+            if (selectedStatus !== 'All' && order.orderStatus !== selectedStatus) {
+                return false;
             }
-        } else {
-            return true; // If no search query provided, include all orders
-        }
-    });
+
+            // Filter by search query
+            if (searchQuery) {
+                if (searchCriteria === 'id') {
+                    return order.orderId.toString().includes(searchQuery);
+                } else if (searchCriteria === 'name') {
+                    return order.customer && order.customer.cusName.toLowerCase().includes(searchQuery.toLowerCase());
+                } else if (searchCriteria === 'mobile') {
+                    return order.customer && order.customer.cusMobile && order.customer.cusMobile.includes(searchQuery);
+                }
+            }
+            return true;
+        });
+
+        setFilteredOrders(result);
+        setResetPaginationToggle(!resetPaginationToggle);
+    };
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        const hours = date.getHours() % 12 || 12; // Convert 0 to 12
+        const hours = date.getHours() % 12 || 12;
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const period = date.getHours() < 12 ? 'AM' : 'PM';
-        return `${year}-${month}-${day} ${hours}.${minutes} ${period}`;
+        return `${year}-${month}-${day} ${hours}:${minutes} ${period}`;
     };
 
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-
-    const handleNextPage = () => {
-        setCurrentPage(prevPage => prevPage + 1);
-    };
-
-    const handlePrevPage = () => {
-        setCurrentPage(prevPage => prevPage - 1);
-    };
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
-    
-    // Function redirect to order view page
     const redirectToOrderView = (orderId) => {
-        window.location.href = `/cashier?tab=orders-view&order=${orderId}`;
+        navigate(`/cashier?tab=orders-view&order=${orderId}`);
     };
+
+    const handleProcessOrder = (orderId) => {
+        Swal.fire({
+            title: '¿Procesar pedido?',
+            text: '¿Deseas proceder con el pago de este pedido?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, procesar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                navigate(`/cashier?tab=bill&order=${orderId}`);
+            }
+        });
+    };
+
+    const columns = [
+        {
+            name: '# Orden',
+            selector: row => row.orderId,
+            sortable: true,
+            center: true,
+            cell: row => (
+                <span 
+                    className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                    onClick={() => redirectToOrderView(row.orderId)}
+                >
+                    {row.orderId}
+                </span>
+            )
+        },
+        {
+            name: 'Estado',
+            selector: row => row.orderStatus,
+            sortable: true,
+            center: true,
+            cell: row => (
+                <span className={`inline-flex px-2 py-1 items-center text-white rounded-lg text-xs ${
+                    row.orderStatus === "Pending" ? "bg-yellow-300" :
+                    row.orderStatus === "Processing" ? "bg-blue-300" :
+                    row.orderStatus === "Ready" ? "bg-green-300" :
+                    row.orderStatus === "Completed" ? "bg-green-500" :
+                    "bg-gray-300"
+                }`}>
+                    {row.orderStatus}
+                </span>
+            )
+        },
+        {
+            name: 'Items',
+            selector: row => row.orderItems.length,
+            sortable: true,
+            center: true
+        },
+        {
+            name: 'Total (S/.)',
+            selector: row => row.totalAfterDiscount.toFixed(2),
+            sortable: true,
+            center: true
+        },
+        {
+            name: 'Cliente',
+            selector: row => row.customer ? row.customer.cusName : '-',
+            sortable: true,
+            center: true
+        },
+        {
+            name: 'Móvil',
+            selector: row => row.customer ? row.customer.cusMobile : '-',
+            sortable: true,
+            center: true
+        },
+        {
+            name: 'Fecha',
+            selector: row => formatDate(row.orderDateTime),
+            sortable: true,
+            center: true,
+            width: '160px'
+        },
+        {
+            name: 'Acciones',
+            center: true,
+            cell: row => (
+                <div className="flex space-x-2">
+                    <button
+                        onClick={() => redirectToOrderView(row.orderId)}
+                        className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                        <i className="ri-eye-line"></i>
+                    </button>
+                    {row.orderStatus === "Ready" && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleProcessOrder(row.orderId);
+                            }}
+                            className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
+                        >
+                         Procesar
+                        </button>
+                    )}
+                </div>
+            )
+        }
+    ];
+
+    const statusFilterOptions = [
+        { label: 'Ver todo', value: 'All' },
+        { label: 'Pendiente', value: 'Pending' },
+        { label: 'En Proceso', value: 'Processing' },
+        { label: 'Listo', value: 'Ready' },
+        { label: 'Completado', value: 'Completed' }
+    ];
+
+    const customStyles = {
+        headCells: {
+            style: {
+                backgroundColor: '#f8fafc',
+                fontWeight: 'bold',
+                fontSize: '0.875rem',
+                color: '#334155',
+                '@media (max-width: 640px)': {
+                    fontSize: '0.75rem',
+                }
+            },
+        },
+        cells: {
+            style: {
+                padding: '0.5rem',
+                '@media (max-width: 640px)': {
+                    fontSize: '0.75rem',
+                    padding: '0.25rem',
+                }
+            },
+        },
+    };
+
+    const subHeaderComponent = (
+        <div className="flex flex-col md:flex-row justify-between items-center w-full gap-4 mb-4">
+            <div className="inline-flex overflow-hidden bg-white border divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700">
+                {statusFilterOptions.map(option => (
+                    <button
+                        key={option.value}
+                        onClick={() => setSelectedStatus(option.value)}
+                        className={`px-3 py-1 text-xs font-medium transition-colors duration-200 sm:text-sm ${
+                            selectedStatus === option.value 
+                                ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-white' 
+                                : 'text-gray-600 dark:text-gray-300 dark:bg-gray-800'
+                        }`}
+                    >
+                        {option.label}
+                    </button>
+                ))}
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
+                <div className="relative w-full md:w-64">
+                    <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                        <i className="ri-search-line text-gray-400"></i>
+                    </div>
+                    <input
+                        type="search"
+                        className="block p-2 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-0 focus:border-gray-300 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        placeholder="Buscar..."
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-2.5 bottom-2.5 text-gray-400 hover:text-gray-600"
+                        >
+                            <i className="ri-close-line"></i>
+                        </button>
+                    )}
+                </div>
+                
+                <select
+                    className="p-2 text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-gray-300 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    value={searchCriteria}
+                    onChange={e => setSearchCriteria(e.target.value)}
+                >
+                    <option value="name">Por nombre</option>
+                    <option value="mobile">Por móvil</option>
+                    <option value="id">Por ID</option>
+                </select>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="w-full bg-slate-200 dark:bg-slate-500 py-5">
-            <div className="w-full">
-                <div className="max-w-full px-6">
-
-                    <div className="mt-6 md:flex md:items-center md:justify-between">
-                        <div className=" inline-flex overflow-hidden bg-white border divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700">
-                            <button  onClick={() => setSelectedStatus('All')}
-                                className={`px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:bg-gray-800 dark:text-gray-300 ${
-                                selectedStatus === 'All' && 'bg-gray-100'}`}
-                            >                            
-                               Ver todo
-                            </button>
-                            <button onClick={() => setSelectedStatus('Pending')}
-                                className={`px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:bg-gray-800 dark:text-gray-300 ${
-                                selectedStatus === 'Pending' && 'bg-gray-100'}`}
-                            >                                
-                                Pendiente
-                            </button>
-                            <button  onClick={() => setSelectedStatus('Processing')}
-                                className={`px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:bg-gray-800 dark:text-gray-300 ${
-                                selectedStatus === 'Processing' && 'bg-gray-100'}`}
-                            >
-                                En Proceso
-                            </button>
-                            <button  onClick={() => setSelectedStatus('Ready')}
-                                className={`px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:bg-gray-800 dark:text-gray-300 ${
-                                selectedStatus === 'Ready' && 'bg-gray-100'}`}
-                            >                                
-                                Listo
-                            </button>
-                            <button onClick={() => setSelectedStatus('Completed')} 
-                                className={`px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:bg-gray-800 dark:text-gray-300 ${
-                                selectedStatus === 'Completed' && 'bg-gray-100'}`}
-                            >                                
-                                Completado
-                            </button>
-                        </div>
-                        <div className=" w-1/2 relative flex items-center mt-4 md:mt-0">
-                                <div className="relative flex-1">
-                                    <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                                        <i className="ri-search-line"></i>
-                                    </div>
-                                    <input
-                                        type="search"
-                                        id="default-search"
-                                        className="block p-2 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-0 focus:border-gray-300 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Buscar ID de pedido, cliente..."
-                                        value={searchQuery}
-                                        onChange={e => setSearchQuery(e.target.value)}
-                                    />
-                                    <button
-                                        onClick={() => setSearchQuery('')}
-                                        type="button"
-                                        className="text-white absolute right-1.5 bottom-1.5 bg-orange-500 hover:bg-orange-600 selection:border-none focus:outline-none font-medium rounded-lg text-sm px-2 py-1 dark:bg-orange-500 dark:hover:bg-orange-700"
-                                    >
-                                        Vaciar
-                                    </button>
+        <div className="w-full bg-slate-200 dark:bg-slate-500 py-5 rounded-lg shadow">
+            <div className="w-full px-4 md:px-6">
+                <div className="bg-white dark:bg-gray-700 rounded-lg shadow p-4 md:p-6">
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-6">
+                        Gestión de Pedidos
+                    </h1>
+                    
+                    <div className="overflow-x-auto">
+                        <DataTable
+                            columns={columns}
+                            data={filteredOrders}
+                            progressPending={loading}
+                            progressComponent={
+                                <div className="py-8 flex justify-center">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                                 </div>
-                                <div>
-                                    <select
-                                        id="search-criteria"
-                                        className=" p-2 ml-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-gray-300 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                        value={searchCriteria}
-                                        onChange={e => setSearchCriteria(e.target.value)}
-                                    >
-                                        <option value="name">Por nombre</option>
-                                        <option value="mobile">Por móvil</option>
-                                        <option value="id">Por ID de pedido</option>
-                                    </select>
+                            }
+                            noDataComponent={
+                                <div className="py-8 text-center text-gray-500 dark:text-gray-300">
+                                    No hay pedidos para mostrar
                                 </div>
-                        </div>
+                            }
+                            customStyles={customStyles}
+                            pagination
+                            paginationResetDefaultPage={resetPaginationToggle}
+                            paginationPerPage={10}
+                            paginationRowsPerPageOptions={[10, 20, 30]}
+                            paginationComponentOptions={{
+                                rowsPerPageText: 'Filas por página:',
+                                rangeSeparatorText: 'de',
+                                noRowsPerPage: false,
+                                selectAllRowsItem: false
+                            }}
+                            subHeader
+                            subHeaderComponent={subHeaderComponent}
+                            responsive
+                            highlightOnHover
+                            pointerOnHover
+                            onRowClicked={row => redirectToOrderView(row.orderId)}
+                            className="border rounded-lg overflow-hidden"
+                        />
                     </div>
-
-
-                    <div className="overflow-hidden rounded-lg border border-gray-200 shadow-md my-5">
-                        <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
-                            <thead className="bg-gray-100 text-gray-900  dark:bg-gray-700 dark:text-gray-50">
-                                <tr>
-                                    <th scope="col" className="px-6 py-4 font-medium text-center">
-                                        # de orden
-                                    </th>
-                                    <th scope="col" className="px-6 py-4 font-medium  text-center">
-                                        Estado
-                                    </th>
-                                    <th scope="col" className="px-6 py-4 font-medium  text-center">
-                                        Items
-                                    </th>
-                                    <th scope="col" className="px-6 py-4 font-medium  text-center">
-                                        Total (S/.)
-                                    </th>
-                                    <th scope="col" className="px-6 py-4 font-medium text-center">
-                                        Nombre del cliente
-                                    </th>
-                                    <th scope="col" className="px-6 py-4 font-medium text-center">
-                                        Número de móvil de cliente
-                                    </th>
-                                    <th scope="col" className="px-6 py-4 font-medium text-center">
-                                        Fecha
-                                    </th>
-                                    <th scope="col" className="px-6 py-4 font-medium text-center">
-                                        Acción
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100 border-t border-gray-100 dark:bg-gray-600 dark:text-gray-50">
-                                {filteredOrders.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="9" className="px-6 py-4 text-center">No hay reportes para ver hoy. Por favor, crea una nueva orden.</td>
-                                    </tr>
-                                ) : (
-                                    currentItems.map(order => (
-                                        <tr onClick={() => redirectToOrderView(order.orderId)} key={order.orderId} className="hover:bg-gray-100 dark:hover:bg-gray-400 cursor-pointer ">
-                                            <td className="px-6 py-2 text-center"><a className=' hover:text-green-500' href={`cashier?tab=orders-view&order=${order.orderId}`}>{order.orderId}</a></td>
-                                            <td className="px-6 py-2 text-center">
-                                                    <span className={`inline-flex px-2 py-1 items-center text-white rounded-lg text-xs ${
-                                                                        order.orderStatus === "Pending" ? "bg-yellow-300" :
-                                                                        order.orderStatus === "Processing" ? "bg-blue-300" :
-                                                                        order.orderStatus === "Ready" ? "bg-green-300" :
-                                                                        order.orderStatus === "Completed" ? "bg-green-500" :
-                                                                        ""
-                                                                    }`}
-                                                    >{order.orderStatus}</span>
-                                            </td>
-                                            <td className="px-6 py-2 text-center">{order.orderItems.length}</td>
-                                            <td className="px-6 py-2 text-center">{order.totalAfterDiscount.toFixed(2)}</td>
-                                            <td className="px-6 py-2 text-center">{order.customer ? order.customer.cusName : '-'}</td>
-                                            <td className="px-6 py-2 text-center">{order.customer ? order.customer.cusMobile : '-'}</td>
-                                            <td className="px-6 py-2 text-center text-xs">{formatDate(order.orderDateTime)}</td>
-                                            <td className="px-6 py-2">
-                                                <div className=" flex items-center justify-center w-full">
-                                                    { order.orderStatus == "Ready" ? (
-                                                            <a href={`/cashier?tab=bill&order=${order.orderId}`} className=" px-2 py-1 text-sm text-white text-center bg-green-500 rounded-md hover:bg-green-700">
-                                                                <i className="ri-arrow-right-s-fill"></i> Procesar
-                                                            </a>
-                                                        ):
-                                                        "Processing not permitted"
-                                                    }
-                                                </div>
-                                                
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    {/* Pagination */}
-                    {   filteredOrders.length != 0 &&  
-                        <div className="flex justify-center mt-4">
-                            <button
-                                onClick={handlePrevPage}
-                                disabled={currentPage === 1}
-                                className="mx-1 px-4 py-2 text-sm font-medium text-gray-700 bg-green-200 rounded-md hover:bg-green-300 focus:outline-none"
-                            >
-                                <i className="ri-arrow-left-s-line"></i> Siguiente
-                            </button>
-                            {Array.from({ length: totalPages }, (_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handlePageChange(index + 1)}
-                                    className={`mx-1 px-4 py-2 text-sm font-medium rounded-md focus:outline-none ${
-                                        currentPage === index + 1 ? 'text-white bg-green-500' : 'text-gray-700 bg-green-200 hover:bg-green-300'
-                                    }`}
-                                >
-                                    {index + 1}
-                                </button>
-                            ))}
-                            <button
-                                onClick={handleNextPage}
-                                disabled={currentPage === totalPages}
-                                className="mx-1 px-4 py-2 text-sm font-medium text-gray-700 bg-green-200 rounded-md hover:bg-green-300 focus:outline-none"
-                            >
-                                Anterior <i className="ri-arrow-right-s-line"></i>
-                            </button>
-                        </div>
-                    }
                 </div>
             </div>
         </div>
     );
 }
-

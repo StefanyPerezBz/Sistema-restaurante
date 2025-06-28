@@ -37,35 +37,35 @@ export default function CashierSideBar() {
         <Sidebar className='w-full md:w-56'>
             <Sidebar.Items>
                 <Sidebar.ItemGroup>
-                    <Link to='/cashier?tab=TodayAttendancePieChart'>
+                    <Link to='/cashier?tab=dashboard'>
                         <Sidebar.Item active={tab === 'dashboard'} icon={FaChartPie} as='div'>
-                            Dashboard
+                            Inicio
                         </Sidebar.Item>
                     </Link>
                     
-                    <Sidebar.Collapse label='Attendance' icon={HiUser}>
+                    <Sidebar.Collapse label='Asistencia' icon={HiUser}>
                         <Link to='/cashier?tab=addAttendance'>
-                            <Sidebar.Item active={tab === 'addAttendance'} icon={RiUserShared2Fill } as='div'> Add Attendance </Sidebar.Item>
+                            <Sidebar.Item active={tab === 'addAttendance'} icon={RiUserShared2Fill } as='div'> Agregar </Sidebar.Item>
                         </Link>
                         <Link to='/cashier?tab=viewAttendance'>
-                            <Sidebar.Item active={tab === 'viewAttendance'} icon={HiOutlineUsers } as='div'> View Attendance </Sidebar.Item>
+                            <Sidebar.Item active={tab === 'viewAttendance'} icon={HiOutlineUsers } as='div'> Ver </Sidebar.Item>
                         </Link>
 
                     </Sidebar.Collapse>
 
                     <Link to='/cashier?tab=orders'>
                         <Sidebar.Item active={tab === 'orders'} icon={MdOutlineRestaurantMenu} as='div'>
-                            Manage Orders
+                            Órdenes
                         </Sidebar.Item>
                     </Link>
                     <Link to='/cashier?tab=profile'>
-                        <Sidebar.Item active={tab === 'profile'} icon={HiUser} label={"Cashier"} labelColor='dark' as='div'>
-                            Profile
+                        <Sidebar.Item active={tab === 'profile'} icon={HiUser} label={"Cajero"} labelColor='red' as='div'>
+                            Perfil
                         </Sidebar.Item>
                     </Link>
 
                     <Sidebar.Item icon={HiArrowSmRight} className='cursor-pointer' onClick={handleLogOut} >
-                        Log Out
+                        Salir
                     </Sidebar.Item>
 
 

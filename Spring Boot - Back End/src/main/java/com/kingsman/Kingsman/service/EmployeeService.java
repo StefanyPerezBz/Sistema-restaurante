@@ -5,11 +5,16 @@ import com.kingsman.Kingsman.model.InAttendance;
 import com.kingsman.Kingsman.repository.EmployeeRepository;
 import com.kingsman.Kingsman.repository.InAttendanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,78 +22,53 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public Employee updateEmployee(Integer id, Employee updateEmployee) {
-        Employee existingEmployee = employeeRepository.findById(id).orElse(null);
+    //
 
-        if(existingEmployee != null){
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-            if((updateEmployee.getFirst_name() == null)){ //if updated employee FName is "null", assign the existing emp FName
-                existingEmployee.setFirst_name(existingEmployee.getFirst_name());
-            }else{
-                existingEmployee.setFirst_name(updateEmployee.getFirst_name());
-            }
+    public Employee getEmployeeById(Integer id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+    }
 
-            if((updateEmployee.getLast_name() == null)){//if updated employee LName is "null", assign the existing emp LName
-                existingEmployee.setEmail(existingEmployee.getEmail());
-            }else{
-                existingEmployee.setLast_name(updateEmployee.getLast_name());
-            }
+    public Employee updateEmployee(Integer id, Employee employeeUpdates) {
+        Employee existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
 
-            if((updateEmployee.getEmail() == null)){//if updated employee email is "null", assign the existing emp email
-                existingEmployee.setEmail(existingEmployee.getEmail());
-            }else{
-                existingEmployee.setEmail(updateEmployee.getEmail());
-            }
-
-            if((updateEmployee.getProfilePicture() == null)){//if updated employee ProfilePic is "null", assign the existing emp ProfilePic
-                existingEmployee.setProfilePicture(existingEmployee.getProfilePicture());
-            }else {
-                existingEmployee.setProfilePicture(updateEmployee.getProfilePicture());
-            }
-
-            if((updateEmployee.getPassword() == null)) {//if updated employee Password is "null", assign the existing emp Password
-                existingEmployee.setPassword(existingEmployee.getPassword());
-            }else{
-                existingEmployee.setPassword(updateEmployee.getPassword());
-            }
-
-            if((updateEmployee.getContact_number() == null)){//if updated employee ContactNumber is "null", assign the existing emp ContactNumber
-                existingEmployee.setContact_number(existingEmployee.getContact_number());
-            }else{
-                existingEmployee.setContact_number(updateEmployee.getContact_number());
-            }
-
-            if((updateEmployee.getAddress() == null)){//if updated employee Address is "null", assign the existing emp Address
-                existingEmployee.setAddress(existingEmployee.getAddress());
-            }else{
-                existingEmployee.setAddress(updateEmployee.getAddress());
-            }
-
-            if((updateEmployee.getIdNumber() == null)){//if updated employee IdNumber  is "null", assign the existing emp IdNumber
-                existingEmployee.setIdNumber(existingEmployee.getIdNumber());
-            }else{
-                existingEmployee.setIdNumber(updateEmployee.getIdNumber());
-            }
-
-            if((updateEmployee.getUniform_size() == null)){//if updated employee Uniform Size is "null", assign the existing emp Uniform Size
-                existingEmployee.setUniform_size(existingEmployee.getUniform_size());
-            }else{
-                existingEmployee.setUniform_size(updateEmployee.getUniform_size());
-            }
-
-            if((updateEmployee.getEmergency_contact() == null)){//if updated employee EmgContact is "null", assign the existing emp Emg
-                existingEmployee.setEmergency_contact(existingEmployee.getEmergency_contact());
-            }else{
-                existingEmployee.setEmergency_contact(updateEmployee.getEmergency_contact());
-            }
-
-            return employeeRepository.save(existingEmployee);
-
-        }else {
-            System.out.println("error");
-            return  null;
-
+        // Actualizar solo los campos no nulos
+        if (employeeUpdates.getFirst_name() != null && !employeeUpdates.getFirst_name().isEmpty()) {
+            existingEmployee.setFirst_name(employeeUpdates.getFirst_name().trim());
         }
+        if (employeeUpdates.getLast_name() != null && !employeeUpdates.getLast_name().isEmpty()) {
+            existingEmployee.setLast_name(employeeUpdates.getLast_name().trim());
+        }
+        if (employeeUpdates.getEmail() != null) {
+            existingEmployee.setEmail(employeeUpdates.getEmail());
+        }
+        if (employeeUpdates.getContact_number() != null) {
+            existingEmployee.setContact_number(employeeUpdates.getContact_number());
+        }
+        if (employeeUpdates.getAddress() != null) {
+            existingEmployee.setAddress(employeeUpdates.getAddress());
+        }
+        if (employeeUpdates.getGender() != null) {
+            existingEmployee.setGender(employeeUpdates.getGender());
+        }
+        if (employeeUpdates.getUniform_size() != null) {
+            existingEmployee.setUniform_size(employeeUpdates.getUniform_size());
+        }
+        if (employeeUpdates.getEmergency_contact() != null) {
+            existingEmployee.setEmergency_contact(employeeUpdates.getEmergency_contact());
+        }
+        if (employeeUpdates.getPosition() != null) {
+            existingEmployee.setPosition(employeeUpdates.getPosition());
+        }
+        if (employeeUpdates.getProfilePicture() != null) {
+            existingEmployee.setProfilePicture(employeeUpdates.getProfilePicture());
+        }
+
+        return employeeRepository.save(existingEmployee);
     }
 
 
@@ -129,6 +109,65 @@ public class EmployeeService {
     public String getEmployeeFirstNameById(Integer id) {
         Employee employee = employeeRepository.findById(id).orElse(null);
         return (employee != null) ? employee.getFirst_name() : null;
+    }
+
+
+    //
+    // Metodo para crear nuevo empleado
+    public Employee createEmployee(Employee newEmployee) {
+        // Validación básica de campos requeridos
+        if(newEmployee.getFirst_name() == null || newEmployee.getFirst_name().isEmpty() ||
+                newEmployee.getLast_name() == null || newEmployee.getLast_name().isEmpty() ||
+                newEmployee.getUsername() == null || newEmployee.getUsername().isEmpty() ||
+                newEmployee.getPosition() == null || newEmployee.getPosition().isEmpty()) {
+            throw new IllegalArgumentException("Faltan campos requeridos");
+        }
+
+        // Encriptar la contraseña antes de guardar
+        if(newEmployee.getPassword() != null && !newEmployee.getPassword().isEmpty()) {
+            newEmployee.setPassword(passwordEncoder.encode(newEmployee.getPassword()));
+        } else {
+            // Generar contraseña automática si no se proporciona
+            String generatedPassword = generateRandomPassword();
+            newEmployee.setPassword(passwordEncoder.encode(generatedPassword));
+        }
+
+        // Establecer valores por defecto si no se proporcionan
+        //if(newEmployee.getJoined_date() == null) {
+            //newEmployee.setJoined_date(LocalDate.now());
+        //}
+        if (newEmployee.getJoined_date() == null) {
+            LocalDate localDate = LocalDate.now();
+            Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            newEmployee.setJoined_date(date);
+        }
+
+        return employeeRepository.save(newEmployee);
+    }
+
+    // Metodo auxiliar para generar contraseña aleatoria
+    private String generateRandomPassword() {
+        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lower = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String special = "!@#$%^&*";
+        String combination = upper + lower + digits + special;
+
+        Random random = new Random();
+        StringBuilder password = new StringBuilder();
+
+        // Aseguramos al menos un carácter de cada tipo
+        password.append(upper.charAt(random.nextInt(upper.length())));
+        password.append(lower.charAt(random.nextInt(lower.length())));
+        password.append(digits.charAt(random.nextInt(digits.length())));
+        password.append(special.charAt(random.nextInt(special.length())));
+
+        // Completamos hasta 12 caracteres
+        for(int i = 4; i < 12; i++) {
+            password.append(combination.charAt(random.nextInt(combination.length())));
+        }
+
+        return password.toString();
     }
 
 

@@ -35,4 +35,18 @@ public interface ManageEventsRepository extends JpaRepository<Event, String> {
 
     // Encuentra el próximo evento después de la fecha actual
     Optional<Event> findFirstByEventDateAfterOrderByEventDateAsc(LocalDate currentDate);
+
+    //
+    // Busca un evento por nombre exacto
+    Optional<Event> findByEventName(String eventName);
+
+    // Busca un evento por fecha exacta
+    Optional<Event> findByEventDate(LocalDate eventDate);
+
+    // Verifica si existe un evento con el nombre dado
+    boolean existsByEventName(String eventName);
+
+    // Verifica si existe un evento en la fecha dada
+    boolean existsByEventDate(LocalDate eventDate);
+
 }

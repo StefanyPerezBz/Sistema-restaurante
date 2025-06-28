@@ -6,6 +6,7 @@ import com.kingsman.Kingsman.exception.ItemNotFoundExeption;
 import com.kingsman.Kingsman.model.InventoryItemUsageLog;
 import com.kingsman.Kingsman.model.Order;
 import com.kingsman.Kingsman.service.OrderService;
+import com.kingsman.Kingsman.service.TableManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -25,9 +26,13 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    private final TableManageService tableManageService;
+
     @Autowired
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, TableManageService tableManageService) {
         this.orderService = orderService;
+        //
+        this.tableManageService = tableManageService;
     }
 
     @GetMapping
@@ -48,7 +53,13 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable("id") Long orderId) { // method retrieves an order based on its ID.
-        return ResponseEntity.ok(orderService.getOrderById(orderId));
+        //return ResponseEntity.ok(orderService.getOrderById(orderId));
+
+        OrderDTO order = orderService.getOrderById(orderId);
+        if (order == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(order);
     }
 
     @GetMapping("/customer/{customerId}")
@@ -73,16 +84,46 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) { //method handles the creation of a new order.
+        //return new ResponseEntity<>(orderService.createOrder(orderDTO), HttpStatus.CREATED);
+        // Verificar y actualizar disponibilidad de la mesa
+        if (orderDTO.getTableNumber() > 0) {
+            tableManageService.updateTableAvailabilityByNumber(orderDTO.getTableNumber(), false);
+        }
         return new ResponseEntity<>(orderService.createOrder(orderDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable("id") Long orderId, @RequestBody OrderDTO orderDTO) { //method updates an existing order
+        //return ResponseEntity.ok(orderService.updateOrder(orderId, orderDTO));
+
+        OrderDTO existingOrder = orderService.getOrderById(orderId);
+
+        if (existingOrder.getTableNumber() != orderDTO.getTableNumber()) {
+            if (existingOrder.getTableNumber() > 0) {
+                tableManageService.updateTableAvailabilityByNumber(existingOrder.getTableNumber(), true);
+            }
+            if (orderDTO.getTableNumber() > 0) {
+                tableManageService.updateTableAvailabilityByNumber(orderDTO.getTableNumber(), false);
+            }
+        }
+
         return ResponseEntity.ok(orderService.updateOrder(orderId, orderDTO));
     }
 
     @DeleteMapping("/{id}")//method removes an order based on its ID
     public ResponseEntity<Void> deleteOrder(@PathVariable("id") Long orderId) {
+        //orderService.deleteOrder(orderId);
+        //return ResponseEntity.noContent().build();
+
+        // Antes de eliminar, liberar la mesa si existe
+        OrderDTO order = orderService.getOrderById(orderId);
+        if (order == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (order.getTableNumber() > 0) {
+            tableManageService.updateTableAvailabilityByNumber(order.getTableNumber(), true);
+        }
         orderService.deleteOrder(orderId);
         return ResponseEntity.noContent().build();
     }
@@ -105,12 +146,26 @@ public class OrderController {
 
     @PutMapping("/status-update/{orderId}/{orderStatus}") //update the order status
     public ResponseEntity<String> updateOrderStatus(@PathVariable long orderId, @PathVariable String orderStatus){
-        boolean success = orderService.updateOrderStatus(orderId,orderStatus);
-        if (success){
-            return ResponseEntity.ok("Estado del pedido actualizado correctamente");
-        }else {
-            throw new ItemNotFoundExeption(orderId);
+       // boolean success = orderService.updateOrderStatus(orderId,orderStatus);
+       // if (success){
+           // return ResponseEntity.ok("Estado del pedido actualizado correctamente");
+       // }else {
+       //     throw new ItemNotFoundExeption(orderId);
+       // }
+
+        // Si la orden se completa o cancela, liberar la mesa
+        // Liberar mesa si se completa o cancela
+        if ("Completed".equalsIgnoreCase(orderStatus) || "Canceled".equalsIgnoreCase(orderStatus)) {
+            OrderDTO order = orderService.getOrderById(orderId);
+            if (order.getTableNumber() > 0) {
+                tableManageService.updateTableAvailabilityByNumber(order.getTableNumber(), true);
+            }
         }
+
+        boolean success = orderService.updateOrderStatus(orderId, orderStatus);
+        return success ?
+                ResponseEntity.ok("Estado del pedido actualizado correctamente") :
+                ResponseEntity.badRequest().body("No se pudo actualizar el estado");
     }
 
     @GetMapping("/get-data-by-order-status/{orderStatus}") // get order details related the order Status

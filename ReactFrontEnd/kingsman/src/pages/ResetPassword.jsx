@@ -250,8 +250,8 @@ function ResetPassword() {
                 text: 'Por favor ingrese un nombre de usuario',
                 icon: 'error',
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b'
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b'
             });
             return;
         }
@@ -266,8 +266,8 @@ function ResetPassword() {
                       <small>Si no lo ves en tu bandeja principal, revisa la carpeta de spam.</small>`,
                 icon: 'success',
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b'
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b'
             });
             
             setShowOtpForm(true);
@@ -280,8 +280,8 @@ function ResetPassword() {
                       <small>${error.response?.data?.message || 'Verifica que el usuario exista y tenga un correo asociado.'}</small>`,
                 icon: 'error',
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b'
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b'
             });
             
             dispatch(resetPasswordFailure(error));
@@ -299,8 +299,8 @@ function ResetPassword() {
                 text: 'Por favor ingrese el código de verificación',
                 icon: 'error',
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b'
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b'
             });
             return;
         }
@@ -318,8 +318,8 @@ function ResetPassword() {
                     text: 'Código validado correctamente',
                     icon: 'success',
                     confirmButtonColor: '#f97316',
-                    background: '#fff',
-                    color: '#1e293b'
+                    background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                    color: localStorage.theme === 'dark' ? '#fff' : '#1e293b'
                 });
                 setShowPasswordForm(true);
             } else {
@@ -333,8 +333,8 @@ function ResetPassword() {
                 text: error.response?.data?.message || error.message || 'Código de verificación incorrecto',
                 icon: 'error',
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b'
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b'
             });
             
             dispatch(resetPasswordFailure(error));
@@ -357,8 +357,8 @@ function ResetPassword() {
                       '<li>Al menos 1 número/símbolo</li></ul>',
                 icon: 'error',
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b'
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b'
             });
             return;
         }
@@ -369,8 +369,8 @@ function ResetPassword() {
                 text: 'Las contraseñas no coinciden',
                 icon: 'error',
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b'
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b'
             });
             return;
         }
@@ -412,8 +412,8 @@ function ResetPassword() {
                     `,
                     showConfirmButton: false,
                     timer: 2000,
-                    background: '#fff',
-                    color: '#1e293b',
+                    background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                    color: localStorage.theme === 'dark' ? '#fff' : '#1e293b',
                     didClose: () => {
                         // Resetear estados y redirigir después de cerrar el alert
                         setUsername('');
@@ -442,8 +442,8 @@ function ResetPassword() {
                     </div>
                 `,
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b'
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b'
             });
         } finally {
             setLoading(false);
@@ -468,29 +468,29 @@ function ResetPassword() {
     };
 
     return (
-        <div className='min-h-screen flex items-center justify-center p-4 bg-orange-50'>
+        <div className='min-h-screen flex items-center justify-center p-4 bg-orange-50 dark:bg-gray-900'>
             <div className='w-full max-w-md mx-auto'>
                 {/* Formulario de usuario */}
                 {!showOtpForm && !showPasswordForm && (
-                    <div className='bg-white shadow-lg rounded-lg p-6 border border-orange-200'>
+                    <div className='bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border border-orange-200 dark:border-gray-700'>
                         <div className="text-center mb-4">
-                            <h1 className="text-2xl font-bold text-orange-600">
+                            <h1 className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                                 Recuperar Contraseña
                             </h1>
-                            <p className="text-gray-600 mt-2 text-sm">
+                            <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
                                 Ingresa tu nombre de usuario para recibir un código de verificación
                             </p>
                         </div>
                         
                         <form onSubmit={handleSubmitUsername} className="flex flex-col gap-4">
                             <div>
-                                <Label value="Nombre de Usuario" className="text-gray-700" />
+                                <Label value="Nombre de Usuario" className="text-gray-700 dark:text-gray-300" />
                                 <TextInput 
                                     type="text" 
                                     placeholder="Ej: jperez" 
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)} 
-                                    className="focus:ring-orange-500 focus:border-orange-500"
+                                    className="focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                     required
                                 />
                             </div>
@@ -512,7 +512,7 @@ function ResetPassword() {
                             <div className="text-center mt-3">
                                 <Link 
                                     to="/login" 
-                                    className="text-orange-600 hover:text-orange-800 text-sm"
+                                    className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 text-sm"
                                 >
                                     ← Volver al inicio de sesión
                                 </Link>
@@ -523,25 +523,25 @@ function ResetPassword() {
 
                 {/* Formulario de OTP */}
                 {showOtpForm && !showPasswordForm && (
-                    <div className='bg-white shadow-lg rounded-lg p-6 border border-orange-200'>
+                    <div className='bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border border-orange-200 dark:border-gray-700'>
                         <div className="text-center mb-4">
-                            <h1 className="text-2xl font-bold text-orange-600">
+                            <h1 className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                                 Verificar Código
                             </h1>
-                            <p className="text-gray-600 mt-2 text-sm">
+                            <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
                                 Ingresa el código de verificación enviado a tu correo
                             </p>
                         </div>
                         
                         <form onSubmit={handleSubmitOtp} className="flex flex-col gap-4">
                             <div>
-                                <Label value="Código de Verificación" className="text-gray-700" />
+                                <Label value="Código de Verificación" className="text-gray-700 dark:text-gray-300" />
                                 <TextInput 
                                     type="text" 
                                     placeholder="Ej: 123456" 
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value)} 
-                                    className="focus:ring-orange-500 focus:border-orange-500 text-center text-lg"
+                                    className="focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-center text-lg"
                                     required
                                 />
                             </div>
@@ -565,14 +565,14 @@ function ResetPassword() {
                                     type="button"
                                     onClick={handleSubmitUsername}
                                     disabled={loading}
-                                    className="text-orange-600 hover:text-orange-800 text-sm"
+                                    className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 text-sm"
                                 >
                                     ¿No recibiste el código?
                                 </button>
                                 
                                 <Link 
                                     to="/login" 
-                                    className="text-gray-600 hover:text-gray-800 text-sm"
+                                    className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 text-sm"
                                 >
                                     Cancelar
                                 </Link>
@@ -583,32 +583,32 @@ function ResetPassword() {
 
                 {/* Formulario de nueva contraseña */}
                 {showPasswordForm && (
-                    <div className='bg-white shadow-lg rounded-lg p-6 border border-orange-200'>
+                    <div className='bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border border-orange-200 dark:border-gray-700'>
                         <div className="text-center mb-4">
-                            <h1 className="text-2xl font-bold text-orange-600">
+                            <h1 className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                                 Nueva Contraseña
                             </h1>
-                            <p className="text-gray-600 mt-2 text-sm">
+                            <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
                                 Crea una nueva contraseña segura para tu cuenta
                             </p>
                         </div>
                         
                         <form onSubmit={handleSubmitPassword} className="flex flex-col gap-4">
                             <div>
-                                <Label value="Nueva Contraseña" className="text-gray-700" />
+                                <Label value="Nueva Contraseña" className="text-gray-700 dark:text-gray-300" />
                                 <div className="relative">
                                     <TextInput 
                                         type={showNewPassword ? "text" : "password"} 
                                         placeholder="Ingresa tu nueva contraseña" 
                                         value={newPassword}
                                         onChange={handlePasswordChange} 
-                                        className="focus:ring-orange-500 focus:border-orange-500 w-full"
+                                        className="focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white w-full"
                                         required
                                     />
                                     <button 
                                         type="button" 
                                         onClick={() => togglePasswordVisibility('new')}
-                                        className="absolute right-2 top-2 text-sm text-orange-600 hover:text-orange-800"
+                                        className="absolute right-2 top-2 text-sm text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300"
                                     >
                                         {showNewPassword ? 'Ocultar' : 'Mostrar'}
                                     </button>
@@ -616,20 +616,20 @@ function ResetPassword() {
                             </div>
                             
                             <div>
-                                <Label value="Confirmar Contraseña" className="text-gray-700" />
+                                <Label value="Confirmar Contraseña" className="text-gray-700 dark:text-gray-300" />
                                 <div className="relative">
                                     <TextInput 
                                         type={showConfirmPassword ? "text" : "password"} 
                                         placeholder="Repite tu nueva contraseña" 
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)} 
-                                        className="focus:ring-orange-500 focus:border-orange-500 w-full"
+                                        className="focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white w-full"
                                         required
                                     />
                                     <button 
                                         type="button" 
                                         onClick={() => togglePasswordVisibility('confirm')}
-                                        className="absolute right-2 top-2 text-sm text-orange-600 hover:text-orange-800"
+                                        className="absolute right-2 top-2 text-sm text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300"
                                     >
                                         {showConfirmPassword ? 'Ocultar' : 'Mostrar'}
                                     </button>
@@ -637,8 +637,8 @@ function ResetPassword() {
                             </div>
                             
                             {/* Requisitos de contraseña */}
-                            <div className="bg-orange-50 p-3 rounded-lg mt-2">
-                                <h3 className="text-sm font-medium text-gray-700 mb-2">
+                            <div className="bg-orange-50 dark:bg-gray-700 p-3 rounded-lg mt-2">
+                                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     La contraseña debe contener:
                                 </h3>
                                 <ul className="space-y-1 text-sm">

@@ -78,4 +78,25 @@ public class ManageEventsService {
         return manageEventsRepository.findFirstByEventDateAfterOrderByEventDateAsc(currentDate).orElse(null);
     }
 
+    //
+    public Event addEvent(Event event) {
+        // Generar ID único para el evento
+        String eventID = generateEventID();
+        event.setEventID(eventID);
+
+        return manageEventsRepository.save(event);
+    }
+
+    public boolean eventNameExists(String eventName) {
+        return manageEventsRepository.existsByEventName(eventName);
+    }
+
+    public boolean eventExistsOnDate(LocalDate date) {
+        return manageEventsRepository.existsByEventDate(date);
+    }
+
+    private String generateEventID() {
+        // Lógica para generar un ID único
+        return "event" + System.currentTimeMillis();
+    }
 }

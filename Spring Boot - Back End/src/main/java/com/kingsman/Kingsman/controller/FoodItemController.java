@@ -56,7 +56,7 @@ public class FoodItemController {
         return ResponseEntity.ok(availableItems);
     }
 
-    @DeleteMapping("/{id}") //El método elimina un alimento según su identificación.
+    @DeleteMapping("/{id}") //El metodo elimina un alimento según su identificación.
     public ResponseEntity<Void> deleteFoodItem(@PathVariable Long id) {
         foodItemService.deleteFoodItem(id);
         return ResponseEntity.noContent().build();
@@ -65,6 +65,7 @@ public class FoodItemController {
     public boolean updateFoodAvailability(@PathVariable Long foodId){
         return foodItemService.updateFoodAvailability(foodId);
     }
+
     @DeleteMapping("/delete/{foodId}")//eliminar artículo de comida por Id
     public ResponseEntity<String> deleteFoodItemById(@PathVariable Long foodId){
         foodItemService.deleteFoodItem(foodId);
@@ -103,8 +104,5 @@ public class FoodItemController {
             //return ResponseEntity.notFound().build();
         }
     }
-
-
-
 
 }

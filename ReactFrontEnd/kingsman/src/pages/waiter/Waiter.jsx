@@ -7,6 +7,9 @@ import ManageOrder from './order/ManageOrder';
 import UpdateOrder from './order/UpdateOrder';
 import OrderView from './order/OrderView';
 import WaiterDashboard from './Dashboard/WaiterDashboard';
+import WaiterProfile from './WaiterProfile';
+import Attendance from './attendance/Attendance';
+import ViewAttendance from './attendance/ViewAttendance';
 
 export default function Waiter() {
 
@@ -14,35 +17,40 @@ export default function Waiter() {
   const [tab, setTab] = useState('');
 
   useEffect(() => {
-      const urlParams = new URLSearchParams(location.search);
-      const tabFromUrl = urlParams.get('tab');
-      if (tabFromUrl) {
-          setTab(tabFromUrl);
-      }
-      else {
-        window.location.href = '/waiter?tab=dashboard';
+    const urlParams = new URLSearchParams(location.search);
+    const tabFromUrl = urlParams.get('tab');
+    if (tabFromUrl) {
+      setTab(tabFromUrl);
+    }
+    else {
+      window.location.href = '/waiter?tab=dashboard';
     }
   }, [location.search]);
 
   return (
 
     <div>
-       <Toaster position="top-right" />
-        <div className='min-h-screen flex flex-col md:flex-row'>
-            <div className='md:w-56'>
-                {/* sidebar */}
-                <WaiterSideBar/>
-            </div>
-                {tab === 'dashboard' && <WaiterDashboard/>}
-                {/* Orders */}
-                {tab === 'take-order' && <TakeOrder/>}
-                {/* Manage Orders */}
-                {tab === 'manage-orders' && <ManageOrder/>}
-                 {/* Update Order */}
-                {tab === 'update-orders' && <UpdateOrder/>}
-                 {/* View Order */}
-                 {tab === 'order-view' && <OrderView/>}
+      <Toaster position="top-right" />
+      <div className='min-h-screen flex flex-col md:flex-row'>
+        <div className='md:w-56'>
+          {/* sidebar */}
+          <WaiterSideBar />
         </div>
+        {tab === 'dashboard' && <WaiterDashboard />}
+        {tab === 'profile' && <WaiterProfile />}
+
+      {tab === 'addAttendance' && <Attendance/>}
+
+      {tab === 'viewAttendance' && <ViewAttendance/>}
+        {/* Orders */}
+        {tab === 'take-order' && <TakeOrder />}
+        {/* Manage Orders */}
+        {tab === 'manage-orders' && <ManageOrder />}
+        {/* Update Order */}
+        {tab === 'update-orders' && <UpdateOrder />}
+        {/* View Order */}
+        {tab === 'order-view' && <OrderView />}
+      </div>
     </div>
 
   )

@@ -365,15 +365,15 @@ export default function AllinventoryItem() {
 
   return (
     <Fragment>
-      <section className="bg-gray-200 dark:bg-slate-600 min-h-screen">
+      <section className="bg-gray-100 dark:bg-gray-800 min-h-screen">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Left column - Inventory Table */}
-            <div className="w-full lg:w-2/3 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+            <div className="w-full lg:w-2/3 bg-white dark:bg-gray-700 rounded-lg shadow p-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                <h2 className="text-2xl font-semibold">Inventario de Ingredientes</h2>
+                <h2 className="text-2xl font-semibold">Inventario</h2>
                 <Button color="success" className="bg-green-500 hover:bg-green-600" onClick={openAddInventoryPopup}>
-                  Nuevo ingrediente +
+                  Nuevo +
                 </Button>
               </div>
 
@@ -442,7 +442,7 @@ export default function AllinventoryItem() {
             </div>
 
             {/* Right column - Daily Usage */}
-            <div className="w-full lg:w-1/3 bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 flex flex-col items-center">
+            <div className="w-full lg:w-1/3 bg-white dark:bg-gray-700 rounded-lg shadow p-6 flex flex-col items-center">
               <h2 className="text-2xl font-semibold mb-6 text-center">Verificar uso diario</h2>
               
               <div className="w-full max-w-xs">
@@ -464,7 +464,7 @@ export default function AllinventoryItem() {
                   className="w-full bg-green-500 hover:bg-green-600"
                   onClick={handleSubmitDailyUsage}
                 >
-                  Enviar
+                  Verificar
                 </Button>
               </div>
             </div>

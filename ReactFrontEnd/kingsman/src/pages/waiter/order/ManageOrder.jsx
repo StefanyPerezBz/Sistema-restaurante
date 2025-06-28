@@ -113,7 +113,7 @@ export default function ManageOrder() {
         const hours = date.getHours() % 12 || 12; // Convert 0 to 12
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const period = date.getHours() < 12 ? 'AM' : 'PM';
-        return `${year}-${month}-${day} ${hours}.${minutes} ${period}`;
+        return `${year}-${month}-${day} ${hours}:${minutes} ${period}`;
     };
 
     const toggleCancelModal = (order, event) => {
@@ -158,7 +158,7 @@ export default function ManageOrder() {
                                         type="search"
                                         id="default-search"
                                         className="block p-4 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-0 focus:border-gray-300 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Search Order ID, Customer..."
+                                        placeholder="Buscar ID de pedido, Cliente..."
                                         value={searchQuery}
                                         onChange={e => setSearchQuery(e.target.value)}
                                     />
@@ -201,10 +201,10 @@ export default function ManageOrder() {
                                         Número de mesa
                                     </th>
                                     <th scope="col" className="px-6 py-4 font-medium  text-center">
-                                        Items
+                                        Cantidad
                                     </th>
                                     <th scope="col" className="px-6 py-4 font-medium  text-center">
-                                        Total (S/.)
+                                        Total
                                     </th>
                                     <th scope="col" className="px-6 py-4 font-medium text-center">
                                         Nombre del cliente
@@ -252,11 +252,11 @@ export default function ManageOrder() {
                                                 ) : (
 
                                                     <div className=" flex items-center justify-center w-full">
-                                                        <a href={`/waiter?tab=update-orders&order=${order.orderId}`} className=" px-2 py-1 text-sm text-white text-center bg-amber-500 rounded-md hover:bg-amber-600">
+                                                        <a href={`/waiter?tab=update-orders&order=${order.orderId}`} className=" px-2 py-1 text-sm text-white text-center bg-amber-500 rounded-lg hover:bg-amber-600">
                                                             <i className="ri-edit-fill"></i> Editar
                                                         </a>
                                                         &nbsp;
-                                                        <button onClick={(event) => toggleCancelModal(order, event)} className=" px-2 py-1 text-sm text-white text-center bg-red-500 rounded-md hover:bg-red-700">
+                                                        <button onClick={(event) => toggleCancelModal(order, event)} className=" px-2 py-1 text-sm text-white text-center bg-red-500 rounded-lg hover:bg-red-700">
                                                             <i className="ri-file-excel-fill"></i> Cancelar
                                                         </button>
                                                     </div>

@@ -46,8 +46,8 @@ public class FeedbackController {
     }
 
     public void crateFeedbackNotificationForManager(Feedback feedback){
-        String title = "Feedback";
-        String message = feedback.getName() + " es calificar el servicio";
+        String title = "Comentario";
+        String message = feedback.getName() + " calificó el servicio";
         boolean isRead = false;
         LocalDateTime createdAt = LocalDateTime.now();
         LocalDateTime updatedAt = createdAt;

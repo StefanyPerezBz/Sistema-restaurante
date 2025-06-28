@@ -13,18 +13,18 @@ import java.util.Optional;
 public class TableManageService {
     @Autowired
     TableManageRepository tableManageRepository;
+
     public void addTable(TableManage table){
         // Check if the tableNumber is already in use
         if (tableManageRepository.existsByTableNumber(table.getTableNumber())) {
             throw new RuntimeException("Ya existe una mesa con el mismo número de tabla");
         }else {
             // Set the current date
+            //table.setDate(new Date());
             table.setDate(new Date());
+            table.setTableAvailability(true); // Por defecto disponible al crear
             tableManageRepository.save(table);
         }
-
-
-
     }
 
     // Method to retrieve all tables
@@ -54,5 +54,25 @@ public class TableManageService {
         return tableManageRepository.findByTableAvailability(true);
     }
 
+    //
+    public TableManage getTableById(Long id) {
+        return tableManageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mesa no encontrada con ID: " + id));
+    }
+
+    //
+    public void updateTableAvailabilityByNumber(int tableNumber, boolean availability) {
+        TableManage table = tableManageRepository.findByTableNumber(tableNumber);
+        if (table != null) {
+            table.setTableAvailability(availability);
+            tableManageRepository.save(table);
+        } else {
+            throw new RuntimeException("Mesa no encontrada con número: " + tableNumber);
+        }
+    }
+
+    public TableManage getTableByNumber(int tableNumber) {
+        return tableManageRepository.findByTableNumber(tableNumber);
+    }
 
 }

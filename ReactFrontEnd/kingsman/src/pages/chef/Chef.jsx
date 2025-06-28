@@ -12,7 +12,8 @@ import FoodMenu from './foodManagement/FoodMenu';
 import AllFood from './foodManagement/AllFood';
 import PreparingOrders from './orders/PreparingOrders';
 import ChefDashboard from './ChefDashboard';
-
+import Attendance from './attendance/Attendance';
+import ViewAttendance from './attendance/ViewAttendance';
 
 export default function Chef() {
     const location = useLocation();
@@ -23,38 +24,41 @@ export default function Chef() {
         if (tabFromUrl) {
             setTab(tabFromUrl);
 
-            
+
         }
     }, [location.search]);
     return (
         <div className='min-h-screen flex flex-col md:flex-row'>
             <div className='md:w-56'>
                 {/* sidebar */}
-                <ChefSideBar/>
+                <ChefSideBar />
             </div>
 
-                {/* Inventory */}
-                {tab === 'inventory' && <ManageInventory/>}
-                {/* profile */}
-                {tab === 'profile' && <ChefProfile/>}
-                {/* availableOrders */}
-                {tab === 'availableOrders' && <AvailableOrders/>}
-                {/* finishedOrders */}
-                {tab === 'finishedOrders' && <FinishedOrders/>}
-                {/* canceledOrders */}
-                {tab === 'canceledOrders' && <CancelOrders/>}
-                {/* All Orders */}
-                {tab === 'allOrders' && <AllOrders/>}
-                {/* Food Menu */}
-                {/* {tab === 'foodMenu' && <FoodMenu/>} */}
-                {/* all food */}
-                {tab === 'allFood' && <AllFood/>}
-                {/* preparing orders */}
-                {tab === 'preparingOrders' && <PreparingOrders/>}
-                {/* dashboard */}
-                {tab === 'dashboard' && <ChefDashboard/>}
+            {/* Inventory */}
+            {tab === 'inventory' && <ManageInventory />}
+            {/* profile */}
+            {tab === 'profile' && <ChefProfile />}
+            {tab === 'addAttendance' && <Attendance />}
 
-                
+            {tab === 'viewAttendance' && <ViewAttendance />}
+            {/* availableOrders */}
+            {tab === 'availableOrders' && <AvailableOrders />}
+            {/* finishedOrders */}
+            {tab === 'finishedOrders' && <FinishedOrders />}
+            {/* canceledOrders */}
+            {tab === 'canceledOrders' && <CancelOrders />}
+            {/* All Orders */}
+            {tab === 'allOrders' && <AllOrders />}
+            {/* Food Menu */}
+            {/* {tab === 'foodMenu' && <FoodMenu/>} */}
+            {/* all food */}
+            {tab === 'allFood' && <AllFood />}
+            {/* preparing orders */}
+            {tab === 'preparingOrders' && <PreparingOrders />}
+            {/* dashboard */}
+            {tab === 'dashboard' && <ChefDashboard />}
+
+
 
         </div>
     )

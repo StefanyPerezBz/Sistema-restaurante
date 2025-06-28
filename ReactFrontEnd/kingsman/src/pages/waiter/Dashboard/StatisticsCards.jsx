@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 export default function StatisticsCards({ orderCountPreviousMonth, orderCountThisMonth, todayOrderCount }) {
 
     const formatCount = (count) => {
-        return new Intl.NumberFormat('en-US').format(count);
+        return new Intl.NumberFormat('es-PE').format(count);
     };
 
     return (

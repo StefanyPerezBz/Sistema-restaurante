@@ -1,7 +1,7 @@
 import React from 'react';
 import {  useSelector } from 'react-redux'
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import logoImage from './logo/cafe-logo.png';
+import logoImage from './logo/logo.jpg';
 
 const styles = StyleSheet.create({
     page: {
@@ -150,7 +150,7 @@ const OrderPDF = ({ order }) => {
                             <View>
                                <Text style={{ fontWeight:900 }}>Restaurant Campestre "Los Patos"</Text>
                                 <Text>Polwathumodara,Mirissa</Text>
-                                <Text>contact@lospatos.com</Text>
+                                <Text>contacto@lospatos.com</Text>
                                 <Text>+51 777998768, +51 772888452</Text>
 
                                 <View style={styles.billData}>

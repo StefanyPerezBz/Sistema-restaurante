@@ -17,11 +17,11 @@ export default function WaiterDashboard() {
     const fetchStatistics = async () => {
       try {
         const response = await fetch(`http://localhost:8080/api/orders/statistics?employeeId=${currentUser?.id}`);
-        if (!response.ok) throw new Error('Network response was not ok');
+        if (!response.ok) throw new Error('La respuesta de la red no fue correcta');
         const data = await response.json();
         setStatistics(data);
       } catch (error) {
-        console.error('Error fetching statistics:', error);
+        console.error('Error al obtener estadísticas:', error);
       } finally {
         setLoading(false);
       }
@@ -30,8 +30,8 @@ export default function WaiterDashboard() {
     if (currentUser?.id) fetchStatistics();
   }, [currentUser?.id]);
 
-  // Extract today's date in Sri Lanka time zone
-  const sriLankaDate = new Date().toLocaleDateString('en-CA', {
+  // Extract today's date in Peru time zone
+  const peruDate = new Date().toLocaleDateString('es-PE', {
     timeZone: 'America/Lima',
     year: 'numeric',
     month: '2-digit',
@@ -39,7 +39,7 @@ export default function WaiterDashboard() {
   });
 
   // Format the date string to YYYY-MM-DD
-  const [year, month, day] = sriLankaDate.split('-');
+  const [day, month, year] = peruDate.split('/');
   const formattedDate = `${year}-${month}-${day}`;
 
   // Extract 14-day order data
@@ -63,10 +63,7 @@ export default function WaiterDashboard() {
         </div>
       ) : (
         <>
-          <div className="mt-4 sm:mx-6 md:mx-8 lg:mx-12 xl:mx-16">
-            <h1 className="text-left text-xl font-bold dark:text-white">Dashboard</h1>
-          </div>
-
+          <h1 className="text-2xl font-bold mb-4">Panel de Control del Camarero</h1>
           <StatisticsCards
             orderCountPreviousMonth={statistics.orderCountPreviousMonth || 0}
             orderCountThisMonth={statistics.orderCountThisMonth || 0}
@@ -74,7 +71,10 @@ export default function WaiterDashboard() {
           />
 
           <div className="mt-4 bg-white border rounded-sm shadow sm:mx-6 md:mx-8 lg:mx-12 xl:mx-16 dark:bg-gray-900">
-            <OrderChart dailyOrderCounts={dailyOrderCounts} />
+            <OrderChart 
+              dailyOrderCounts={dailyOrderCounts} 
+              userName={currentUser?.first_name || 'Usuario'} 
+            />
           </div>
         </>
       )}

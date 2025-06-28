@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 
 public interface InventoryRepository extends JpaRepository<InventoryItem,Long> {
 
+    //
+    boolean existsByItemName(String itemName);
+    boolean existsByItemNameAndIdNot(String itemName, Long id);
+
     @Query("SELECT SUM(i.totalPrice) FROM InventoryItem i WHERE i.dateTime BETWEEN :startOfMonth AND :endOfMonth")
     Float findTotalPriceForCurrentMonth(@Param("startOfMonth") LocalDateTime startOfMonth, @Param("endOfMonth") LocalDateTime endOfMonth);
 

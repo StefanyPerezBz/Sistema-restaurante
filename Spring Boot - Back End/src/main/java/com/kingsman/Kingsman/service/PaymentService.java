@@ -34,9 +34,10 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-//    public void deletePayment(int paymentId) {
-//        paymentRepository.deleteById(paymentId);
-//    }
+    //
+    public void deletePayment(int paymentId) {
+        paymentRepository.deleteById(paymentId);
+    }
 
     public Payment getPayment(int paymentId) {
         Optional<Payment> payment = paymentRepository.findById(paymentId);

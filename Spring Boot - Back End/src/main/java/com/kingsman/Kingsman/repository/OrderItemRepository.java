@@ -10,3 +10,4 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     @Query("DELETE FROM OrderItem oi WHERE oi.orderItemId = ?1")   // Este método es una consulta personalizada que elimina un OrderItem en función de su orderItemId
     void deleteByOrderItemId(Long orderItemId);
 }
+

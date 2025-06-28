@@ -137,7 +137,7 @@
 // }   
 
 import React from 'react';
-import logo from '../image/logo.png';
+import logo from '../image/logo.jpg';
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -170,8 +170,8 @@ export default function Login() {
                 text: 'El nombre de usuario no puede tener más de 10 caracteres',
                 icon: 'warning',
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b',
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b',
                 confirmButtonText: 'Entendido'
             });
             return;
@@ -184,8 +184,8 @@ export default function Login() {
                 text: 'La contraseña no puede tener más de 18 caracteres',
                 icon: 'warning',
                 confirmButtonColor: '#f97316',
-                background: '#fff',
-                color: '#1e293b',
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b',
                 confirmButtonText: 'Entendido'
             });
             return;
@@ -236,8 +236,8 @@ export default function Login() {
                     text: `Bienvenido ${data.username}`,
                     icon: 'success',
                     confirmButtonColor: '#f97316',
-                    background: '#fff',
-                    color: '#1e293b',
+                    background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                    color: localStorage.theme === 'dark' ? '#fff' : '#1e293b',
                     timer: 1500,
                     showConfirmButton: false
                 });
@@ -264,6 +264,15 @@ export default function Login() {
                 navigate(redirectPath);
             }
         } catch (error) {
+            MySwal.fire({
+                title: 'Error',
+                text: 'Nombre de usuario o contraseña no válidos',
+                icon: 'error',
+                confirmButtonColor: '#f97316',
+                background: localStorage.theme === 'dark' ? '#1f2937' : '#fff',
+                color: localStorage.theme === 'dark' ? '#fff' : '#1e293b',
+                confirmButtonText: 'Entendido'
+            });
             setError("Nombre de usuario o contraseña no válidos");
             setFormData({});
             setRedirecting(false);
@@ -275,8 +284,8 @@ export default function Login() {
     };
 
     return (
-        <div className='min-h-screen bg-orange-50 flex items-center justify-center p-4'>
-            <div className='flex p-6 max-w-3xl w-full mx-auto flex-col md:flex-row md:items-center shadow-lg bg-white rounded-lg'>
+        <div className='min-h-screen bg-orange-50 dark:bg-gray-900 flex items-center justify-center p-4'>
+            <div className='flex p-6 max-w-3xl w-full mx-auto flex-col md:flex-row md:items-center shadow-lg bg-white dark:bg-gray-800 rounded-lg'>
                 {/* left side */}
                 <div className='flex-1 flex justify-center'>
                     <img src={logo} alt='logo' className='w-64 h-64 md:w-80 md:h-80' />
@@ -284,10 +293,10 @@ export default function Login() {
 
                 {/* right side */}
                 <div className='flex-1'>
-                    <h2 className='text-2xl font-bold text-orange-600 mb-6 text-center md:text-left'>Iniciar Sesión</h2>
+                    <h2 className='text-2xl font-bold text-orange-600 dark:text-orange-400 mb-6 text-center md:text-left'>Iniciar Sesión</h2>
                     <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
                         <div>
-                            <Label value='Username' className='text-gray-700' />
+                            <Label value='Username' className='text-gray-700 dark:text-gray-300' />
                             <TextInput 
                                 type='text' 
                                 placeholder='Usuario (máx. 10 caracteres)' 
@@ -295,12 +304,12 @@ export default function Login() {
                                 onChange={handleChange} 
                                 value={formData.username || ''}
                                 maxLength={10}
-                                className='focus:ring-orange-500 focus:border-orange-500'
+                                className='focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white'
                             />
                         </div>
 
                         <div>
-                            <Label value='Password' className='text-gray-700' />
+                            <Label value='Password' className='text-gray-700 dark:text-gray-300' />
                             <TextInput 
                                 type={showPassword ? 'text' : 'password'} 
                                 placeholder='Contraseña (máx. 18 caracteres)' 
@@ -308,7 +317,7 @@ export default function Login() {
                                 onChange={handleChange} 
                                 value={formData.password || ''}
                                 maxLength={18}
-                                className='focus:ring-orange-500 focus:border-orange-500'
+                                className='focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white'
                             />
                             {/* password visibility */}
                             <div className='flex justify-between mt-1'>
@@ -316,7 +325,7 @@ export default function Login() {
                                 <button
                                     type='button'
                                     onClick={togglePasswordVisibility}
-                                    className='text-sm text-orange-600 hover:text-orange-800 focus:outline-none'>
+                                    className='text-sm text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 focus:outline-none'>
                                     {showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                                 </button>
                             </div>
@@ -325,7 +334,7 @@ export default function Login() {
                         <Button 
                             gradientDuoTone='orangeToRed' 
                             type='submit' 
-                            className='mt-4 bg-orange-600 hover:bg-orange-700 focus:ring-orange-500 text-white'
+                            className='mt-4 bg-orange-600 hover:bg-orange-700 focus:ring-orange-500 text-white dark:bg-orange-600 dark:hover:bg-orange-700'
                             disabled={loading || redirecting}
                         >
                             {
@@ -339,7 +348,7 @@ export default function Login() {
                         </Button>
                         <Link 
                             to='/ResetPassword' 
-                            className="text-orange-600 hover:text-orange-800 text-sm text-center md:text-left"
+                            className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 text-sm text-center md:text-left"
                         >
                             ¿Has olvidado tu contraseña?
                         </Link>

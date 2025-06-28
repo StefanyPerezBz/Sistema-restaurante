@@ -1,80 +1,97 @@
 import { React, Fragment, useEffect, useState } from 'react'
-import { Table, Button, Pagination } from "flowbite-react";
+import { Button, Spinner } from "flowbite-react";
 import axios from 'axios';
 import UseItemPopup from './UseItemPopup';
+import Swal from 'sweetalert2';
+import DataTable from 'react-data-table-component';
 
 export default function ManageInventory() {
   const [items, setItems] = useState([]);
   const [todayUsage, setTodayUsage] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7; // Number of items to display per page
+  const [loading, setLoading] = useState(true);
+  const [usageLoading, setUsageLoading] = useState(true);
 
-  useEffect(() => { /*run the useEffect method, when lord the page and chenge the state*/
+  useEffect(() => {
     fetchData();
     fetchTodayUsage();
-
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await axios.get("http://localhost:8080/api/inventory/view");
-      console.log(response.data);
       setItems(response.data);
-      fetchTodayUsage();
-
     } catch (error) {
       console.error("Error al recuperar datos", error);
-
+      Swal.fire({
+        title: 'Error!',
+        text: 'No se pudo cargar el inventario',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+    } finally {
+      setLoading(false);
     }
-  };
-
-  // Calculate the index range of items to display based on the current page
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-
-  // Filter the inventory data to display only items for the current page
-  const currentInventoryData = items.slice(startIndex, endIndex);
-
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-
   };
 
   const fetchTodayUsage = async () => {
+    setUsageLoading(true);
     try {
-
-      const currentDate = new Date(); // Get the current date
-      currentDate.setDate(currentDate.getDate() + 0); // Increase the date by 1 day
-      const increasedDate = currentDate.toISOString().split('T')[0]; // Format the increased date
-      console.log(increasedDate); // Output the increased date
-
-
-      const response = await axios.get(`http://localhost:8080/api/inventory/inventory-usage-log/` + increasedDate);
-      console.log(response);
+      const currentDate = new Date();
+      currentDate.setDate(currentDate.getDate() + 0);
+      const increasedDate = currentDate.toISOString().split('T')[0];
+      
+      const response = await axios.get(`http://localhost:8080/api/inventory/inventory-usage-log/${increasedDate}`);
       setTodayUsage(response.data);
     } catch (error) {
       console.error("Error al obtener el uso de hoy", error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'No se pudo cargar el uso de hoy',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+    } finally {
+      setUsageLoading(false);
     }
   };
 
-  // use Item popup winfow function
-
   const handleUseItem = (itemId) => {
     const item = items.find(item => item.id === itemId);
+    if (!item) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Ítem no encontrado',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
     setSelectedItem(item);
     setShowPopup(true);
-    fetchData();
   };
 
   const handleUseItemConfirm = async (quantityUsed) => {
     try {
-      fetchData();
+      await fetchData();
+      await fetchTodayUsage();
       setShowPopup(false);
+      Swal.fire({
+        title: 'Éxito!',
+        text: 'Ítem usado correctamente',
+        icon: 'success',
+        confirmButtonText: 'Ok'
+      });
     } catch (error) {
       console.error("Error al usar el artículo", error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'No se pudo usar el ítem',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
     }
   };
 
@@ -83,113 +100,185 @@ export default function ManageInventory() {
     setSelectedItem(null);
   };
 
+  // DataTable columns for inventory
+  const inventoryColumns = [
+    {
+      name: '#',
+      cell: (row, index) => index + 1,
+      width: '70px',
+      center: true
+    },
+    {
+      name: 'ID',
+      selector: row => row.id,
+      sortable: true,
+      center: true
+    },
+    {
+      name: 'Nombre del ítem',
+      selector: row => row.itemName,
+      sortable: true,
+      grow: 2
+    },
+    {
+      name: 'Cantidad',
+      selector: row => row.quantity,
+      sortable: true,
+      center: true
+    },
+    {
+      name: 'Nombre del vendedor',
+      selector: row => row.vendorId,
+      sortable: true,
+      center: true
+    },
+    {
+      name: 'Acción',
+      cell: row => (
+        <Button 
+          size='sm' 
+          color='success' 
+          className='bg-green-500 hover:bg-green-600'
+          onClick={() => handleUseItem(row.id)}
+        >
+          Usar
+        </Button>
+      ),
+      center: true,
+      width: '100px'
+    }
+  ];
+
+  // DataTable columns for today's usage
+  const usageColumns = [
+    {
+      name: '#',
+      cell: (row, index) => index + 1,
+      width: '70px',
+      center: true
+    },
+    {
+      name: 'ID',
+      selector: row => row.itemId,
+      sortable: true,
+      center: true
+    },
+    {
+      name: 'Nombre',
+      selector: row => row.itemName,
+      sortable: true
+    },
+    {
+      name: 'Cantidad usada',
+      selector: row => `${row.decreasedQuantity} ${row.unit}`,
+      sortable: true,
+      center: true
+    },
+    {
+      name: 'Hora de uso',
+      selector: row => new Date(row.usageDateTime).toLocaleTimeString(),
+      sortable: true,
+      center: true
+    }
+  ];
+
+  const customStyles = {
+    headCells: {
+      style: {
+        backgroundColor: '#f0fdf4', // green-50
+        fontWeight: 'bold',
+        fontSize: '0.9rem',
+      },
+    },
+    cells: {
+      style: {
+        padding: '8px',
+      },
+    },
+  };
 
   return (
     <Fragment>
-      <section>
-        <div className='h-screen w-full flex grid-rows-2 md:grid-cols-2 bg-gray-200 dark:bg-gray-700'>
-
-          <div className='h-full w-3/5 md:h-screen p-4 border-r-2 border-white'>
-            <div className='flex justify-between border-b-2 bg-white p-2 rounded-lg shadow-md dark:bg-gray-600'>
-              {/* Left column */}
-              <h2 className="text-2xl">Artículo de inventario disponible</h2>
-            </div>
-            <br></br>
-            {/* Pagination */}
-            <div className="flex mt-0 justify-end">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={Math.ceil(items.length / itemsPerPage)}
-                onPageChange={onPageChange}
+      <div className='min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 bg-gray-100'>
+        {/* Left column - Inventory */}
+        <div className='p-4 border-r border-gray-200'>
+          <div className='bg-white p-4 rounded-lg shadow mb-4'>
+            <h2 className="text-xl font-bold text-gray-800">Inventario disponible</h2>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <Spinner size="xl" />
+                <span className="ml-3">Cargando inventario...</span>
+              </div>
+            ) : items.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">No hay items disponibles en el inventario</p>
+              </div>
+            ) : (
+              <DataTable
+                columns={inventoryColumns}
+                data={items}
+                customStyles={customStyles}
+                pagination
+                paginationPerPage={10}
+                paginationRowsPerPageOptions={[5, 10, 15]}
+                noDataComponent={<div className="py-8 text-center text-gray-500">No hay datos disponibles</div>}
+                striped
+                highlightOnHover
+                responsive
               />
-            </div>
-            {/* inventory Table */}
-            <div className="overflow-x-auto drop-shadow-md">
-              <Table striped>
-                <Table.Head>
-                  <Table.HeadCell className='text-center bg-green-100'>#</Table.HeadCell>
-                  <Table.HeadCell className='text-center bg-green-100'>ID</Table.HeadCell>
-                  <Table.HeadCell className='text-center bg-green-100'>Nombre del ítem</Table.HeadCell>
-                  <Table.HeadCell className='text-center bg-green-100' >Cantidad</Table.HeadCell>
-                  <Table.HeadCell className='text-center bg-green-100 '>Nombre del vendedor</Table.HeadCell>
-                  <Table.HeadCell className='text-center bg-green-100'>Acción</Table.HeadCell>
-                </Table.Head>
-                <Table.Body className="divide-y">
-
-                  {currentInventoryData.map((item, index) => (
-                    <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                      <Table.Cell className='text-center'>{index + 1}</Table.Cell>
-                      <Table.Cell className='text-center'>{item.id}</Table.Cell>
-                      <Table.Cell>{item.itemName}</Table.Cell>
-                      <Table.Cell className='text-center'><span>{item.quantity} {item.unit}</span></Table.Cell>
-                      <Table.Cell className='text-center'>{item.vendorId}</Table.Cell>
-                      <Table.Cell><Button size='md' color='success' className=' bg-green-500' onClick={() => handleUseItem(item.id)}>Use</Button></Table.Cell>
-                    </Table.Row>
-                  ))
-                  }
-                </Table.Body>
-              </Table>
-            </div>
-
-
+            )}
           </div>
-
-
-          {/* Right column */}
-          <div className=' h-full w-2/5 md:h-screen  p-4 justify-start items-center'>
-            <div className='border-b-2 w-full bg-white p-2 rounded-md shadow-md dark:bg-gray-600'>
-              <h2 className="text-2xl ">Today Item Usage</h2>
-            </div>
-
-            {/* daily usage show table */}
-            <div className="overflow-x-auto shadow-md mt-16">
-
-
-              <Table striped>
-                <Table.Head>
-                  <Table.HeadCell className='text-center  bg-green-100'>#</Table.HeadCell>
-                  <Table.HeadCell className='text-center  bg-green-100'>ID</Table.HeadCell>
-                  <Table.HeadCell className='text-center  bg-green-100'>Nombre</Table.HeadCell>
-                  <Table.HeadCell className='text-center  bg-green-100'>Cantidad usada</Table.HeadCell>
-                  <Table.HeadCell className='text-center bg-green-100'>Tiempo usado</Table.HeadCell>
-                </Table.Head>
-                <Table.Body className="divide-y">
-
-                  {todayUsage.map((usage, index) => (
-                    <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                      <Table.Cell className='text-center'>{index + 1}</Table.Cell>
-                      <Table.Cell className='text-center'>{usage.itemId}</Table.Cell>
-                      <Table.Cell className='text-center'>{usage.itemName}</Table.Cell>
-                      <Table.Cell className='text-center'>{usage.decreasedQuantity} {usage.unit}</Table.Cell>
-                      <Table.Cell className='text-center'>{new Date(usage.usageDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Table.Cell>
-
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
-
-
-            </div>
-
-
-
-          </div>
-
         </div>
-        {/* Popup window */}
-        {showPopup && selectedItem && (
-          <UseItemPopup
-            item={selectedItem}
-            onConfirm={handleUseItemConfirm}
-            onCancel={handleCancelPopup}
-            onReloadItems={() => {
-              fetchData();
-              fetchTodayUsage();
-            }}
-          />
-        )}
-      </section>
 
+        {/* Right column - Today's Usage */}
+        <div className='p-4'>
+          <div className='bg-white p-4 rounded-lg shadow mb-4'>
+            <h2 className="text-xl font-bold text-gray-800">Uso del artículo hoy</h2>
+          </div>
+
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            {usageLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <Spinner size="xl" />
+                <span className="ml-3">Cargando uso diario...</span>
+              </div>
+            ) : todayUsage.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">No se ha usado ningún item hoy</p>
+              </div>
+            ) : (
+              <DataTable
+                columns={usageColumns}
+                data={todayUsage}
+                customStyles={customStyles}
+                pagination
+                paginationPerPage={10}
+                paginationRowsPerPageOptions={[5, 10, 15]}
+                noDataComponent={<div className="py-8 text-center text-gray-500">No hay datos disponibles</div>}
+                striped
+                highlightOnHover
+                responsive
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Popup window */}
+      {showPopup && selectedItem && (
+        <UseItemPopup
+          item={selectedItem}
+          onConfirm={handleUseItemConfirm}
+          onCancel={handleCancelPopup}
+          onReloadItems={() => {
+            fetchData();
+            fetchTodayUsage();
+          }}
+        />
+      )}
     </Fragment>
   )
 }

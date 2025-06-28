@@ -22,6 +22,8 @@ import EmpSalaries from './salary/EmpSalaries';
 import Bonuses from './salary/Bonuses';
 import PayPerHour from './salary/PayPerHour';
 import BillPayments from './BillPayments';
+import Attendance from './attendance/Attendance';
+import ViewAttendance from './attendance/ViewAttendance';
 
 export default function Manager() {
     const location = useLocation();
@@ -34,66 +36,100 @@ export default function Manager() {
         }
     }, [location.search]);
     return (
-        <div className='min-h-screen flex flex-col md:flex-row'>
-            <div className='md:w-56'>
-                {/* sidebar */}
+        // <div className='min-h-screen flex flex-col md:flex-row bg-white dark:bg-gray-900'>
+        //     <div className='md:w-56'>
+        //         {/* sidebar */}
+        //         <ManagerSideBar />
+        //     </div>
+
+        //     {/* Inventory */}
+        //     {tab === 'inventory' && <AllinventoryItem />}
+
+        //     {/* profile */}
+        //     {tab === 'profile' && <ManagerProfile />}
+
+        //     {/* New Employee */}
+        //     {tab === 'new-employee' && <RegisterEmployee />}
+
+        //     {/* View All Employees */}
+        //     {tab === 'view-all-employees' && <ViewAllEmployees />}
+
+        //     {/* Add Event */}
+        //     {tab === 'add-event' && <AddEvent />}
+
+        //     {/* View All Events */}
+        //     {tab === 'view-all-events' && <ViewAllEvents />}
+
+        //     {/* Manage Orders */}
+        //     {tab === 'manage-orders' && <ManageOrders />}
+
+        //     {/* View Order */}
+        //     {tab === 'view-order' && <OrderView/>}
+
+        //     {/* Update Order */}
+        //     {tab === 'update-order' && <UpdateOrder/>}
+
+        //     {tab === 'update-order-items' && <UpdateOrderItems/>}
+
+        //     {/* Attendance */}
+        //     {tab === 'attendance' && <AttendanceFrManager />}
+
+        //     {/* salary */}
+        //     {tab === 'salary' && <EmpSalaries />}
+        //     {tab === 'earnings' && <Bonuses />}
+        //     {tab === 'hourpayments' && <PayPerHour />}
+
+
+        //     {/* Dashboard */}
+        //     {tab === 'dashboard' && <ManagerDash/>}
+
+        //     {/* income statement - monthly */}
+        //     {tab === 'monthly-profit' && <MonthlyProfit />}
+
+        //     {/* income statement - annual */}
+        //     {tab === 'annual-income' && <AnnualIncome />}
+
+        //     {/* Table Manage */}
+        //     {tab === 'table-manage' && <TableManage/>}
+
+        //     {/* Bill Payments */}
+        //     {tab === 'billPayments' && <BillPayments/>}
+
+
+        // </div>
+
+        <div className='min-h-screen flex flex-col md:flex-row bg-white dark:bg-gray-900'>
+            {/* Sidebar */}
+            <div className='md:w-56 border-r border-gray-200 dark:border-gray-700'>
                 <ManagerSideBar />
             </div>
 
-            {/* Inventory */}
-            {tab === 'inventory' && <AllinventoryItem />}
+            {/* Main content */}
+            <main className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                {tab === 'dashboard' && <ManagerDash />}
+                {tab === 'inventory' && <AllinventoryItem />}
+                {tab === 'profile' && <ManagerProfile />}
+                {tab === 'new-employee' && <RegisterEmployee />}
+                {tab === 'view-all-employees' && <ViewAllEmployees />}
+                {tab === 'add-event' && <AddEvent />}
+                {tab === 'view-all-events' && <ViewAllEvents />}
+                {tab === 'manage-orders' && <ManageOrders />}
+                {tab === 'view-order' && <OrderView />}
+                {tab === 'update-order' && <UpdateOrder />}
+                {tab === 'update-order-items' && <UpdateOrderItems />}
+                {tab === 'salary' && <EmpSalaries />}
+                {tab === 'earnings' && <Bonuses />}
+                {tab === 'hourpayments' && <PayPerHour />}
+                {tab === 'monthly-profit' && <MonthlyProfit />}
+                {tab === 'annual-income' && <AnnualIncome />}
+                {tab === 'table-manage' && <TableManage />}
+                {tab === 'billPayments' && <BillPayments />}
+                {tab === 'addAttendance' && <Attendance />}
+                {tab === 'viewAttendance' && <ViewAttendance />}
+                {tab === 'attendance' && <AttendanceFrManager />}
 
-            {/* profile */}
-            {tab === 'profile' && <ManagerProfile />}
-
-            {/* New Employee */}
-            {tab === 'new-employee' && <RegisterEmployee />}
-
-            {/* View All Employees */}
-            {tab === 'view-all-employees' && <ViewAllEmployees />}
-
-            {/* Add Event */}
-            {tab === 'add-event' && <AddEvent />}
-            
-            {/* View All Events */}
-            {tab === 'view-all-events' && <ViewAllEvents />}
-
-            {/* Manage Orders */}
-            {tab === 'manage-orders' && <ManageOrders />}
-
-            {/* View Order */}
-            {tab === 'view-order' && <OrderView/>}
-
-            {/* Update Order */}
-            {tab === 'update-order' && <UpdateOrder/>}
-
-            {tab === 'update-order-items' && <UpdateOrderItems/>}
-
-            {/* Attendance */}
-            {tab === 'attendance' && <AttendanceFrManager />}
-
-            {/* salary */}
-            {tab === 'salary' && <EmpSalaries />}
-            {tab === 'earnings' && <Bonuses />}
-            {tab === 'hourpayments' && <PayPerHour />}
-
-
-            {/* Dashboard */}
-            {tab === 'dashboard' && <ManagerDash/>}
-
-            {/* income statement - monthly */}
-            {tab === 'monthly-profit' && <MonthlyProfit />}
-
-            {/* income statement - annual */}
-            {tab === 'annual-income' && <AnnualIncome />}
-
-            {/* Table Manage */}
-            {tab === 'table-manage' && <TableManage/>}
-
-            {/* Bill Payments */}
-            {tab === 'billPayments' && <BillPayments/>}
-
-
+            </main>
         </div>
+
     )
 }

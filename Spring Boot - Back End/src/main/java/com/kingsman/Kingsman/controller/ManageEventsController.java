@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -109,5 +111,40 @@ public class ManageEventsController {
         }
     }
 
+    //
+    @PostMapping("/add-event")
+    public ResponseEntity<?> addEvent(@RequestBody Event event) {
+        try {
+            // Validar campos obligatorios
+            if (event.getEventName() == null || event.getEventName().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("El nombre del evento es obligatorio");
+            }
+            if (event.getEventDate() == null) {
+                return ResponseEntity.badRequest().body("La fecha del evento es obligatoria");
+            }
+            if (event.getStartTime() == null || event.getStartTime().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("La hora de inicio es obligatoria");
+            }
+
+            // Verificar duplicados
+            if (manageEventsService.eventNameExists(event.getEventName())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya existe un evento con el mismo nombre");
+            }
+            if (manageEventsService.eventExistsOnDate(event.getEventDate())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Ya existe un evento el mismo día");
+            }
+
+            Event createdEvent = manageEventsService.addEvent(event);
+            return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al agregar el evento: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/check-name")
+    public ResponseEntity<Map<String, Boolean>> checkEventNameExists(@RequestParam String name) {
+        boolean exists = manageEventsService.eventNameExists(name);
+        return ResponseEntity.ok(Collections.singletonMap("exists", exists));
+    }
 
 }

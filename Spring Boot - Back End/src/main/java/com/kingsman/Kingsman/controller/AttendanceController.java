@@ -10,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -103,41 +105,103 @@ public class AttendanceController {
 
     @GetMapping("/current-date")
     public List<AttendanceDTO> getAttendanceForCurrentDate() {
-        return attendanceService.getAttendanceForCurrentDate();
+        //return attendanceService.getAttendanceForCurrentDate();
+
+        //
+        LocalDate currentDate = LocalDate.now();
+        List<Attendance> attendanceList = attendanceRepository.findByDate(currentDate);
+
+        return attendanceList.stream()
+                .map(attendance -> {
+                    AttendanceDTO dto = new AttendanceDTO();
+                    dto.setEmpId(attendance.getEmpId());
+                    dto.setEmpName(attendance.getEmpName());
+                    dto.setPosition(attendance.getPosition());
+                    dto.setDate(attendance.getDate());
+                    dto.setInTime(formatTime(attendance.getInTime()));
+                    dto.setOutTime(formatTime(attendance.getOutTime()));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    //
+    private String formatTime(String time) {
+        if (time == null) return null;
+        if (time.matches("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")) {
+            return time;
+        }
+        if (time.matches("^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$")) {
+            return time.substring(0, 5);
+        }
+        return time;
     }
 
     //asistencia del mes actual
 
     @GetMapping("/current-month")
     public ResponseEntity<List<Attendance>> getAttendanceForCurrentMonth() {
-        List<Attendance> attendanceList = attendanceService.getAttendanceForCurrentMonth();
+        //List<Attendance> attendanceList = attendanceService.getAttendanceForCurrentMonth();
+       // return new ResponseEntity<>(attendanceList, HttpStatus.OK);
+
+        //
+        YearMonth currentYearMonth = YearMonth.now();
+        LocalDate firstDayOfMonth = currentYearMonth.atDay(1);
+        LocalDate lastDayOfMonth = currentYearMonth.atEndOfMonth();
+
+        List<Attendance> attendanceList = attendanceRepository.findByDateBetween(firstDayOfMonth, lastDayOfMonth);
         return new ResponseEntity<>(attendanceList, HttpStatus.OK);
     }
 
 
-//Actualizar registros de asistencia
+    //Actualizar registros de asistencia
     @PutMapping("/update")
     public ResponseEntity<String> updateAttendance(@RequestBody AttendanceUpdateRequest request) {
+
         //Validar entrada
         if (request.getEmpId() == null || request.getDate() == null ||
                 request.getInTime() == null || request.getOutTime() == null) {
             return ResponseEntity.badRequest().body("Faltan campos obligatorios.");
         }
 
-        // Obtener registro de asistencia
-        Attendance attendance = attendanceRepository.findByEmpIdAndDate(request.getEmpId(), request.getDate());
-        if (attendance == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró el registro de asistencia.");
+        //
+        try {
+            // Parsear la fecha
+            //LocalDate date = LocalDate.parse(request.getDate());
+            LocalDate date = request.getDate();
+
+            // Obtener registro de asistencia
+            Attendance attendance = attendanceRepository.findByEmpIdAndDate(request.getEmpId(), date);
+
+            if (attendance == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No se encontró el registro de asistencia.");
+            }
+
+            // Actualizar registro de asistencia
+            attendance.setInTime(request.getInTime());
+            attendance.setOutTime(request.getOutTime());
+
+            // Guardar cambios
+            attendanceRepository.save(attendance);
+
+            return ResponseEntity.ok("Registro de asistencia actualizado exitosamente.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar: " + e.getMessage());
         }
 
-        // Actualizar registro de asistencia
-        attendance.setInTime(request.getInTime());
-        attendance.setOutTime(request.getOutTime());
+       // Attendance attendance = attendanceRepository.findByEmpIdAndDate(request.getEmpId(), request.getDate());
+        //if (attendance == null) {
+            //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró el registro de asistencia.");
+        //}
 
-        // Guardar cambios
-        attendanceRepository.save(attendance);
+        //attendance.setInTime(request.getInTime());
+        //attendance.setOutTime(request.getOutTime());
 
-        return ResponseEntity.ok("Registro de asistencia actualizado exitosamente.");
+        //attendanceRepository.save(attendance);
+
+        //return ResponseEntity.ok("Registro de asistencia actualizado exitosamente.");
     }
 
     //Eliminar registros de asistencia
@@ -259,6 +323,33 @@ public class AttendanceController {
 
         List<Attendance> attendanceList = attendanceRepository.findByEmpIdAndDateBetween(empId, startDate, endDate);
         return ResponseEntity.ok(attendanceList);
+    }
+
+    //
+    @GetMapping("/current-user")
+    public ResponseEntity<Map<String, String>> getCurrentUser(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Obtener el nombre de usuario (email) del principal
+        String username = principal.getName();
+
+        // Buscar el empleado por email
+        Employee employee = employeeRepository.findByEmail(username);
+
+        if (employee == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Crear respuesta con los datos necesarios
+        Map<String, String> response = new HashMap<>();
+        response.put("empId", "EMP" + String.format("%03d", employee.getId()));
+        response.put("empName", employee.getFirst_name() + " " + employee.getLast_name());
+        response.put("position", employee.getPosition());
+        response.put("email", employee.getEmail());
+
+        return ResponseEntity.ok(response);
     }
 
 
