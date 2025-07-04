@@ -159,12 +159,19 @@ export default function OrderView() {
                         <h1 className="mb-2 text-left text-lg md:text-xl font-bold dark:text-white px-2">
                             #{OrderResponse.orderId} &nbsp; | &nbsp;
                             <span className={`inline-flex px-2 py-1 mr-auto items-center font-semibold text-sm md:text-base text-white rounded-lg ${OrderResponse.orderStatus === "Pending" ? "bg-yellow-300" :
-                                    OrderResponse.orderStatus === "Processing" ? "bg-blue-300" :
-                                        OrderResponse.orderStatus === "Ready" ? "bg-green-300" :
-                                            OrderResponse.orderStatus === "Completed" ? "bg-green-500" :
+                                OrderResponse.orderStatus === "Processing" ? "bg-blue-300" :
+                                    OrderResponse.orderStatus === "Ready" ? "bg-green-300" :
+                                        OrderResponse.orderStatus === "Completed" ? "bg-green-500" :
+                                            OrderResponse.orderStatus === "Canceled" ? "bg-red-500" :
                                                 "bg-gray-300"
                                 }`}>
-                                &nbsp;{OrderResponse.orderStatus}&nbsp;
+                                &nbsp;{OrderResponse.orderStatus === "Pending" ? "Pendiente" :
+                                    OrderResponse.orderStatus === "Processing" ? "En proceso" :
+                                        OrderResponse.orderStatus === "Ready" ? "Listo" :
+                                            OrderResponse.orderStatus === "Completed" ? "Completado" :
+                                                OrderResponse.orderStatus === "Canceled" ? "Cancelado" :
+                                                    OrderResponse.orderStatus
+                                }&nbsp;
                             </span>
                             &nbsp;|&nbsp;
                             {convertDate(OrderResponse.orderDateTime)}
@@ -328,13 +335,16 @@ export default function OrderView() {
                                         <i className="ri-arrow-left-s-line"></i>
                                         <span className="ml-1">Regresar</span>
                                     </button>
-                                    <button
-                                        onClick={handleEditOrder}
-                                        className="w-full md:w-auto flex-grow flex items-center justify-center px-3 py-2 bg-amber-500 text-white font-semibold rounded hover:bg-amber-600"
-                                    >
-                                        <i className="ri-edit-fill"></i>
-                                        <span className="ml-1">Editar orden</span>
-                                    </button>
+                                    {OrderResponse.orderStatus === "Pending" && (
+                                        <button
+                                            onClick={handleEditOrder}
+                                            className="w-full md:w-auto flex-grow flex items-center justify-center px-3 py-2 bg-amber-500 text-white font-semibold rounded hover:bg-amber-600"
+                                        >
+                                            <i className="ri-edit-fill"></i>
+                                            <span className="ml-1">Editar orden</span>
+                                        </button>
+                                    )}
+
                                 </div>
                             </div>
                         </div>

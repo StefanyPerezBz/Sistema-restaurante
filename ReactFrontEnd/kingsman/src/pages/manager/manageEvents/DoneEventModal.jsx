@@ -117,110 +117,137 @@ import { Modal, Button, Label, TextInput } from 'flowbite-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const DoneEventModal = ({ event, handleClose }) => {
+const DoneEventModal = ({ event, handleClose, onSuccess }) => {
     if (!event) {
         return null;
     }
 
     const [formData, setFormData] = useState({
-        budget: event.budget || '',
-        soldTicketQuantity: event.soldTicketQuantity || ''
+        budget: event.budget ? String(event.budget) : '',
+        soldTicketQuantity: event.soldTicketQuantity ? String(event.soldTicketQuantity) : ''
     });
 
-    const [budgetErrorMessage, setBudgetErrorMessage] = useState('');
-    const [ticketQuantityErrorMessage, setTicketQuantityErrorMessage] = useState('');
+    const [budgetError, setBudgetError] = useState('');
+    const [ticketError, setTicketError] = useState('');
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-
-        if (name === 'budget') {
-            if (value !== '' && (!/^\d+(\.\d{1,2})?$/.test(value) || parseFloat(value) < 1)) {
-                setBudgetErrorMessage('El presupuesto debe ser un número válido mayor o igual a 1 con hasta dos decimales.');
-            } else {
-                setBudgetErrorMessage('');
-            }
-        } else if (name === 'soldTicketQuantity') {
-            if (value !== '' && (!/^\d+$/.test(value) || parseInt(value) < 1)) {
-                setTicketQuantityErrorMessage('La cantidad debe ser un número entero mayor o igual a 1.');
-            } else {
-                setTicketQuantityErrorMessage('');
-            }
+    const handleBudgetChange = (e) => {
+        const value = e.target.value;
+        
+        // Permite: vacío, números, o números con un punto decimal
+        if (value === '' || /^\d*\.?\d{0,1}$/.test(value)) {
+            setFormData({...formData, budget: value});
+            setBudgetError('');
         }
-
     };
 
-    const validateForm = () => {
-        let isValid = true;
-
-        // Validar presupuesto
-        if (!formData.budget) {
-            setBudgetErrorMessage('El presupuesto es obligatorio');
-            isValid = false;
-        } else if (!/^\d+(\.\d{1,2})?$/.test(formData.budget)) {
-            setBudgetErrorMessage('Formato inválido (ej: 1500.50)');
-            isValid = false;
-        } else if (parseFloat(formData.budget) < 1) {
-            setBudgetErrorMessage('El presupuesto debe ser al menos 1 sol');
-            isValid = false;
-        } else {
-            setBudgetErrorMessage('');
+    const validateBudget = () => {
+        const budgetStr = String(formData.budget).trim();
+        
+        if (!budgetStr) {
+            setBudgetError('El presupuesto es obligatorio');
+            return false;
         }
-
-        // Validar cantidad de tickets
-        if (!formData.soldTicketQuantity) {
-            setTicketQuantityErrorMessage('La cantidad es obligatoria');
-            isValid = false;
-        } else if (!/^\d+$/.test(formData.soldTicketQuantity)) {
-            setTicketQuantityErrorMessage('Debe ser un número entero');
-            isValid = false;
-        } else if (parseInt(formData.soldTicketQuantity) < 1) {
-            setTicketQuantityErrorMessage('Debe haber al menos 1 ticket vendido');
-            isValid = false;
-        } else {
-            setTicketQuantityErrorMessage('');
+        
+        // No permite punto sin decimal (ej. "123.")
+        if (/\.$/.test(budgetStr) || !/^\d+(\.\d)?$/.test(budgetStr)) {
+            setBudgetError('Debe ser entero o con un decimal (ej: 1500 o 1500.5)');
+            return false;
         }
+        
+        if (parseFloat(budgetStr) < 1) {
+            setBudgetError('Debe ser mayor o igual a 1');
+            return false;
+        }
+        
+        setBudgetError('');
+        return true;
+    };
 
-        return isValid;
+    const handleTicketChange = (e) => {
+        const value = e.target.value;
+        
+        // Solo permite números enteros
+        if (value === '' || /^\d*$/.test(value)) {
+            setFormData({...formData, soldTicketQuantity: value});
+            setTicketError('');
+        }
+    };
+
+    const validateTicket = () => {
+        const ticketStr = String(formData.soldTicketQuantity).trim();
+        
+        if (!ticketStr) {
+            setTicketError('La cantidad es obligatoria');
+            return false;
+        }
+        
+        if (!/^\d+$/.test(ticketStr)) {
+            setTicketError('Debe ser un número entero');
+            return false;
+        }
+        
+        if (parseInt(ticketStr) < 1) {
+            setTicketError('Debe ser mayor o igual a 1');
+            return false;
+        }
+        
+        setTicketError('');
+        return true;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!validateForm()) {
+        
+        const isBudgetValid = validateBudget();
+        const isTicketValid = validateTicket();
+        
+        if (!isBudgetValid || !isTicketValid) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error en el formulario',
-                text: 'Por favor corrige los errores marcados',
-                confirmButtonColor: '#3085d6',
+                text: 'Por favor corrige los errores antes de continuar',
+                confirmButtonText: 'Entendido'
             });
             return;
         }
 
         try {
+            // Formatear budget (eliminar .0 si es entero)
+            const budgetValue = parseFloat(formData.budget);
+            const formattedBudget = Number.isInteger(budgetValue) 
+                ? budgetValue.toString() 
+                : budgetValue.toFixed(1);
+
             const updatedEvent = {
                 ...event,
-                ...formData
+                budget: formattedBudget,
+                soldTicketQuantity: formData.soldTicketQuantity,
+                status: 'completed'
             };
 
-            const { data } = await axios.put(`http://localhost:8080/api/events/update/${event.eventID}`, updatedEvent);
+            await axios.put(`http://localhost:8080/api/events/update/${event.eventID}`, updatedEvent);
 
-            Swal.fire({
+            await Swal.fire({
                 icon: 'success',
                 title: '¡Éxito!',
-                text: 'El evento se ha actualizado correctamente',
-                confirmButtonColor: '#3085d6',
-            }).then(() => {
-                handleClose();
+                text: 'Evento actualizado correctamente',
+                confirmButtonText: 'Aceptar'
             });
 
+            handleClose();
+            
+            // Recargar la página después de cerrar el modal
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+
         } catch (error) {
-            console.error('No se pudo actualizar el evento', error);
+            console.error('Error al actualizar evento:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'No se pudo actualizar el evento. Inténtalo de nuevo.',
-                confirmButtonColor: '#3085d6',
+                text: 'No se pudo actualizar el evento. Por favor intenta nuevamente.',
+                confirmButtonText: 'Entendido'
             });
         }
     };
@@ -232,42 +259,33 @@ const DoneEventModal = ({ event, handleClose }) => {
             </Modal.Header>
             <Modal.Body>
                 <form onSubmit={handleSubmit}>
-                    <div>
-                        <Label htmlFor="budget" value="Presupuesto (S/.)" />
+                    <div className="mb-4">
+                        <Label htmlFor="budget" value="Monto recaudado (S/.)" />
                         <TextInput
                             id="budget"
                             type="text"
                             name="budget"
                             value={formData.budget}
-                            onChange={handleChange}
-                            required
-                            placeholder="Ejemplo: 1500.50"
-                            color={budgetErrorMessage ? 'failure' : ''}
+                            onChange={handleBudgetChange}
+                            placeholder="Ejemplo: 1500 o 1500.5"
+                            color={budgetError ? 'failure' : ''}
+                            helperText={budgetError && <span className="text-red-500 text-sm">{budgetError}</span>}
                         />
-                        {budgetErrorMessage && (
-                            <p className="text-red-500 text-sm mt-1">{budgetErrorMessage}</p>
-                        )}
                     </div>
-                    <div className='mt-4'>
+                    <div className="mb-4">
                         <Label htmlFor="soldTicketQuantity" value="Cantidad de tickets vendidos" />
                         <TextInput
                             id="soldTicketQuantity"
                             type="text"
                             name="soldTicketQuantity"
                             value={formData.soldTicketQuantity}
-                            onChange={handleChange}
-                            required
+                            onChange={handleTicketChange}
                             placeholder="Ejemplo: 120"
-                            color={ticketQuantityErrorMessage ? 'failure' : ''}
+                            color={ticketError ? 'failure' : ''}
+                            helperText={ticketError && <span className="text-red-500 text-sm">{ticketError}</span>}
                         />
-                        {ticketQuantityErrorMessage && (
-                            <p className="text-red-500 text-sm mt-1">{ticketQuantityErrorMessage}</p>
-                        )}
                     </div>
-                    <Button
-                        type="submit"
-                        className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded w-full mt-6"
-                    >
+                    <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
                         Confirmar
                     </Button>
                 </form>

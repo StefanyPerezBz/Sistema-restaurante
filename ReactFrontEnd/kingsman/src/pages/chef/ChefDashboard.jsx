@@ -331,7 +331,7 @@ export default function ChefDashboard() {
         <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-semibold">Ítems en inventario</h3>
+              <h3 className="text-lg font-semibold">Artículos en inventario</h3>
               <p className="text-3xl font-bold text-purple-500">{inventoryData.length}</p>
             </div>
             <FaUtensils className="text-4xl text-purple-300" />
@@ -341,7 +341,7 @@ export default function ChefDashboard() {
         <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-semibold">Ítems bajos</h3>
+              <h3 className="text-lg font-semibold">Artículos bajos</h3>
               <p className="text-3xl font-bold text-red-500">
                 {inventoryData.filter(item => item.quantity < 10).length}
               </p>

@@ -114,7 +114,7 @@ export default function ManageOrder() {
             sortable: true,
             center: true,
             cell: row => (
-                <span 
+                <span
                     className="text-blue-600 hover:text-blue-800 cursor-pointer"
                     onClick={() => redirectToOrderView(row.orderId)}
                 >
@@ -127,20 +127,36 @@ export default function ManageOrder() {
             selector: row => row.orderStatus,
             sortable: true,
             center: true,
-            cell: row => (
-                <span className={`inline-flex px-2 py-1 items-center text-white rounded-lg text-xs ${
-                    row.orderStatus === "Pending" ? "bg-yellow-300" :
-                    row.orderStatus === "Processing" ? "bg-blue-300" :
-                    row.orderStatus === "Ready" ? "bg-green-300" :
-                    row.orderStatus === "Completed" ? "bg-green-500" :
-                    "bg-gray-300"
-                }`}>
-                    {row.orderStatus}
-                </span>
-            )
+            cell: row => {
+                const statusMap = {
+                    "Pending": "Pendiente",
+                    "Processing": "En preparación",
+                    "Ready": "Listo para entregar",
+                    "Completed": "Terminado",
+                    "Canceled": "Cancelado"
+                };
+
+                const colorClass = {
+                    "Pending": "bg-yellow-300",
+                    "Processing": "bg-blue-300",
+                    "Ready": "bg-green-300",
+                    "Completed": "bg-green-500",
+                    "Canceled": "bg-red-400"
+                };
+
+                const translated = statusMap[row.orderStatus] || row.orderStatus;
+                const bgColor = colorClass[row.orderStatus] || "bg-gray-300";
+
+                return (
+                    <span className={`inline-flex px-2 py-1 items-center text-white rounded-lg text-xs ${bgColor}`}>
+                        {translated}
+                    </span>
+                );
+            }
         },
+
         {
-            name: 'Items',
+            name: 'Cantidad',
             selector: row => row.orderItems.length,
             sortable: true,
             center: true
@@ -189,7 +205,7 @@ export default function ManageOrder() {
                             }}
                             className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
                         >
-                         Procesar
+                            Procesar
                         </button>
                     )}
                 </div>
@@ -235,17 +251,16 @@ export default function ManageOrder() {
                     <button
                         key={option.value}
                         onClick={() => setSelectedStatus(option.value)}
-                        className={`px-3 py-1 text-xs font-medium transition-colors duration-200 sm:text-sm ${
-                            selectedStatus === option.value 
-                                ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-white' 
+                        className={`px-3 py-1 text-xs font-medium transition-colors duration-200 sm:text-sm ${selectedStatus === option.value
+                                ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-white'
                                 : 'text-gray-600 dark:text-gray-300 dark:bg-gray-800'
-                        }`}
+                            }`}
                     >
                         {option.label}
                     </button>
                 ))}
             </div>
-            
+
             <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
                 <div className="relative w-full md:w-64">
                     <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
@@ -267,7 +282,7 @@ export default function ManageOrder() {
                         </button>
                     )}
                 </div>
-                
+
                 <select
                     className="p-2 text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-gray-300 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     value={searchCriteria}
@@ -288,7 +303,7 @@ export default function ManageOrder() {
                     <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-6">
                         Gestión de Pedidos
                     </h1>
-                    
+
                     <div className="overflow-x-auto">
                         <DataTable
                             columns={columns}

@@ -84,7 +84,10 @@ export default function ChefSideBar() {
                                     Menú
                                 </Sidebar.Item>
                             </Link>
-                            <Sidebar.Collapse icon={HiClipboardCheck} label={`Ordenes -  ${orders.filter(order => order.orderStatus === 'Pending').length}`} className='w-full'>
+                            <Sidebar.Collapse icon={HiClipboardCheck} label={`Órdenes - ${orders.filter(order =>
+                                ["Pending", "Processing", "Canceled", "Ready", "Completed"].includes(order.orderStatus)
+                            ).length
+                                }`} className='w-full'>
                                 <Link to='/chef?tab=allOrders'>
                                     <Sidebar.Item className=' ml-0 justify-self-start' active={tab === 'allOrders'} >Todas las órdenes </Sidebar.Item>
                                 </Link>
@@ -95,7 +98,7 @@ export default function ChefSideBar() {
                                     <Sidebar.Item className=' ml-0 justify-self-start' active={tab === 'preparingOrders'} >Órdenes en preparación</Sidebar.Item>
                                 </Link>
                                 <Link to='/chef?tab=finishedOrders'>
-                                    <Sidebar.Item active={tab === 'finishedOrders'} >Órdenes terminadas</Sidebar.Item>
+                                    <Sidebar.Item active={tab === 'finishedOrders'} >Órdenes finalizadas</Sidebar.Item>
                                 </Link>
                                 <Link to='/chef?tab=canceledOrders'>
                                     <Sidebar.Item active={tab === 'canceledOrders'} >Órdenes canceladas</Sidebar.Item>

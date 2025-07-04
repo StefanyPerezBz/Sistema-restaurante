@@ -47,6 +47,7 @@ export default function ManagerDash() {
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [payments, setPayments] = useState([]);
+  const [menuItems, setMenuItems] = useState([]); // Nuevo estado para los items del menú
 
   // Estadísticas
   const [stats, setStats] = useState({
@@ -153,6 +154,7 @@ export default function ManagerDash() {
       setNextEvent(eventRes.data);
       setOrders(ordersRes.data);
       setPayments(paymentsRes.data);
+      setMenuItems(menuItemsRes.data); // Guardar los items del menú
 
       const activeEmployees = employeesRes.data.filter(e => e.isActive).length;
 
@@ -173,7 +175,7 @@ export default function ManagerDash() {
         activeEmployees,
         monthlyRevenue: monthlyRevenueRes.data || 0,
         dailyRevenue: dailyRevenue || 0,
-        popularItems: getPopularItems(ordersRes.data),
+        popularItems: getPopularItems(ordersRes.data, menuItemsRes.data), // Pasamos los items del menú
         eventCount: allEventsRes.data.length || 0,
         paymentCount: paymentsRes.data.length || 0,
         menuItemsCount: menuItemsRes.data.length
@@ -233,17 +235,28 @@ export default function ManagerDash() {
     ];
   };
 
-  const getPopularItems = (orders) => {
+  const getPopularItems = (orders, menuItems) => {
     if (!orders || orders.length === 0) return [];
 
     const itemCounts = {};
+    const menuItemsMap = {};
+
+    // Creamos un mapa rápido de los items del menú para búsqueda por ID
+    menuItems.forEach(item => {
+      menuItemsMap[item.foodId] = item;
+    });
 
     orders.forEach(order => {
       order.orderItems.forEach(item => {
-        if (!itemCounts[item.itemName]) {
-          itemCounts[item.itemName] = 0;
+        // Buscamos el nombre correcto: primero en el item del pedido, sino en el menú
+        const itemName = item.foodItemName ||
+          (menuItemsMap[item.foodItemId]?.foodName) ||
+          'Ítem no disponible';
+
+        if (!itemCounts[itemName]) {
+          itemCounts[itemName] = 0;
         }
-        itemCounts[item.itemName] += item.quantity;
+        itemCounts[itemName] += item.quantity;
       });
     });
 
@@ -303,15 +316,39 @@ export default function ManagerDash() {
 
     const categories = {};
 
+    // Mapeo de traducción de categorías
+    const categoryTranslations = {
+      'Main Course': 'Plato Principal',
+      'Side Dish': 'Acompañamiento',
+      'Appetizer': 'Entrada',
+      'Dessert': 'Postre',
+      'Beverage': 'Bebida',
+      'Salad': 'Ensalada',
+      'Soup': 'Sopa',
+      'Breakfast': 'Desayuno',
+      'Lunch': 'Almuerzo',
+      'Dinner': 'Cena',
+      'Kids Menu': 'Menú Infantil',
+      'Vegetarian': 'Vegetariano',
+      'Vegan': 'Vegano',
+      'Gluten Free': 'Sin Gluten'
+    };
+
     menuItems.forEach(item => {
-      if (!categories[item.category]) {
-        categories[item.category] = 0;
+      // Obtener la categoría original o usar 'Sin categoría'
+      const originalCategory = item.foodCategory || 'Sin categoría';
+
+      // Traducir la categoría o mantenerla igual si no hay traducción
+      const categoryName = categoryTranslations[originalCategory] || originalCategory;
+
+      if (!categories[categoryName]) {
+        categories[categoryName] = 0;
       }
-      categories[item.category]++;
+      categories[categoryName]++;
     });
 
     return Object.entries(categories).map(([category, count]) => ({
-      type: category || 'Sin categoría',
+      type: category,
       count
     }));
   };
@@ -338,20 +375,22 @@ export default function ManagerDash() {
     });
 
     try {
-      const pdf = new jsPDF('l', 'mm', 'a4');
+      const pdf = new jsPDF('p', 'mm', 'a4');
       let positionY = 20;
       let positionX = 15;
 
+      // Encabezado del PDF
       pdf.setFontSize(20);
       pdf.setTextColor(colors.primary);
-      pdf.text('Reporte de Gestión - Restaurante Los Patos', 148, positionY, { align: 'center' });
+      pdf.text('Reporte de Gestión - Restaurante Los Patos', 105, positionY, { align: 'center' });
       positionY += 10;
 
       pdf.setFontSize(12);
       pdf.setTextColor(colors.text);
-      pdf.text(`Generado el: ${formattedDate} a las ${formattedTime}`, 148, positionY, { align: 'center' });
+      pdf.text(`Generado el: ${formattedDate} a las ${formattedTime}`, 105, positionY, { align: 'center' });
       positionY += 15;
 
+      // Resumen de estadísticas
       pdf.setFontSize(14);
       pdf.setTextColor(colors.primary);
       pdf.text('Resumen de Estadísticas', positionX, positionY);
@@ -360,75 +399,138 @@ export default function ManagerDash() {
       pdf.setFontSize(10);
       pdf.setTextColor(colors.text);
 
-      pdf.text(`• Empleados: ${stats.employees}`, positionX, positionY);
-      pdf.text(`• Ingresos diarios: S/. ${stats.dailyRevenue.toLocaleString('es-PE')}`, positionX + 140, positionY);
-      positionY += 7;
+      // Tabla de resumen
+      pdf.autoTable({
+        startY: positionY,
+        head: [['Métrica', 'Valor']],
+        body: [
+          ['Empleados', stats.employees],
+          ['Empleados activos', stats.activeEmployees],
+          ['Ingresos mensuales', `S/. ${stats.monthlyRevenue.toLocaleString('es-PE')}`],
+          ['Ingresos diarios', `S/. ${stats.dailyRevenue.toLocaleString('es-PE')}`],
+          ['Eventos programados', stats.eventCount],
+          ['Pagos registrados', stats.paymentCount],
+          ['Platos en menú', stats.menuItemsCount],
+          ['Mesas disponibles', `${availableTables}/${tables.length}`]
+        ],
+        theme: 'grid',
+        headStyles: {
+          fillColor: colors.primary,
+          textColor: '#ffffff'
+        },
+        alternateRowStyles: {
+          fillColor: isDarkMode ? '#374151' : '#f3f4f6'
+        }
+      });
 
-      pdf.text(`• Eventos programados: ${stats.eventCount}`, positionX, positionY);
-      pdf.text(`• Pagos registrados: ${stats.paymentCount}`, positionX + 70, positionY);
-      positionY += 15;
+      positionY = pdf.autoTable.previous.finalY + 15;
+
+      // Ingresos mensuales
+      pdf.setFontSize(14);
+      pdf.setTextColor(colors.primary);
+      pdf.text('Ingresos Mensuales', positionX, positionY);
+      positionY += 10;
 
       if (revenueData.length > 0) {
-        const canvas = await html2canvas(chartsRef.current[0]);
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', positionX, positionY, 120, 80);
+        const revenueTableData = revenueData.map(item => [
+          item.day,
+          `S/. ${item.revenue.toLocaleString('es-PE')}`
+        ]);
+
+        pdf.autoTable({
+          startY: positionY,
+          head: [['Día', 'Ingresos (S/.)']],
+          body: revenueTableData,
+          theme: 'grid',
+          headStyles: {
+            fillColor: colors.primary,
+            textColor: '#ffffff'
+          },
+          alternateRowStyles: {
+            fillColor: isDarkMode ? '#374151' : '#f3f4f6'
+          }
+        });
       } else {
-        pdf.setTextColor(colors.danger);
-        pdf.text('Datos de ingresos mensuales no disponibles', positionX, positionY + 40);
+        pdf.setTextColor(colors.text);
+        pdf.text('Sin datos de ingresos mensuales', positionX, positionY);
       }
+
+      positionY = revenueData.length > 0 ? pdf.autoTable.previous.finalY + 15 : positionY + 10;
+
+      // Ingresos por hora
+      pdf.setFontSize(14);
+      pdf.setTextColor(colors.primary);
+      pdf.text('Ingresos por Hora', positionX, positionY);
+      positionY += 10;
 
       if (dailyRevenueData.length > 0) {
-        const canvas = await html2canvas(chartsRef.current[1]);
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', positionX + 130, positionY, 120, 80);
+        const dailyRevenueTableData = dailyRevenueData.map(item => [
+          item.hour,
+          `S/. ${item.revenue.toLocaleString('es-PE')}`
+        ]);
+
+        pdf.autoTable({
+          startY: positionY,
+          head: [['Hora', 'Ingresos (S/.)']],
+          body: dailyRevenueTableData,
+          theme: 'grid',
+          headStyles: {
+            fillColor: colors.primary,
+            textColor: '#ffffff'
+          },
+          alternateRowStyles: {
+            fillColor: isDarkMode ? '#374151' : '#f3f4f6'
+          }
+        });
       } else {
-        pdf.setTextColor(colors.danger);
-        pdf.text('Datos de ingresos diarios no disponibles', positionX + 130, positionY + 40);
+        pdf.setTextColor(colors.text);
+        pdf.text('Sin datos de ingresos por hora', positionX, positionY);
       }
 
-      pdf.addPage();
-      positionY = 20;
+      positionY = dailyRevenueData.length > 0 ? pdf.autoTable.previous.finalY + 15 : positionY + 10;
+
+      // Estado de pedidos
+      pdf.setFontSize(14);
+      pdf.setTextColor(colors.primary);
+      pdf.text('Estado de Pedidos', positionX, positionY);
+      positionY += 10;
 
       if (orderStatusData.length > 0) {
-        const canvas = await html2canvas(chartsRef.current[2]);
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', positionX, positionY, 120, 80);
+        const orderStatusTableData = orderStatusData.map(item => [
+          item.status,
+          item.count.toString()
+        ]);
+
+        pdf.autoTable({
+          startY: positionY,
+          head: [['Estado', 'Cantidad']],
+          body: orderStatusTableData,
+          theme: 'grid',
+          headStyles: {
+            fillColor: colors.primary,
+            textColor: '#ffffff'
+          },
+          alternateRowStyles: {
+            fillColor: isDarkMode ? '#374151' : '#f3f4f6'
+          }
+        });
       } else {
-        pdf.setTextColor(colors.danger);
-        pdf.text('Datos de estado de pedidos no disponibles', positionX, positionY + 40);
+        pdf.setTextColor(colors.text);
+        pdf.text('Sin datos de estado de pedidos', positionX, positionY);
       }
+
+      positionY = orderStatusData.length > 0 ? pdf.autoTable.previous.finalY + 15 : positionY + 10;
+
+      // Eventos
+      pdf.setFontSize(14);
+      pdf.setTextColor(colors.primary);
+      pdf.text('Estado de Eventos', positionX, positionY);
+      positionY += 10;
 
       if (eventsData.length > 0) {
-        const canvas = await html2canvas(chartsRef.current[3]);
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', positionX + 130, positionY, 120, 80);
-      } else {
-        pdf.setTextColor(colors.danger);
-        pdf.text('Datos de eventos no disponibles', positionX + 130, positionY + 40);
-      }
-
-      pdf.addPage();
-      positionY = 20;
-
-      if (paymentData.length > 0) {
-        const canvas = await html2canvas(chartsRef.current[4]);
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', positionX, positionY, 120, 80);
-      } else {
-        pdf.setTextColor(colors.danger);
-        pdf.text('Datos de gastos no disponibles', positionX, positionY + 40);
-      }
-
-      if (menuCategoryData.length > 0) {
-        const canvas = await html2canvas(chartsRef.current[5]);
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', positionX + 130, positionY, 120, 80);
-      } else {
-        pdf.setTextColor(colors.danger);
-        pdf.text('Datos de categorías de menú no disponibles', positionX + 130, positionY + 40);
-      }
-
-      pdf.addPage();
-      positionY = 20;
-
-      if (eventsData.length > 0) {
-        const eventsTableData = eventsData.map(event => [
-          event.status,
-          event.count.toString()
+        const eventsTableData = eventsData.map(item => [
+          item.status,
+          item.count.toString()
         ]);
 
         pdf.autoTable({
@@ -446,24 +548,26 @@ export default function ManagerDash() {
         });
       } else {
         pdf.setTextColor(colors.text);
-        pdf.text('No hay datos de eventos disponibles', positionX, positionY);
+        pdf.text('Sin datos de eventos', positionX, positionY);
       }
 
-      positionY = pdf.autoTable.previous.finalY + 15;
-      pdf.setFontSize(16);
+      positionY = eventsData.length > 0 ? pdf.autoTable.previous.finalY + 15 : positionY + 10;
+
+      // Gastos
+      pdf.setFontSize(14);
       pdf.setTextColor(colors.primary);
-      pdf.text('Detalle de Pagos', positionX, positionY);
+      pdf.text('Gastos por Categoría', positionX, positionY);
       positionY += 10;
 
       if (paymentData.length > 0) {
-        const paymentsTableData = paymentData.map(payment => [
-          payment.category,
-          `S/. ${payment.amount.toLocaleString('es-PE')}`
+        const paymentsTableData = paymentData.map(item => [
+          item.category,
+          `S/. ${item.amount.toLocaleString('es-PE')}`
         ]);
 
         pdf.autoTable({
           startY: positionY,
-          head: [['Categoría', 'Monto']],
+          head: [['Categoría', 'Monto (S/.)']],
           body: paymentsTableData,
           theme: 'grid',
           headStyles: {
@@ -476,13 +580,122 @@ export default function ManagerDash() {
         });
       } else {
         pdf.setTextColor(colors.text);
-        pdf.text('No hay datos de pagos disponibles', positionX, positionY);
+        pdf.text('Sin datos de gastos', positionX, positionY);
       }
 
+      positionY = paymentData.length > 0 ? pdf.autoTable.previous.finalY + 15 : positionY + 10;
+
+      // Categorías del menú
+      pdf.setFontSize(14);
+      pdf.setTextColor(colors.primary);
+      pdf.text('Categorías del Menú', positionX, positionY);
+      positionY += 10;
+
+      if (menuCategoryData.length > 0) {
+        const menuCategoryTableData = menuCategoryData.map(item => [
+          item.type,
+          item.count.toString()
+        ]);
+
+        pdf.autoTable({
+          startY: positionY,
+          head: [['Categoría', 'Cantidad']],
+          body: menuCategoryTableData,
+          theme: 'grid',
+          headStyles: {
+            fillColor: colors.primary,
+            textColor: '#ffffff'
+          },
+          alternateRowStyles: {
+            fillColor: isDarkMode ? '#374151' : '#f3f4f6'
+          }
+        });
+      } else {
+        pdf.setTextColor(colors.text);
+        pdf.text('Sin datos de categorías del menú', positionX, positionY);
+      }
+
+      positionY = menuCategoryData.length > 0 ? pdf.autoTable.previous.finalY + 15 : positionY + 10;
+
+      // Platos populares
+      pdf.setFontSize(14);
+      pdf.setTextColor(colors.primary);
+      pdf.text('Platos Más Populares', positionX, positionY);
+      positionY += 10;
+
+      if (stats.popularItems.length > 0) {
+        const popularItemsTableData = stats.popularItems.map(item => [
+          item.name || 'Ítem no disponible',
+          item.count.toString(),
+          `S/. ${(menuItems.find(mi => mi.foodName === item.name)?.foodPrice?.toLocaleString('es-PE') || 'N/A')}`
+        ]);
+
+        pdf.autoTable({
+          startY: positionY,
+          head: [['Plato', 'Ventas', 'Precio unitario']],
+          body: popularItemsTableData,
+          theme: 'grid',
+          headStyles: {
+            fillColor: colors.primary,
+            textColor: '#ffffff'
+          },
+          alternateRowStyles: {
+            fillColor: isDarkMode ? '#374151' : '#f3f4f6'
+          }
+        });
+      } else {
+        pdf.setTextColor(colors.text);
+        pdf.text('Sin datos de platos populares', positionX, positionY);
+      }
+
+      positionY = stats.popularItems.length > 0 ? pdf.autoTable.previous.finalY + 15 : positionY + 10;
+
+      // Próximo evento
+      pdf.setFontSize(14);
+      pdf.setTextColor(colors.primary);
+      pdf.text('Próximo Evento', positionX, positionY);
+      positionY += 10;
+
+      if (nextEvent) {
+        const eventDate = new Date(nextEvent.eventDate).toLocaleDateString('es-PE', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+
+        const eventTableData = [
+          ['Nombre', nextEvent.eventName || 'No especificado'],
+          ['Fecha', eventDate],
+          ['Hora', nextEvent.startTime || 'No especificada'],
+          ['Invitado', nextEvent.entertainer || 'No especificado'],
+          ['Recaudado', nextEvent.budget ? `S/. ${nextEvent.budget.toLocaleString('es-PE')}` : 'No especificado']
+        ];
+
+        pdf.autoTable({
+          startY: positionY,
+          head: [['Detalle', 'Información']],
+          body: eventTableData,
+          theme: 'grid',
+          headStyles: {
+            fillColor: colors.primary,
+            textColor: '#ffffff'
+          },
+          alternateRowStyles: {
+            fillColor: isDarkMode ? '#374151' : '#f3f4f6'
+          }
+        });
+      } else {
+        pdf.setTextColor(colors.text);
+        pdf.text('No hay eventos próximos', positionX, positionY);
+      }
+
+      // Pie de página
       pdf.setFontSize(10);
       pdf.setTextColor(colors.text);
-      pdf.text('© Restaurante Los Patos - Todos los derechos reservados', 148, 200, { align: 'center' });
+      pdf.text('© Restaurante Los Patos - Todos los derechos reservados', 105, 285, { align: 'center' });
 
+      // Guardar el PDF
       pdf.save(`reporte-gestion-${new Date().toISOString().slice(0, 10)}.pdf`);
 
       loadingAlert.close();
@@ -609,18 +822,13 @@ export default function ManagerDash() {
   };
 
   const menuCategoryChartData = {
-    labels: menuCategoryData.map(item => item.type),
+    labels: menuCategoryData.map(item => item.type || 'Sin categoría'),
     datasets: [
       {
         label: 'Platos por Categoría',
         data: menuCategoryData.map(item => item.count),
         backgroundColor: [
-          '#F94144', // Rojo
-          '#F3722C', // Naranja
-          '#F8961E', // Amarillo oscuro
-          '#90BE6D', // Verde
-          '#43AA8B', // Verde azulado
-          '#577590'  // Azul grisáceo
+          '#F94144', '#F3722C', '#F8961E', '#90BE6D', '#43AA8B', '#577590'
         ],
         borderColor: isDarkMode ? '#374151' : '#e5e7eb',
         borderWidth: 1
@@ -1125,7 +1333,7 @@ export default function ManagerDash() {
                 )}
 
                 <div>
-                  <p className="font-semibold dark:text-white">Presupuesto:</p>
+                  <p className="font-semibold dark:text-white">Recaudado:</p>
                   <p className="text-gray-600 dark:text-gray-300">
                     {selectedEvent.budget ? `S/. ${selectedEvent.budget.toLocaleString('es-PE')}` : 'No especificado'}
                   </p>

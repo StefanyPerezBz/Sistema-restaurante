@@ -58,7 +58,7 @@ const OrderView = () => {
                     setOrderItems(convertedOrderItems);
                     setTableNumber(tableNumber);
                     setNote(specialNote || "Sin notas especiales");
-                    
+
                     // Establecer los valores directamente del servidor
                     setSubtotal(subTotal);
                     setDiscountPercentage(discountPercentage || 0);
@@ -109,7 +109,7 @@ const OrderView = () => {
             const newSubtotal = orderItems.reduce((total, item) => total + (item.foodPrice * item.quantity), 0);
             const newDiscountValue = (newSubtotal * discountPercentage) / 100;
             const newTotal = newSubtotal - newDiscountValue;
-            
+
             setSubtotal(newSubtotal);
             setDiscountValue(newDiscountValue);
             setTotalAfterDiscount(newTotal);
@@ -179,13 +179,19 @@ const OrderView = () => {
                         <h1 className="mb-2 text-left text-lg md:text-xl font-bold dark:text-white px-2">
                             #{OrderResponse.orderId} &nbsp; | &nbsp;
                             <span className={`inline-flex px-2 py-1 mr-auto items-center font-semibold text-sm md:text-base text-white rounded-lg ${OrderResponse.orderStatus === "Pending" ? "bg-yellow-300" :
-                                    OrderResponse.orderStatus === "Processing" ? "bg-blue-300" :
-                                        OrderResponse.orderStatus === "Ready" ? "bg-green-300" :
-                                            OrderResponse.orderStatus === "Completed" ? "bg-green-500" :
-                                                OrderResponse.orderStatus === "Canceled" ? "bg-red-500" :
-                                                    "bg-gray-300"
+                                OrderResponse.orderStatus === "Processing" ? "bg-blue-300" :
+                                    OrderResponse.orderStatus === "Ready" ? "bg-green-300" :
+                                        OrderResponse.orderStatus === "Completed" ? "bg-green-500" :
+                                            OrderResponse.orderStatus === "Canceled" ? "bg-red-500" :
+                                                "bg-gray-300"
                                 }`}>
-                                &nbsp;{OrderResponse.orderStatus}&nbsp;
+                                &nbsp;{OrderResponse.orderStatus === "Pending" ? "Pendiente" :
+                                    OrderResponse.orderStatus === "Processing" ? "En proceso" :
+                                        OrderResponse.orderStatus === "Ready" ? "Listo" :
+                                            OrderResponse.orderStatus === "Completed" ? "Completado" :
+                                                OrderResponse.orderStatus === "Canceled" ? "Cancelado" :
+                                                    OrderResponse.orderStatus
+                                }&nbsp;
                             </span>
                             &nbsp;|&nbsp;
                             {convertDate(OrderResponse.orderDateTime)}

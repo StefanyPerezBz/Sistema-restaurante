@@ -59,7 +59,7 @@ export function DailyInventoryUsage({ selectedDate, onCancel }) {
                         </div>
                     ) : apiData.length === 0 ? (
                         <div className="p-4 text-center text-gray-500">
-                            No se utilizó ningún ingrediente para la fecha seleccionada.
+                            No se utilizó ningún artículo para la fecha seleccionada.
                         </div>
                     ) : (
                         <div className="overflow-x-auto">

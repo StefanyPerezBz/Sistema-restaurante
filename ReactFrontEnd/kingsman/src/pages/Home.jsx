@@ -284,7 +284,7 @@ export default function Home() {
               <ul className='space-y-2'>
                 <li className='flex items-start'>
                   <FaMapMarkerAlt className='mt-1 mr-2 text-orange-300' />
-                  <span className='text-orange-200 dark:text-orange-300'>Av. Sabores 456, Centro</span>
+                  <span className='text-orange-200 dark:text-orange-300'>Panamericana Km 712, Chepén</span>
                 </li>
                 <li className='flex items-center'>
                   <FaPhone className='mr-2 text-orange-300' />
@@ -292,7 +292,7 @@ export default function Home() {
                 </li>
                 <li className='flex items-center'>
                   <FaClock className='mr-2 text-orange-300' />
-                  <span className='text-orange-200 dark:text-orange-300'>Lun-Dom: 11AM - 10PM</span>
+                  <span className='text-orange-200 dark:text-orange-300'>Lun-Dom: 9AM - 6PM</span>
                 </li>
               </ul>
             </div>

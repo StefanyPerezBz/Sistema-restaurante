@@ -44,7 +44,7 @@ export default function ManageOrder() {
 
     const handleCancelOrder = async (order) => {
 
-        console.log(order);
+        // console.log(order);
         const orderId = order.orderId;
         try {
             const response = await fetch(`http://localhost:8080/api/orders/status-update/${orderId}/Canceled`, {
@@ -230,14 +230,34 @@ export default function ManageOrder() {
                                         <tr onClick={() => redirectToOrderView(order.orderId)} key={order.orderId} className="hover:bg-gray-100 dark:hover:bg-gray-400 cursor-pointer">
                                             <td className="px-6 py-2 text-center"><a className=' hover:text-green-500' href={`/waiter?tab=order-view&order=${order.orderId}`}>{order.orderId}</a></td>
                                             <td className="px-6 py-2 text-center">
-                                                <span className={`inline-flex px-2 py-1 items-center text-white rounded-lg text-xs ${order.orderStatus === "Pending" ? "bg-yellow-300" :
-                                                        order.orderStatus === "Processing" ? "bg-blue-300" :
-                                                            order.orderStatus === "Ready" ? "bg-green-300" :
-                                                                order.orderStatus === "Completed" ? "bg-green-500" :
-                                                                    ""
-                                                    }`}
-                                                >{order.orderStatus}</span>
+                                                {(() => {
+                                                    const statusMap = {
+                                                        "Pending": "Pendiente",
+                                                        "Processing": "En preparación",
+                                                        "Ready": "Listo para entregar",
+                                                        "Completed": "Terminado",
+                                                        "Canceled": "Cancelado"
+                                                    };
+
+                                                    const colorClass = {
+                                                        "Pending": "bg-yellow-300",
+                                                        "Processing": "bg-blue-300",
+                                                        "Ready": "bg-green-300",
+                                                        "Completed": "bg-green-500",
+                                                        "Canceled": "bg-red-400"
+                                                    };
+
+                                                    const translated = statusMap[order.orderStatus] || order.orderStatus;
+                                                    const bgColor = colorClass[order.orderStatus] || "bg-gray-300";
+
+                                                    return (
+                                                        <span className={`inline-flex px-2 py-1 items-center text-white rounded-lg text-xs ${bgColor}`}>
+                                                            {translated}
+                                                        </span>
+                                                    );
+                                                })()}
                                             </td>
+
                                             <td className="px-6 py-2 text-center">{order.tableNumber == 0 ? "-" : order.tableNumber}</td>
                                             <td className="px-6 py-2 text-center">{order.orderItems.length}</td>
                                             <td className="px-6 py-2 text-center">{order.totalAfterDiscount.toFixed(2)}</td>

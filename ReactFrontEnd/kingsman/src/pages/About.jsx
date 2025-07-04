@@ -54,8 +54,8 @@ export default function About() {
                   <div className='flex items-start'>
                     <FaMapMarkerAlt className='text-orange-500 dark:text-orange-300 mt-1 mr-3 flex-shrink-0' />
                     <div>
-                      <p className='font-medium text-gray-700 dark:text-gray-300'>Carretera Chepén - Guadalupe Km 4.5</p>
-                      <p className='text-gray-600 dark:text-gray-400'>Campo Verde, Chepén</p>
+                      <p className='font-medium text-gray-700 dark:text-gray-300'>Chepén Km 712</p>
+                      <p className='text-gray-600 dark:text-gray-400'>Chepén, La Libertad</p>
                     </div>
                   </div>
                   <div className='flex items-center'>
@@ -76,20 +76,20 @@ export default function About() {
                 <div className='space-y-3'>
                   <div className='flex justify-between pb-2 border-b border-gray-200 dark:border-gray-700'>
                     <span className='text-gray-700 dark:text-gray-300'>Lunes - Viernes</span>
-                    <span className='font-medium text-orange-600 dark:text-orange-400'>11:00 AM - 10:00 PM</span>
+                    <span className='font-medium text-orange-600 dark:text-orange-400'>9:00 AM - 6:00 PM</span>
                   </div>
                   <div className='flex justify-between pb-2 border-b border-gray-200 dark:border-gray-700'>
                     <span className='text-gray-700 dark:text-gray-300'>Sábado</span>
-                    <span className='font-medium text-orange-600 dark:text-orange-400'>10:00 AM - 11:00 PM</span>
+                    <span className='font-medium text-orange-600 dark:text-orange-400'>9:00 AM - 6:00 PM</span>
                   </div>
                   <div className='flex justify-between'>
                     <span className='text-gray-700 dark:text-gray-300'>Domingo</span>
-                    <span className='font-medium text-orange-600 dark:text-orange-400'>10:00 AM - 9:00 PM</span>
+                    <span className='font-medium text-orange-600 dark:text-orange-400'>9:00 AM - 6:00 PM</span>
                   </div>
                 </div>
                 <div className='mt-4 bg-orange-100 dark:bg-gray-700 p-3 rounded-lg'>
                   <p className='text-orange-700 dark:text-orange-300 text-center text-sm'>
-                    Horario extendido los feriados hasta las 10:00 PM
+                    Horario extendido los feriados hasta las 8:00 PM
                   </p>
                 </div>
               </div>

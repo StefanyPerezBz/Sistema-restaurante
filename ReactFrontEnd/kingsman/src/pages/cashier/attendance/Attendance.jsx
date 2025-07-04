@@ -1,228 +1,8 @@
-// import React, { useState, useEffect } from "react";
-// import { Table, Button, Modal, Alert, Pagination } from "flowbite-react";
-// import { FcAlarmClock } from "react-icons/fc"; // Importing FcAlarmClock icon
-// import { HiOutlineExclamationCircle, HiInformationCircle } from "react-icons/hi";
-// import axios from 'axios';
-
-// function Attendance() {
-//   const [attendance, setAttendance] = useState([]);
-//   const [openModal, setOpenModal] = useState(false);
-//   const [selectedEmployee, setSelectedEmployee] = useState({});
-//   const [isInTime, setIsInTime] = useState(true); // Track if it's in time or out time
-//   const [errorMessage, setErrorMessage] = useState(""); // State for error message
-//   const [currentPage, setCurrentPage] = useState(1); // State for current page
-//   const itemsPerPage = 10; // Number of items per page
-
-//   // Get today's date in the format: DD-MM-YYYY
-//   const todayDate = new Date().toLocaleDateString("en-US", {
-//     day: "2-digit",
-//     month: "2-digit",
-//     year: "numeric"
-//   });
-
-//   // Function to fetch employee data from the backend
-//   const fetchEmployeeData = () => {
-//     axios.get('http://localhost:8080/employeeIdsAndPositions')
-//       .then(response => {
-//         const filteredData = response.data.filter(employee => employee[2] !== "manager");
-//         setAttendance(filteredData.map(employee => ({
-//           empId: employee[0],
-//           empName: employee[1],
-//           position: employee[2],
-//           inTime: "",
-//           outTime: ""
-//         })));
-//       })
-//       .catch(error => {
-//         console.error('Error al obtener los datos del empleado:', error);
-//       });
-//   };
-
-//   useEffect(() => {
-//     fetchEmployeeData();
-//   }, []); // Run only once on component mount
-
-//   // Pagination calculations
-//   const indexOfLastItem = currentPage * itemsPerPage;
-//   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//   const currentAttendance = attendance.slice(indexOfFirstItem, indexOfLastItem);
-
-//   // Function to handle page change
-//   const onPageChange = (page) => {
-//     setCurrentPage(page);
-//   };
-
-//   // Function to handle taking in time or out time
-//   const handleTakeTime = (empId, empName, position, isInTime) => {
-//     setSelectedEmployee({ empId, empName, position });
-//     setIsInTime(isInTime);
-//     setOpenModal(true);
-//   };
-
-//   const confirmAttendance = () => {
-//     const currentTime = new Date().toLocaleTimeString();
-//     console.log("Hora actual::", currentTime); // Check if currentTime is correct
-//     // Mark in attendance
-//     if (isInTime) {
-//       axios.post('http://localhost:8080/attendance/in', {
-//         empId: selectedEmployee.empId,
-//         empName: selectedEmployee.empName,
-//         position: selectedEmployee.position,
-//         inTime: currentTime,
-//       })
-//         .then(response => {
-//           setAttendance(prevAttendance => prevAttendance.map(emp => {
-//             if (emp.empId === selectedEmployee.empId) {
-//               return { ...emp, inTime: currentTime };
-//             }
-//             return emp;
-//           }));
-//           setOpenModal(false);
-//         })
-//         .catch(error => {
-//           console.error('Marcado de errores en la asistencia:', error);
-//           setOpenModal(false);
-//           if (error.response && error.response.status === 400) {
-//             // Set error message state
-//             setErrorMessage(error.response.data);
-//             // Clear error message after 1.5 seconds
-//             setTimeout(() => {
-//               setErrorMessage("");
-//             }, 1500);
-//           }
-//         });
-//     } else {
-//       // Mark out attendance
-//       axios.post('http://localhost:8080/attendance/out', {
-//         empId: selectedEmployee.empId, // Corrected field name to empId
-//         empName: selectedEmployee.empName,
-//         position: selectedEmployee.position,
-//         outTime: currentTime,
-//       })
-//         .then(response => {
-//           console.log("Tiempo fuera:", currentTime); // Check if outTime is being set correctly
-//           setAttendance(prevAttendance => prevAttendance.map(emp => {
-//             if (emp.empId === selectedEmployee.empId) {
-//               return { ...emp, outTime: currentTime };
-//             }
-//             return emp;
-//           }));
-//           setOpenModal(false);
-//         })
-//         .catch(error => {
-//           console.error('Error al marcar la asistencia:', error);
-//           setOpenModal(false);
-//           if (error.response && error.response.status === 400) {
-//             // Set error message state
-//             setErrorMessage(error.response.data);
-//             // Clear error message after 1.8 seconds
-//             setTimeout(() => {
-//               setErrorMessage("");
-//             }, 1800);
-//           }
-//         });
-//     }
-//   };
-
-//   return (
-//     <div className="mr-16 ml-16 mt-5 mb-5 w-full">
-//       {/* Header */}
-//       <h1 style={{ fontFamily: "Arial", fontSize: "24px", fontWeight: "bold" }}>
-//         Tomar asistencia (La fecha de hoy: {todayDate})
-//       </h1>
-
-//       {/* Table container */}
-//       <div>
-//         {/* Error Alert */}
-//         {errorMessage && (
-//           <Alert color="failure" icon={HiInformationCircle}>
-//             <span className="font-medium">Error!</span> {errorMessage}
-//           </Alert>
-//         )}
-//         <Table hoverable className="my-4 shadow">
-//           <Table.Head>
-//             <Table.HeadCell>#</Table.HeadCell>
-//             <Table.HeadCell>ID del empleado</Table.HeadCell>
-//             <Table.HeadCell>Nombre del empleado</Table.HeadCell>
-//             <Table.HeadCell>Rol</Table.HeadCell>
-//             <Table.HeadCell>Hora de entrada</Table.HeadCell>
-//             <Table.HeadCell>Marcar entrada</Table.HeadCell>
-//             <Table.HeadCell>Hora de salida</Table.HeadCell>
-//             <Table.HeadCell>Marcar salida</Table.HeadCell>
-//           </Table.Head>
-//           <Table.Body className="divide-y">
-//             {currentAttendance.map((employee, index) => (
-//               <Table.Row 
-//                 key={index} 
-//                 className="bg-slate-800 hover:bg-emerald-400"
-//               >
-//                 <Table.Cell className="text-white">{indexOfFirstItem + index + 1}</Table.Cell>
-//                 <Table.Cell className="text-white">{employee.empId}</Table.Cell>
-//                 <Table.Cell className="text-white">{employee.empName}</Table.Cell>
-//                 <Table.Cell className="text-white">{employee.position}</Table.Cell>
-//                 <Table.Cell>
-//                   {employee.inTime ? employee.inTime : (
-//                     <FcAlarmClock style={{ cursor: 'pointer', fontSize: '24px', color: 'blue' }}/>
-//                   )}
-//                 </Table.Cell>
-//                 <Table.Cell>
-//                   <Button color="blue" pill onClick={() => handleTakeTime(employee.empId, employee.empName, employee.position, true)}>Registrar hora de entrada</Button>
-//                 </Table.Cell>
-//                 <Table.Cell>
-//                   {employee.outTime ? employee.outTime : (
-//                     <FcAlarmClock  style={{ cursor: 'pointer', fontSize: '24px', color: 'red' }} />
-//                   )}
-//                 </Table.Cell>
-//                 <Table.Cell>
-//                   <Button color="success" pill onClick={() => handleTakeTime(employee.empId, employee.empName, employee.position, false)}>Registrar hora de salida</Button>
-//                 </Table.Cell>
-//               </Table.Row>
-//             ))}
-//           </Table.Body>
-//         </Table>
-//       </div>
-
-//       {/* Pagination */}
-//       <div className="flex justify-center my-4">
-//         <Pagination
-//           currentPage={currentPage}
-//           totalPages={Math.ceil(attendance.length / itemsPerPage)}
-//           onPageChange={onPageChange}
-//           showIcons
-//         />
-//       </div>
-
-//       {/* Confirmation Modal */}
-//       <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
-//         <Modal.Header />
-//         <Modal.Body>
-//           <div className="text-center">
-//             <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
-//             <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-//               {isInTime ? `Confirm in time for ${selectedEmployee.empId}?` : `Confirm out time for ${selectedEmployee.empId}?`}
-//             </h3>
-//             <div className="flex justify-center gap-4">
-//               <Button color="success" onClick={confirmAttendance}>
-//                 Si, estoy seguro
-//               </Button>
-//               <Button color="gray" onClick={() => setOpenModal(false)}>
-//                 No, cancelar
-//               </Button>
-//             </div>
-//           </div>
-//         </Modal.Body>
-//       </Modal>
-//     </div>
-//   );
-// }
-
-// export default Attendance;
-
 
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Alert } from "flowbite-react";
+import { Button, Alert, Modal, TextInput, Label } from "flowbite-react";
 import { FcAlarmClock, FcDownload } from "react-icons/fc";
-import { HiInformationCircle } from "react-icons/hi";
+import { HiInformationCircle, HiX, HiCheck } from "react-icons/hi";
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
 import Swal from 'sweetalert2';
@@ -230,21 +10,23 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 function Attendance() {
+  // Estados principales
   const [attendance, setAttendance] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState({});
   const [isInTime, setIsInTime] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [loading, setLoading] = useState(true);
   const tableRef = useRef();
 
-  // Get today's date in the format: DD-MM-YYYY
-  const todayDate = new Date().toLocaleDateString("en-US", {
+  // Fecha actual formateada
+  const todayDate = new Date().toLocaleDateString("es-ES", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric"
   });
 
-  // Effect to handle window resize
+  // Efecto para manejar el redimensionamiento de la ventana
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -254,78 +36,138 @@ function Attendance() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Function to translate position to Spanish
+  // Traducción de roles
   const translatePosition = (position) => {
     const translations = {
       'chef': 'Chef',
       'waiter': 'Mesero',
       'cashier': 'Cajero',
-      'cleaner': 'Limpieza',
       'manager': 'Gerente'
     };
     return translations[position.toLowerCase()] || position;
   };
 
-  // Function to format time to 12-hour format with AM/PM
+  // Formateo de hora a formato 12 horas AM/PM
   const formatTime = (timeString) => {
-    if (!timeString) return "";
-
+    if (!timeString) return "No registrado";
+    
+    // Si ya está en formato AM/PM, devolver tal cual
     if (timeString.includes("AM") || timeString.includes("PM")) {
       return timeString;
     }
 
+    // Convertir formato 24h a 12h AM/PM
     const timeParts = timeString.split(':');
     let hours = parseInt(timeParts[0]);
     const minutes = timeParts[1];
-    const seconds = timeParts[2]?.split(' ')[0] || '';
+    const seconds = timeParts[2] || '00';
 
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
-    hours = hours ? hours : 12;
+    hours = hours ? hours : 12; // La hora 0 se convierte en 12 AM
 
-    return `${hours}:${minutes}:${seconds} ${ampm}`;
+    return `${hours}:${minutes} ${ampm}`;
   };
 
-  // Function to get current time in 12-hour format
+  // Obtener hora actual en formato 12 horas AM/PM
   const getCurrentTime = () => {
     const now = new Date();
-    return now.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    });
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12; // La hora 0 se convierte en 12
+    
+    // Asegurar formato de 2 dígitos
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    
+    return `${hours}:${minutes} ${ampm}`;
   };
 
-  // Function to check if current time is within allowed range
-  const isTimeAllowed = (isEntry) => {
-    const now = new Date();
-    const hours = now.getHours();
+  // Convertir hora AM/PM a minutos para validación
+  const timeToMinutes = (timeStr) => {
+    if (!timeStr) return 0;
+    
+    // Extraer partes del tiempo
+    const [time, period] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+    
+    // Ajustar horas para PM
+    if (period === 'PM' && hours !== 12) {
+      hours += 12;
+    }
+    if (period === 'AM' && hours === 12) {
+      hours = 0;
+    }
+    
+    return hours * 60 + minutes;
+  };
 
+  // Validar si la hora actual está dentro del rango permitido
+  const isTimeAllowed = (isEntry) => {
+    const currentTime = getCurrentTime();
+    const currentMinutes = timeToMinutes(currentTime);
+    
     if (isEntry) {
-      return hours >= 7 && hours < 11;
+      // Entrada permitida de 7:00 AM a 9:00 AM (420 a 540 minutos)
+      return currentMinutes >= 420 && currentMinutes < 540;
     } else {
-      return hours >= 19 && hours < 22;
+      // Salida permitida de 7:00 PM a 10:00 PM (1140 a 1320 minutos)
+      return currentMinutes >= 1140 && currentMinutes < 1320;
     }
   };
 
-  // Function to fetch employee data from the backend
+  // Obtener datos de empleados
   const fetchEmployeeData = () => {
+    setLoading(true);
     axios.get('http://localhost:8080/employeeIdsAndPositions')
       .then(response => {
-        const filteredData = response.data.filter(employee => employee[2] !== "manager");
-        setAttendance(filteredData.map(employee => ({
+        const filteredData = response.data.filter(employee => employee[2] !== "manager" && employee[2] !== "waiter" && employee[2] !== "chef");
+        const initialAttendance = filteredData.map(employee => ({
           empId: employee[0],
           empName: employee[1],
           position: employee[2],
           inTime: "",
           outTime: "",
           hasRegisteredIn: false,
-          hasRegisteredOut: false
-        })));
+          hasRegisteredOut: false,
+          date: new Date().toISOString().split('T')[0]
+        }));
+
+        // Obtener registros existentes para hoy
+        axios.get('http://localhost:8080/current-date')
+          .then(attendanceResponse => {
+            const updatedAttendance = initialAttendance.map(emp => {
+              const existingRecord = attendanceResponse.data.find(
+                record => record.empId === emp.empId
+              );
+              
+              if (existingRecord) {
+                return {
+                  ...emp,
+                  inTime: existingRecord.inTime || "",
+                  outTime: existingRecord.outTime || "",
+                  hasRegisteredIn: !!existingRecord.inTime,
+                  hasRegisteredOut: !!existingRecord.outTime
+                };
+              }
+              return emp;
+            });
+            
+            setAttendance(updatedAttendance);
+            setLoading(false);
+          })
+          .catch(error => {
+            console.error('Error al obtener registros existentes:', error);
+            setAttendance(initialAttendance);
+            setLoading(false);
+          });
       })
       .catch(error => {
         console.error('Error al obtener los datos del empleado:', error);
+        setLoading(false);
+        setErrorMessage('Error al cargar los datos de empleados');
       });
   };
 
@@ -333,7 +175,7 @@ function Attendance() {
     fetchEmployeeData();
   }, []);
 
-  // Function to export to PDF
+  // Exportar a PDF
   const exportToPDF = () => {
     Swal.fire({
       title: 'Generando reporte PDF',
@@ -347,27 +189,27 @@ function Attendance() {
     setTimeout(() => {
       const doc = new jsPDF();
       
-      // Add title
+      // Título
       doc.setFontSize(18);
       doc.setTextColor(40, 40, 40);
       doc.text(`Reporte de Asistencia - ${todayDate}`, 15, 15);
       
-      // Add company info
+      // Información de la empresa
       doc.setFontSize(12);
       doc.text('Sistema de Control de Asistencia', 15, 25);
       
-      // Prepare data for PDF
+      // Preparar datos para la tabla
       const pdfData = attendance.map((emp, index) => [
         index + 1,
         emp.empId,
         emp.empName,
         translatePosition(emp.position),
-        emp.inTime ? formatTime(emp.inTime) : "No registrado",
-        emp.outTime ? formatTime(emp.outTime) : "No registrado",
+        formatTime(emp.inTime),
+        formatTime(emp.outTime),
         emp.inTime ? (emp.outTime ? "Completo" : "Solo entrada") : "Pendiente"
       ]);
 
-      // Add table to PDF
+      // Agregar tabla al PDF
       doc.autoTable({
         head: [['#', 'ID', 'Nombre', 'Rol', 'Entrada', 'Salida', 'Estado']],
         body: pdfData,
@@ -396,7 +238,7 @@ function Attendance() {
           6: { cellWidth: 25 }
         },
         didDrawPage: function (data) {
-          // Footer
+          // Pie de página
           const pageCount = doc.internal.getNumberOfPages();
           doc.setFontSize(10);
           doc.text(`Página ${data.pageNumber} de ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
@@ -414,7 +256,7 @@ function Attendance() {
     }, 1000);
   };
 
-  // Responsive columns configuration
+  // Configuración de columnas responsivas
   const getColumns = () => {
     const baseColumns = [
       {
@@ -460,16 +302,18 @@ function Attendance() {
       {
         name: windowWidth < 640 ? 'Entrada' : 'Marcar entrada',
         cell: row => (
-          <Button
-            color="blue"
-            size="xs"
-            pill
-            onClick={() => handleTakeTime(row.empId, row.empName, row.position, true)}
-            disabled={row.hasRegisteredIn || !isTimeAllowed(true)}
-            className="text-xs sm:text-sm"
-          >
-            {windowWidth < 640 ? 'Entrada' : 'Registrar entrada'}
-          </Button>
+          <div className="flex flex-col gap-1">
+            <Button
+              color="blue"
+              size="xs"
+              pill
+              onClick={() => handleTakeTime(row.empId, row.empName, row.position, true)}
+              disabled={row.hasRegisteredIn || !isTimeAllowed(true)}
+              className="text-xs sm:text-sm"
+            >
+              {windowWidth < 640 ? 'Entrada' : 'Registrar entrada'}
+            </Button>
+          </div>
         ),
         width: windowWidth < 640 ? '100px' : '150px'
       },
@@ -505,12 +349,12 @@ function Attendance() {
     return [...baseColumns, ...timeColumns];
   };
 
-  // Function to handle taking in time or out time
+  // Manejar registro de entrada/salida
   const handleTakeTime = (empId, empName, position, isInTime) => {
     if (isInTime && !isTimeAllowed(true)) {
       Swal.fire({
         title: 'Fuera de horario',
-        text: 'El horario de entrada es solo hasta las 9:00 AM. No puedes registrar tu entrada ahora.',
+        text: 'El horario de entrada es de 7:00 AM a 9:00 AM. No puedes registrar tu entrada ahora.',
         icon: 'error',
         confirmButtonText: 'Entendido'
       });
@@ -520,7 +364,7 @@ function Attendance() {
     if (!isInTime && !isTimeAllowed(false)) {
       Swal.fire({
         title: 'Fuera de horario',
-        text: 'El horario de salida es entre 7:00 PM y 10:00 PM. No puedes registrar tu salida ahora.',
+        text: 'El horario de salida es de 7:00 PM a 10:00 PM. No puedes registrar tu salida ahora.',
         icon: 'error',
         confirmButtonText: 'Entendido'
       });
@@ -532,12 +376,12 @@ function Attendance() {
 
     const confirmationText = isInTime 
       ? `¿Estás seguro de registrar tu hora de entrada ahora? (${getCurrentTime()})`
-      : `Recuerda que tu horario de salida es hasta las 7:30 PM. ¿Estás seguro de registrar tu hora de salida ahora? (${getCurrentTime()})`;
+      : `¿Estás seguro de registrar tu hora de salida ahora? (${getCurrentTime()})`;
 
     Swal.fire({
       title: isInTime ? 'Confirmar entrada' : 'Confirmar salida',
       text: confirmationText,
-      icon: isInTime ? 'question' : 'warning',
+      icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, registrar',
       cancelButtonText: 'Cancelar'
@@ -548,6 +392,7 @@ function Attendance() {
     });
   };
 
+  // Confirmar asistencia
   const confirmAttendance = (empId, empName, position) => {
     const currentTime = getCurrentTime();
 
@@ -560,6 +405,7 @@ function Attendance() {
       empName: empName,
       position: position,
       [timeField]: currentTime,
+      date: new Date().toISOString().split('T')[0]
     })
       .then(response => {
         setAttendance(prevAttendance => prevAttendance.map(emp => {
@@ -576,7 +422,7 @@ function Attendance() {
 
         Swal.fire({
           title: successMessage,
-          text: `Hora ${isInTime ? 'de entrada' : 'de salida'} registrada: ${currentTime}`,
+          text: `Hora ${isInTime ? 'de entrada' : 'de salida'} registrada: ${formatTime(currentTime)}`,
           icon: 'success',
           confirmButtonText: 'Aceptar'
         });
@@ -596,21 +442,39 @@ function Attendance() {
 
   return (
     <div className="mx-4 sm:mx-8 md:mx-16 mt-5 mb-5 w-auto">
-      {/* Header */}
+      {/* Encabezado */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
         <h1 className="text-xl sm:text-2xl font-bold">
           Asistencia (Hoy: {todayDate})
         </h1>
+        <Button 
+          color="gray" 
+          onClick={exportToPDF}
+          className="flex items-center gap-2"
+        >
+          <FcDownload className="text-lg" />
+          <span>Exportar PDF</span>
+        </Button>
       </div>
 
-      {/* Error Alert */}
+      {/* Alerta de error */}
       {errorMessage && (
         <Alert color="failure" icon={HiInformationCircle} className="mb-4">
           <span className="font-medium">Error!</span> {errorMessage}
         </Alert>
       )}
 
-      {/* DataTable */}
+      {/* Información de horarios */}
+      <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <Alert color="info" className="text-sm">
+          <span className="font-medium">Horario de entrada:</span> De 7:00 AM a 9:00 AM
+        </Alert>
+        <Alert color="info" className="text-sm">
+          <span className="font-medium">Horario de salida:</span> De 7:00 PM a 10:00 PM
+        </Alert>
+      </div>
+
+      {/* Tabla de datos */}
       <div className="my-4 shadow rounded-lg overflow-x-auto" ref={tableRef}>
         <DataTable
           columns={getColumns()}
@@ -620,6 +484,8 @@ function Attendance() {
           noHeader
           striped
           highlightOnHover
+          progressPending={loading}
+          progressComponent={<div className="py-8">Cargando datos...</div>}
           paginationPerPage={10}
           paginationRowsPerPageOptions={[5, 10, 15, 20]}
           paginationComponentOptions={{
@@ -628,7 +494,7 @@ function Attendance() {
             noRowsPerPage: false,
             selectAllRowsItem: false
           }}
-          noDataComponent={<div className="py-4 text-center">No hay datos disponibles</div>}
+          noDataComponent={<div className="py-8 text-center">No hay datos disponibles</div>}
           customStyles={{
             headCells: {
               style: {

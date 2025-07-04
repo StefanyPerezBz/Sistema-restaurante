@@ -179,7 +179,7 @@ export default function ManagerSideBar() {
                             : 'text-gray-700 hover:bg-gray-100 dark:hover:bg-neutral-800 dark:text-orange-400'
                             } transition-colors`}
                     >
-                        Agregar
+                        Registrar
                     </Sidebar.Item>
                 </Link>
 
@@ -195,7 +195,7 @@ export default function ManagerSideBar() {
                             : 'text-gray-700 hover:bg-gray-100 dark:hover:bg-neutral-800 dark:text-orange-400'
                             } transition-colors`}
                     >
-                        Ver
+                        Ausentes
                     </Sidebar.Item>
                 </Link>
 
@@ -209,7 +209,7 @@ export default function ManagerSideBar() {
                             : 'text-gray-700 hover:bg-gray-100 dark:hover:bg-neutral-800 dark:text-orange-400'
                             } transition-colors`}
                     >
-                        Resumen
+                        Registro
                     </Sidebar.Item>
                 </Link>
             </Sidebar.Collapse>
