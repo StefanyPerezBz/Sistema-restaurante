@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.kingsman</groupId>
-	<artifactId>Kingsman</artifactId>
+	<artifactId>restaurante</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Kingsman</name>
 	<description>This project is created for Kingsman.</description>
