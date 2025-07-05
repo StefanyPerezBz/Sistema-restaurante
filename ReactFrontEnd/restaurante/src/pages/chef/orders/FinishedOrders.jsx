@@ -34,7 +34,7 @@ export default function FinishedOrders() {
     const fetchOrders = async () => {
         try {
             setPending(true);
-            const response = await axios.get('http://localhost:8080/api/orders/created-date', {
+            const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/orders/created-date`, {
                 params: {
                     createdDate: getTodayDate()
                 }

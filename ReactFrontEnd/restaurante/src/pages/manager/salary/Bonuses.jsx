@@ -55,7 +55,7 @@ function Bonuses() {
   useEffect(() => {
     const currentUser = localStorage.getItem('username'); 
     
-    axios.get('http://localhost:8080/employeeIdsAndPositions')
+    axios.get(`${import.meta.env.REACT_APP_API_URL}/employeeIdsAndPositions`)
       .then(response => {
         setEmployees(response.data);
         // Filtrar para excluir al usuario actual
@@ -201,7 +201,7 @@ function Bonuses() {
       bonus: bonusAmount.toString()
     };
 
-    axios.post('http://localhost:8080/api/bonus', bonusData)
+    axios.post(`${import.meta.env.REACT_APP_API_URL}/api/bonus`, bonusData)
       .then(response => {
         Swal.fire({
           title: 'Éxito',
@@ -232,7 +232,7 @@ function Bonuses() {
       deduction: deductionAmount.toString()
     };
 
-    axios.post('http://localhost:8080/api/deduction', deductionData)
+    axios.post(`${import.meta.env.REACT_APP_API_URL}/api/deduction`, deductionData)
       .then(response => {
         Swal.fire({
           title: 'Éxito',
@@ -256,7 +256,7 @@ function Bonuses() {
 
   const fetchBonuses = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/bonus');
+      const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/bonus`);
       return response.data;
     } catch (error) {
       console.error('Error al obtener las bonificaciones:', error);
@@ -272,7 +272,7 @@ function Bonuses() {
 
   const fetchDeductions = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/deduction');
+      const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/deduction`);
       return response.data;
     } catch (error) {
       console.error('Error al obtener deducciones:', error);

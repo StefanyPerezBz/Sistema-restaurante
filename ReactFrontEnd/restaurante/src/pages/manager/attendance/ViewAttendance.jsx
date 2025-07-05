@@ -95,8 +95,8 @@ function ViewAttendance() {
       
       // Obtener lista de empleados (excluyendo al manager)
       const [empResponse, attResponse] = await Promise.all([
-        axios.get('http://localhost:8080/employeeDetails'),
-        axios.get('http://localhost:8080/current-date')
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/employeeDetails`),
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/current-date`)
       ]);
 
       // Procesar empleados
@@ -169,7 +169,7 @@ function ViewAttendance() {
         cancelButton: 'swal-responsive-cancel'
       },
       preConfirm: () => {
-        return axios.post('http://localhost:8080/attendance/in', {
+        return axios.post(`${import.meta.env.REACT_APP_API_URL}attendance/in`, {
           empId: employee.empId,
           empName: employee.empName,
           position: employee.position,
@@ -249,7 +249,7 @@ function ViewAttendance() {
           outTime: "00:00"
         }));
 
-        return axios.post('http://localhost:8080/attendances', attendanceData)
+        return axios.post(`${import.meta.env.REACT_APP_API_URL}/attendances`, attendanceData)
           .then(response => response.data)
           .catch(error => {
             Swal.showValidationMessage('Error al marcar ausentes');

@@ -21,7 +21,7 @@ export default function ManageInventory() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:8080/api/inventory/view");
+      const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/inventory/view`);
       setItems(response.data);
     } catch (error) {
       console.error("Error al recuperar datos", error);
@@ -43,7 +43,7 @@ export default function ManageInventory() {
       currentDate.setDate(currentDate.getDate() + 0);
       const increasedDate = currentDate.toISOString().split('T')[0];
       
-      const response = await axios.get(`http://localhost:8080/api/inventory/inventory-usage-log/${increasedDate}`);
+      const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/inventory/inventory-usage-log/${increasedDate}`);
       setTodayUsage(response.data);
     } catch (error) {
       console.error("Error al obtener el uso de hoy", error);

@@ -77,7 +77,7 @@ const AddEvent = () => {
     try {
       setIsCheckingName(true);
       const response = await axios.get(
-        `http://localhost:8080/api/events/check-name?name=${encodeURIComponent(name)}`
+        `${import.meta.env.REACT_APP_API_URL}/api/events/check-name?name=${encodeURIComponent(name)}`
       );
       return response.data.exists;
     } catch (error) {
@@ -244,7 +244,7 @@ const AddEvent = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/add-event', formData);
+      const response = await axios.post(`${import.meta.env.REACT_APP_API_URL}/api/add-event`, formData);
 
       Swal.fire({
         icon: 'success',

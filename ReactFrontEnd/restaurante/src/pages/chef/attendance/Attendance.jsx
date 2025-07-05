@@ -122,7 +122,7 @@ function Attendance() {
   // Obtener datos de empleados
   const fetchEmployeeData = () => {
     setLoading(true);
-    axios.get('http://localhost:8080/employeeIdsAndPositions')
+    axios.get(`${import.meta.env.REACT_APP_API_URL}/employeeIdsAndPositions`)
       .then(response => {
         const filteredData = response.data.filter(employee => employee[2] !== "manager" && employee[2] !== "waiter" && employee[2] !== "cashier");
         const initialAttendance = filteredData.map(employee => ({
@@ -137,7 +137,7 @@ function Attendance() {
         }));
 
         // Obtener registros existentes para hoy
-        axios.get('http://localhost:8080/current-date')
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/current-date`)
           .then(attendanceResponse => {
             const updatedAttendance = initialAttendance.map(emp => {
               const existingRecord = attendanceResponse.data.find(
@@ -399,7 +399,7 @@ function Attendance() {
     const timeField = isInTime ? 'inTime' : 'outTime';
     const successMessage = isInTime ? 'Entrada registrada' : 'Salida registrada';
 
-    axios.post(`http://localhost:8080/${endpoint}`, {
+    axios.post(`${import.meta.env.REACT_APP_API_URL}/${endpoint}`, {
       empId: empId,
       empName: empName,
       position: position,

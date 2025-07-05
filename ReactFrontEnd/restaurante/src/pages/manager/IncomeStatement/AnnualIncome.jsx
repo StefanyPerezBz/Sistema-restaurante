@@ -58,7 +58,7 @@ const AnnualIncome = () => {
   // Fetch annual expenses from API
   const fetchAnnualExpenses = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/payment/current-year');
+      const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/payment/current-year`);
       if (!response.ok) {
         throw new Error('No se pudieron obtener los datos');
       }
@@ -78,7 +78,7 @@ const AnnualIncome = () => {
   // Fetch bill type amounts from the API
   const fetchBillTypeAmounts = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/payment/current-year');
+      const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/payment/current-year`);
       if (!response.ok) {
         throw new Error('No se pudieron obtener los datos');
       }
@@ -114,7 +114,7 @@ const AnnualIncome = () => {
   // Fetch annual salary from the API
   const fetchAnnualSalary = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/salary/getTotalGrossPaymentForCurrentYear');
+      const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/salary/getTotalGrossPaymentForCurrentYear`);
       if (!response.ok) {
         throw new Error('No se pudo obtener el salario anual');
       }
@@ -134,7 +134,7 @@ const AnnualIncome = () => {
   // Fetch total event budget for the year from the API
   const fetchTotalEventBudgetforYear = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/events/annual-total-budget');
+      const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/events/annual-total-budget`);
       if (!response.ok) {
         throw new Error('No se pudo obtener el presupuesto anual de eventos');
       }
@@ -154,7 +154,7 @@ const AnnualIncome = () => {
   // Fetch total inventory purchases for the year from the API
   const fetchTotalInventoryPurchasesForYear = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/inventory/total-price/year');
+      const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/inventory/total-price/year`);
       if (!response.ok) {
         throw new Error('No se pudo obtener el total de compras de inventario anual');
       }
@@ -174,7 +174,7 @@ const AnnualIncome = () => {
   // Fetch annual sales revenue from the API
   const fetchAnnualSalesRevenue = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/orders/annaul-sales-revenue');
+      const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/orders/annaul-sales-revenue`);
       if (!response.ok) {
         throw new Error('No se pudieron obtener ingresos anuales por ventas');
       }
@@ -194,7 +194,7 @@ const AnnualIncome = () => {
   // Fetch event revenue from the API
   const fetchEventRevenue = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/events/annual-total-revenue');
+      const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/events/annual-total-revenue`);
       if (!response.ok) {
         throw new Error('No se pudieron obtener los ingresos anuales de eventos');
       }
@@ -214,7 +214,7 @@ const AnnualIncome = () => {
   // Fetch previous year data from the API
   const fetchPreviousYearData = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/income/previous-year/${previousYear}`);
+      const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/income/previous-year/${previousYear}`);
       if (!response.ok) {
         throw new Error('No se pudieron obtener los datos del año anterior');
       }
@@ -243,7 +243,7 @@ const AnnualIncome = () => {
         totalExpenses: totalAnnualExpenses
       };
 
-      const response = await fetch('http://localhost:8080/api/income/save-annual', {
+      const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/income/save-annual`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

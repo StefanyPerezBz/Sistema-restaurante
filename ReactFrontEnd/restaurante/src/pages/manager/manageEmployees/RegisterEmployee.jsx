@@ -231,7 +231,7 @@ export default function RegisterEmployee() {
             // Encriptar contraseña
             const hashedPassword = bcrypt.hashSync(formData.password, 10);
 
-            const response = await axios.post('http://localhost:8080/register', {
+            const response = await axios.post(`${import.meta.env.REACT_APP_API_URL}/register`, {
                 ...formData,
                 password: hashedPassword
             });

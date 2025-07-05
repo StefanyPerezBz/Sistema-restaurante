@@ -40,7 +40,7 @@ function EditInventoryItem({ itemId, onSubmit, onCancel }) {
     useEffect(() => {
         const fetchItemDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/inventory/view/${itemId}`);
+                const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/inventory/view/${itemId}`);
                 const { quantity, vendorId, unit, itemName, price, totalPrice } = response.data;
 
                 setFormData({
@@ -79,7 +79,7 @@ function EditInventoryItem({ itemId, onSubmit, onCancel }) {
         try {
             setIsCheckingName(true);
             const response = await axios.get(
-                `http://localhost:8080/api/inventory/check-name-edit?name=${encodeURIComponent(name)}&id=${itemId}`
+                `${import.meta.env.REACT_APP_API_URL}/api/inventory/check-name-edit?name=${encodeURIComponent(name)}&id=${itemId}`
             );
             return response.data.exists;
         } catch (error) {
@@ -161,7 +161,7 @@ function EditInventoryItem({ itemId, onSubmit, onCancel }) {
                 totalPrice: parseFloat(formData.totalPrice)
             };
 
-            await axios.put(`http://localhost:8080/api/inventory/edit/${itemId}`, updatedItem);
+            await axios.put(`${import.meta.env.REACT_APP_API_URL}/api/inventory/edit/${itemId}`, updatedItem);
 
             Swal.fire({
                 icon: 'success',

@@ -66,7 +66,7 @@ export default function AllFood() {
 
     const fetchFoods = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/food/all');
+            const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/food/all`);
             setFoods(response.data);
             setPending(false);
         } catch (error) {
@@ -91,7 +91,7 @@ export default function AllFood() {
 
     const handleAvailability = async (foodId) => {
         try {
-            await axios.put(`http://localhost:8080/api/food/update-availability/${foodId}`);
+            await axios.put(`${import.meta.env.REACT_APP_API_URL}/api/food/update-availability/${foodId}`);
             Swal.fire({
                 title: '¡Éxito!',
                 text: 'Disponibilidad actualizada',
@@ -130,7 +130,7 @@ export default function AllFood() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`http://localhost:8080/api/food/delete/${foodId}`);
+                    await axios.delete(`${import.meta.env.REACT_APP_API_URL}/api/food/delete/${foodId}`);
                     Swal.fire(
                         '¡Eliminado!',
                         'El alimento ha sido eliminado.',
@@ -197,7 +197,7 @@ export default function AllFood() {
             name: 'Imagen',
             cell: row => (
                 <img
-                    src={`http://localhost:8080/api/food/image/${row.foodImageURL}`}
+                    src={`${import.meta.env.REACT_APP_API_URL}/api/food/image/${row.foodImageURL}`}
                     alt={row.foodName}
                     style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
                 />

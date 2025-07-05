@@ -32,7 +32,7 @@ function HourlyPayTable({ refresh, setRefresh }) {
   const fetchHourPayments = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:8080/hourPayments');
+      const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/hourPayments`);
       if (Array.isArray(response.data)) {
         setHourPayments(response.data);
       } else {
@@ -63,7 +63,7 @@ function HourlyPayTable({ refresh, setRefresh }) {
 
   const confirmDeleteHourPayment = async () => {
     try {
-      await axios.delete(`http://localhost:8080/hourPayments/${deleteHourPaymentId}`);
+      await axios.delete(`${import.meta.env.REACT_APP_API_URL}/hourPayments/${deleteHourPaymentId}`);
       setHourPayments(hourPayments.filter(hourPayment => hourPayment.id !== deleteHourPaymentId));
       Swal.fire({
         title: 'Éxito',
@@ -157,7 +157,7 @@ function HourlyPayTable({ refresh, setRefresh }) {
     if (!validateEditForm()) return;
 
     try {
-      await axios.put(`http://localhost:8080/hourPayments/${editHourPaymentData.id}`, {
+      await axios.put(`${import.meta.env.REACT_APP_API_URL}/hourPayments/${editHourPaymentData.id}`, {
         position: editHourPaymentData.position,
         payPerHour: parseFloat(editHourPaymentData.payPerHour).toFixed(2),
         payPerOverTimeHour: parseFloat(editHourPaymentData.payPerOverTimeHour).toFixed(2)

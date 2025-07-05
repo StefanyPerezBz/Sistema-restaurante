@@ -24,7 +24,7 @@ const ViewAllEvents = () => {
     const viewEvents = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:8080/api/events/view-events');
+        const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/events/view-events`);
         setEvents(response.data);
         setLoading(false);
       } catch (error) {
@@ -62,7 +62,7 @@ const ViewAllEvents = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:8080/api/events/delete/${eventID}`);
+          await axios.delete(`${import.meta.env.REACT_APP_API_URL}/api/events/delete/${eventID}`);
           setEvents(events.filter(event => event.eventID !== eventID));
           Swal.fire(
             'Eliminado!',
@@ -84,7 +84,7 @@ const ViewAllEvents = () => {
 
   const fetchEventDetails = async (eventID) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/inform/get/${eventID}`);
+      const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/inform/get/${eventID}`);
       return response.data;
     } catch (error) {
       console.error('Error al obtener los detalles del evento:', error);
@@ -125,7 +125,7 @@ const ViewAllEvents = () => {
         });
 
         const eventDetails = await fetchEventDetails(eventID);
-        const response = await axios.post('http://localhost:8080/api/inform/share-event-details', {
+        const response = await axios.post(`${import.meta.env.REACT_APP_API_URL}/api/inform/share-event-details`, {
           eventID: eventID,
           emailCount: emailCount
         });

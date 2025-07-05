@@ -78,7 +78,7 @@ export default function WaiterProfile() {
 
     try {
       const response = await axios.post(
-        'http://localhost:8080/api/food/upload',
+        `${import.meta.env.REACT_APP_API_URL}/api/food/upload`,
         formData,
         {
           headers: {
@@ -163,7 +163,7 @@ export default function WaiterProfile() {
       };
 
       const response = await axios.put(
-        `http://localhost:8080/api/employees/update/${currentUser.id}`,
+        `${import.meta.env.REACT_APP_API_URL}/api/employees/update/${currentUser.id}`,
         updateData,
         {
           headers: {

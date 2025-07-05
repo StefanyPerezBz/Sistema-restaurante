@@ -47,14 +47,14 @@ export default function ManageOrder() {
         // console.log(order);
         const orderId = order.orderId;
         try {
-            const response = await fetch(`http://localhost:8080/api/orders/status-update/${orderId}/Canceled`, {
+            const response = await fetch(`${import.meta.env.REACT_APP_API_URL}/api/orders/status-update/${orderId}/Canceled`, {
                 method: 'PUT'
             });
             if (response.status === 204 || response.ok) {
 
                 if (order.tableNumber > 0) {
 
-                    const tableResponse = await axios.put(`http://localhost:8080/api/table/${order.tableNumber}/availability?availability=true`);
+                    const tableResponse = await axios.put(`${import.meta.env.REACT_APP_API_URL}/api/table/${order.tableNumber}/availability?availability=true`);
 
                     if (tableResponse.status == 200) {
                         toast.success('Pedido cancelado y mesa liberada exitosamente!', {

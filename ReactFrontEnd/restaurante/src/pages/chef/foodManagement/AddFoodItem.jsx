@@ -110,7 +110,7 @@ export function AddFoodItem({ onClose }) {
         };
 
         try {
-            const response = await axios.post('http://localhost:8080/api/food/add', addItem);
+            const response = await axios.post(`${import.meta.env.REACT_APP_API_URL}/api/food/add`, addItem);
 
             // Subir la imagen (obligatoria)
             const formData = new FormData();
@@ -118,7 +118,7 @@ export function AddFoodItem({ onClose }) {
 
             try {
                 await axios.post(
-                    `http://localhost:8080/api/food/upload-image/${response.data.foodId}`,
+                    `${import.meta.env.REACT_APP_API_URL}/api/food/upload-image/${response.data.foodId}`,
                     formData,
                     {
                         headers: {
@@ -139,7 +139,7 @@ export function AddFoodItem({ onClose }) {
             } catch (error) {
                 console.error('Error al subir la imagen:', error);
                 // Eliminar el artículo si falla la subida de imagen
-                await axios.delete(`http://localhost:8080/api/food/delete/${response.data.foodId}`);
+                await axios.delete(`${import.meta.env.REACT_APP_API_URL}/api/food/delete/${response.data.foodId}`);
                 Swal.fire({
                     title: 'Error',
                     text: 'Hubo un problema al subir la imagen. El artículo no fue creado.',

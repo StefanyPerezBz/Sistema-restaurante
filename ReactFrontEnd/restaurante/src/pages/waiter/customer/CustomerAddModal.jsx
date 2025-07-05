@@ -66,7 +66,7 @@ export default function CustomerAddModal({ isOpen, onToggle, customerAddModalRes
         }
 
         try {
-            const response = await axios.post('http://localhost:8080/api/customers', dataToSend, {
+            const response = await axios.post(`${import.meta.env.REACT_APP_API_URL}/api/customers`, dataToSend, {
                 timeout: 10000,
                 headers: {
                     'Content-Type': 'application/json',

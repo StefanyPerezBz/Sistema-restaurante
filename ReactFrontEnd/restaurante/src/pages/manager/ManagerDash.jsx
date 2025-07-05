@@ -140,14 +140,14 @@ export default function ManagerDash() {
         monthlyRevenueRes,
         allEventsRes
       ] = await Promise.all([
-        axios.get('http://localhost:8080/api/table/all'),
-        axios.get('http://localhost:8080/api/events/next-event'),
-        axios.get('http://localhost:8080/api/user/manage-employees'),
-        axios.get('http://localhost:8080/api/orders'),
-        axios.get('http://localhost:8080/api/payment/getAllPayments'),
-        axios.get('http://localhost:8080/api/food/available'),
-        axios.get('http://localhost:8080/api/orders/monthly-sales-revenue'),
-        axios.get('http://localhost:8080/api/events/view-events')
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/table/all`),
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/events/next-event`),
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/user/manage-employees`),
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/orders`),
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/payment/getAllPayments`),
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/food/available`),
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/orders/monthly-sales-revenue`),
+        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/events/view-events`)
       ]);
 
       setTables(tablesRes.data);

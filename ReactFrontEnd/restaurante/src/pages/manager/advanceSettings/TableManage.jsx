@@ -32,7 +32,7 @@ export default function TableManage() {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/table/all");
+            const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/table/all`);
             setTables(response.data);
         } catch (error) {
             console.error("Error al obtener datos:", error);
@@ -55,7 +55,7 @@ export default function TableManage() {
     const handleDeleteTable = async () => {
         try {
             const response = await axios.delete(
-                `http://localhost:8080/api/table/delete/${tableToDelete}`
+                `${import.meta.env.REACT_APP_API_URL}/api/table/delete/${tableToDelete}`
             );
             
             if (response.status === 200) {
@@ -134,7 +134,7 @@ export default function TableManage() {
 
         try {
             const response = await axios.post(
-                "http://localhost:8080/api/table/add", 
+                `${import.meta.env.REACT_APP_API_URL}/api/table/add`, 
                 newTable
             );
             
