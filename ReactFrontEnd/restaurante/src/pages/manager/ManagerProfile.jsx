@@ -96,7 +96,7 @@ export default function ManagerProfile() {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.REACT_APP_API_URL}/api/food/upload`,
+        `localhost:8080/api/food/upload`,
         formData,
         {
           headers: {
@@ -221,7 +221,7 @@ export default function ManagerProfile() {
       };
 
       const response = await axios.put(
-        `${import.meta.env.REACT_APP_API_URL}/api/employees/update/${currentUser.id}`,
+        `localhost:8080/api/employees/update/${currentUser.id}`,
         updateData,
         {
           headers: {

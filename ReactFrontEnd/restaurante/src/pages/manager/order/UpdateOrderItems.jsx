@@ -28,7 +28,7 @@ export default function UpdateOrderItems() {
         const urlParams = new URLSearchParams(window.location.search);
         const orderIDFromUrl = urlParams.get('order');
         
-        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/orders/${orderIDFromUrl}`)
+        axios.get(`localhost:8080/api/orders/${orderIDFromUrl}`)
             .then(response => {
                 if (response.status === 200){
                     setOrderResponse(response.data);
@@ -55,7 +55,7 @@ export default function UpdateOrderItems() {
                 console.error("Error al obtener los detalles del pedido:", error);
             });
 
-        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/food/all`)
+        axios.get(`localhost:8080/api/food/all`)
             .then(response => {
                 setFoodItems(response.data);
             })
@@ -195,7 +195,7 @@ export default function UpdateOrderItems() {
         };
     
         try {
-            const response = await axios.put(`${import.meta.env.REACT_APP_API_URL}/api/orders/${OrderResponse.orderId}`, orderJSON, {
+            const response = await axios.put(`localhost:8080/api/orders/${OrderResponse.orderId}`, orderJSON, {
                 headers: { "Content-Type": "application/json" }
             });
             
@@ -237,7 +237,7 @@ export default function UpdateOrderItems() {
     const deleteItems = async (removedIds) => {
         try {
             for (const itemId of removedIds) {
-                const response = await axios.delete(`${import.meta.env.REACT_APP_API_URL}/api/orders/items/${itemId}`);
+                const response = await axios.delete(`localhost:8080/api/orders/items/${itemId}`);
                 if (response.status !== 204) {
                     throw new Error(`No se pudo eliminar el elemento con ID ${itemId}`);
                 }
@@ -342,7 +342,7 @@ export default function UpdateOrderItems() {
                                                 >
                                                     <img
                                                         className="rounded-t-lg w-full h-32 sm:h-40 object-cover"
-                                                        src={`${import.meta.env.REACT_APP_API_URL}/api/food/image/${item.foodImageURL}`}
+                                                        src={`localhost:8080/api/food/image/${item.foodImageURL}`}
                                                         alt={item.foodName}
                                                         onError={(e) => {
                                                             e.target.onerror = null; 

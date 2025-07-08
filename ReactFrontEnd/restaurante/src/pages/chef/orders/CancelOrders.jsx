@@ -33,7 +33,7 @@ export default function CancelOrders() {
     const fetchOrders = async () => {
         try {
             setPending(true);
-            const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/orders/created-date`, {
+            const response = await axios.get(`localhost:8080/api/orders/created-date`, {
                 params: {
                     createdDate: getTodayDate()
                 }

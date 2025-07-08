@@ -29,7 +29,7 @@ function AbsentiesModal({ onClose, reloadAttendance }) {
   }, []);
 
   const fetchAbsentees = () => {
-    axios.get(`${import.meta.env.REACT_APP_API_URL}/employeeDetails`)
+    axios.get(`localhost:8080/employeeDetails`)
       .then(response => {
         const employees = response.data.map(employee => ({
           empId: employee[0],
@@ -120,7 +120,7 @@ function AbsentiesModal({ onClose, reloadAttendance }) {
           outTime: "Ausente"
         }));
 
-        axios.post(`${import.meta.env.REACT_APP_API_URL}/attendances`, attendanceData)
+        axios.post(`localhost:8080/attendances`, attendanceData)
           .then(response => {
             showSuccessAlert('Marcación exitosa', `Se marcaron ${selected.length} empleado(s) como ausente(s) correctamente`);
             onClose();

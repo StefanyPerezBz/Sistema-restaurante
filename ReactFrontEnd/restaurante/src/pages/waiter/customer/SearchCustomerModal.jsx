@@ -46,7 +46,7 @@ export default function SearchCustomerModal({ isOpen, onToggle, searchModalRespo
         }
 
         try {
-            const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/customers/mobile/${mobile}`, {
+            const response = await axios.get(`localhost:8080/api/customers/mobile/${mobile}`, {
                 timeout: 10000,
                 headers: {
                     'Content-Type': 'application/json'

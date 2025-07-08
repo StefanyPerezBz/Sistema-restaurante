@@ -53,7 +53,7 @@ const BillPayments = () => {
     const viewAllPayments = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/payment/getAllPayments`);
+            const response = await axios.get(`localhost:8080/api/payment/getAllPayments`);
             setPayments(response.data);
             setOriginalPayments(response.data);
             setIsLoading(false);
@@ -125,7 +125,7 @@ const handleInputChange = (e) => {
 
         if (result.isConfirmed) {
             try {
-                await axios.post(`${import.meta.env.REACT_APP_API_URL}/api/payment/addPayment`, newPaymentData);
+                await axios.post(`localhost:8080/api/payment/addPayment`, newPaymentData);
                 await viewAllPayments();
                 resetForm();
                 showSuccessAlert('¡Pago agregado!', 'El pago se ha registrado correctamente.');
@@ -149,7 +149,7 @@ const handleInputChange = (e) => {
 
         if (result.isConfirmed) {
             try {
-                await axios.put(`${import.meta.env.REACT_APP_API_URL}/api/payment/updatePayment/${currentPaymentId}`, newPaymentData);
+                await axios.put(`localhost:8080/api/payment/updatePayment/${currentPaymentId}`, newPaymentData);
                 await viewAllPayments();
                 resetForm();
                 showSuccessAlert('¡Pago actualizado!', 'El pago se ha actualizado correctamente.');
@@ -174,7 +174,7 @@ const handleInputChange = (e) => {
 
         if (result.isConfirmed) {
             try {
-                await axios.delete(`${import.meta.env.REACT_APP_API_URL}/api/payment/${paymentId}`);
+                await axios.delete(`localhost:8080/api/payment/${paymentId}`);
                 await viewAllPayments();
                 showSuccessAlert('¡Pago eliminado!', 'El pago se ha eliminado correctamente.');
             } catch (error) {

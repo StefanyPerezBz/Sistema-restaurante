@@ -44,7 +44,7 @@ export default function AllinventoryItem() {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/inventory/view`);
+      const response = await axios.get(`localhost:8080/api/inventory/view`);
       setInventoryData(response.data);
     } catch (error) {
       console.error("Error al obtener datos:", error);
@@ -86,7 +86,7 @@ export default function AllinventoryItem() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`${import.meta.env.REACT_APP_API_URL}/api/inventory/delete/${itemToDelete}`);
+      await axios.delete(`localhost:8080/api/inventory/delete/${itemToDelete}`);
       setShowDeleteConfirmation(false);
       setItemToDelete(null);
       fetchData();

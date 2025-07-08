@@ -63,7 +63,7 @@ function BonusesTable({ fetchBonuses }) {
 
   const confirmDeleteBonus = async () => {
     try {
-      await axios.delete(`${import.meta.env.REACT_APP_API_URL}/api/bonus/${deleteBonusId}`);
+      await axios.delete(`localhost:8080/api/bonus/${deleteBonusId}`);
       setBonuses(bonuses.filter(bonus => bonus.id !== deleteBonusId));
       Swal.fire({
         title: 'Éxito',
@@ -138,7 +138,7 @@ function BonusesTable({ fetchBonuses }) {
     }
 
     try {
-      await axios.put(`${import.meta.env.REACT_APP_API_URL}/api/bonus/${editBonusData.id}`, {
+      await axios.put(`localhost:8080/api/bonus/${editBonusData.id}`, {
         empName: editBonusData.empName,
         bonusType: editBonusData.bonusType,
         bonus: editBonusData.bonus

@@ -82,7 +82,7 @@ export default function UpdateOrder() {
         const orderIDFromUrl = urlParams.get('order');
         getAvailableTables();
 
-        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/orders/${orderIDFromUrl}`)
+        axios.get(`localhost:8080/api/orders/${orderIDFromUrl}`)
             .then(response => {
                 if (response.status === 200) {
                     setOrderResponse(response.data);
@@ -118,7 +118,7 @@ export default function UpdateOrder() {
                 console.error("Error al obtener los detalles del pedido:", error);
             });
 
-        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/food/all`)
+        axios.get(`localhost:8080/api/food/all`)
             .then(response => {
                 setFoodItems(response.data);
             })
@@ -209,7 +209,7 @@ export default function UpdateOrder() {
     const updateTableAvailability = async (tableNumber, availability) => {
         try {
             const response = await axios.put(
-                `${import.meta.env.REACT_APP_API_URL}/api/table/by-number/${tableNumber}/availability`,
+                `localhost:8080/api/table/by-number/${tableNumber}/availability`,
                 null,
                 {
                     params: { availability },
@@ -224,7 +224,7 @@ export default function UpdateOrder() {
     };
 
     const getAvailableTables = () => {
-        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/table/available`)
+        axios.get(`localhost:8080/api/table/available`)
             .then(response => setTableList(response.data))
             .catch(error => {
                 console.error("Error al obtener las mesas disponibles:", error);
@@ -235,7 +235,7 @@ export default function UpdateOrder() {
     const deleteItems = async (removedIds) => {
         try {
             for (const itemId of removedIds) {
-                const response = await axios.delete(`${import.meta.env.REACT_APP_API_URL}/api/orders/items/${itemId}`);
+                const response = await axios.delete(`localhost:8080/api/orders/items/${itemId}`);
                 if (response.status !== 204) {
                     console.error(`No se pudo eliminar el elemento con ID ${itemId}.`);
                     showError("Hubo un error. Contacte con el soporte del sistema.");
@@ -328,7 +328,7 @@ export default function UpdateOrder() {
                 }
 
                 const response = await axios.put(
-                    `${import.meta.env.REACT_APP_API_URL}/api/orders/${OrderResponse.orderId}`,
+                    `localhost:8080/api/orders/${OrderResponse.orderId}`,
                     orderJSON,
                     { headers: { "Content-Type": "application/json" } }
                 );

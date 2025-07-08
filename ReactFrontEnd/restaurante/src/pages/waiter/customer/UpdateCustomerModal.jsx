@@ -72,7 +72,7 @@ export default function UpdateCustomerModal({ isOpen, onToggle, customerUpdateMo
 
         try {
             const response = await axios.put(
-                `${import.meta.env.REACT_APP_API_URL}/api/customers/${currentCustomerData.cusId}`, 
+                `localhost:8080/api/customers/${currentCustomerData.cusId}`, 
                 formData,
                 {
                     timeout: 10000,

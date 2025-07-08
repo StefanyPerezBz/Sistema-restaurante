@@ -49,7 +49,7 @@ function AddInventoryItem({ onSubmit, onCancel }) {
     const checkItemNameExists = async (name) => {
         try {
             setIsCheckingName(true);
-            const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/inventory/check-name?name=${encodeURIComponent(name)}`);
+            const response = await axios.get(`localhost:8080/api/inventory/check-name?name=${encodeURIComponent(name)}`);
             return response.data.exists;
         } catch (error) {
             console.error('Error al verificar el nombre:', error);
@@ -132,7 +132,7 @@ function AddInventoryItem({ onSubmit, onCancel }) {
                 totalPrice: parseFloat(formData.quantity) * parseFloat(formData.price)
             };
 
-            await axios.post(`${import.meta.env.REACT_APP_API_URL}/api/inventory/add`, itemToSend);
+            await axios.post(`localhost:8080/api/inventory/add`, itemToSend);
 
             Swal.fire({
                 icon: 'success',

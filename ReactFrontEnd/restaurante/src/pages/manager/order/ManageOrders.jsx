@@ -155,7 +155,7 @@ export default function ManageOrder() {
             });
 
             if (response.status === 204 || response.ok) {
-                await axios.put(`${import.meta.env.REACT_APP_API_URL}/api/table/${order.tableNumber}/availability?availability=true`);
+                await axios.put(`localhost:8080/api/table/${order.tableNumber}/availability?availability=true`);
 
                 // Show success alert
                 MySwal.fire({

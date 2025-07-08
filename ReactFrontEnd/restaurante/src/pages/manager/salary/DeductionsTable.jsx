@@ -61,7 +61,7 @@ function DeductionsTable({ fetchDeductions }) {
 
   const confirmDeleteDeduction = async () => {
     try {
-      await axios.delete(`${import.meta.env.REACT_APP_API_URL}/api/deduction/${deleteDeductionId}`);
+      await axios.delete(`localhost:8080/api/deduction/${deleteDeductionId}`);
       setDeductions(deductions.filter(deduction => deduction.id !== deleteDeductionId));
       Swal.fire({
         title: 'Éxito',
@@ -136,7 +136,7 @@ function DeductionsTable({ fetchDeductions }) {
     }
 
     try {
-      await axios.put(`${import.meta.env.REACT_APP_API_URL}/api/deduction/${editDeductionData.id}`, {
+      await axios.put(`localhost:8080/api/deduction/${editDeductionData.id}`, {
         empName: editDeductionData.empName,
         deductionType: editDeductionData.deductionType,
         deduction: editDeductionData.deduction

@@ -37,7 +37,7 @@ function AttendanceFrManager() {
 
   // Función para obtener datos de asistencia
   const fetchAttendanceData = () => {
-    axios.get(`${import.meta.env.REACT_APP_API_URL}/current-date`)
+    axios.get(`localhost:8080/current-date`)
       .then(response => {
         setAttendance(response.data);
         checkWorkLimits(response.data);
@@ -240,7 +240,7 @@ function AttendanceFrManager() {
 
   // Función para obtener IDs de empleados
   const fetchEmployeeIds = () => {
-    axios.get(`${import.meta.env.REACT_APP_API_URL}/employeeIds`)
+    axios.get(`localhost:8080/employeeIds`)
       .then(response => {
         setEmpIds(response.data);
       })
@@ -252,7 +252,7 @@ function AttendanceFrManager() {
 
   // Función para obtener datos del mes actual
   const fetchAttendanceDataForCurrentMonth = () => {
-    axios.get(`${import.meta.env.REACT_APP_API_URL}/current-month`)
+    axios.get(`localhost:8080/current-month`)
       .then(response => {
         setAttendance(response.data);
         checkWorkLimits(response.data);
@@ -412,7 +412,7 @@ function AttendanceFrManager() {
       outTime: convertTo24HourFormat(formData.outTime)
     };
 
-    axios.put(`${import.meta.env.REACT_APP_API_URL}/update`, formattedData)
+    axios.put(`localhost:8080/update`, formattedData)
       .then(response => {
         Swal.fire({
           icon: 'success',
@@ -434,7 +434,7 @@ function AttendanceFrManager() {
 
   const handleConfirmDelete = () => {
     const { empId, date } = selectedAttendance;
-    axios.delete(`${import.meta.env.REACT_APP_API_URL}/DeleteAttendance/${empId}/${date}`)
+    axios.delete(`localhost:8080/DeleteAttendance/${empId}/${date}`)
       .then(() => {
         Swal.fire({
           icon: 'success',
@@ -466,7 +466,7 @@ function AttendanceFrManager() {
       return;
     }
 
-    axios.get(`${import.meta.env.REACT_APP_API_URL}/fetch-by-date-range/${startDate}/${endDate}`)
+    axios.get(`localhost:8080/fetch-by-date-range/${startDate}/${endDate}`)
       .then(response => {
         setAttendance(response.data);
         checkWorkLimits(response.data);
@@ -492,9 +492,9 @@ function AttendanceFrManager() {
 
     let endpoint = "";
     if (selectedType === "today") {
-      endpoint = `${import.meta.env.REACT_APP_API_URL}/attendance/${selectedEmpId}/Today`;
+      endpoint = `localhost:8080/attendance/${selectedEmpId}/Today`;
     } else if (selectedType === "this") {
-      endpoint = `${import.meta.env.REACT_APP_API_URL}/attendance/${selectedEmpId}/This%20Month`;
+      endpoint = `localhost:8080/attendance/${selectedEmpId}/This%20Month`;
     }
 
     axios.get(endpoint)

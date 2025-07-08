@@ -15,7 +15,7 @@ export default function Notification() {
     const [unreadCount, setUnreadCount] = useState(0);
 
     const fetchNotifications = useCallback(() => {
-        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/notifications/forWho/${currentUser.position}`)
+        axios.get(`localhost:8080/api/notifications/forWho/${currentUser.position}`)
             .then(response => {
                 const sortedNotifications = response.data.sort((a, b) => 
                     new Date(b.createdAt) - new Date(a.createdAt)

@@ -40,7 +40,7 @@ export default function TakeOrder() {
         setResponseErrors("");
         getAvailableTables();
 
-        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/food/available`)
+        axios.get(`localhost:8080/api/food/available`)
             .then(response => {
                 setFoodItems(response.data);
             })
@@ -193,7 +193,7 @@ export default function TakeOrder() {
     const updateTableAvailability = async (tableNumber, availability) => {
         try {
             const response = await axios.put(
-                `${import.meta.env.REACT_APP_API_URL}/api/table/by-number/${tableNumber}/availability`,
+                `localhost:8080/api/table/by-number/${tableNumber}/availability`,
                 null, // Cuerpo vacío
                 {
                     params: {
@@ -243,7 +243,7 @@ export default function TakeOrder() {
             };
 
             const response = await axios.post(
-                `${import.meta.env.REACT_APP_API_URL}/api/orders`,
+                `localhost:8080/api/orders`,
                 orderJSON,
                 {
                     headers: { "Content-Type": "application/json" }
@@ -286,7 +286,7 @@ export default function TakeOrder() {
     };
 
     const getAvailableTables = () => {
-        axios.get(`${import.meta.env.REACT_APP_API_URL}/api/table/available`)
+        axios.get(`localhost:8080/api/table/available`)
             .then(response => {
                 setTableList(response.data);
             })

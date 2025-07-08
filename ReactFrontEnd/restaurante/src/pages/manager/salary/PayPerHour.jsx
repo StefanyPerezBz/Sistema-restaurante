@@ -36,7 +36,7 @@ function PayPerHour() {
 
   const fetchPositions = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.REACT_APP_API_URL}/employeeIdsAndPositions`);
+      const response = await axios.get(`localhost:8080/employeeIdsAndPositions`);
       const filteredPositions = response.data.filter(item => item[2] !== 'manager');
 
       const uniquePositions = [...new Set(filteredPositions.map(item => item[2]))];
@@ -147,7 +147,7 @@ function PayPerHour() {
     };
 
     try {
-      await axios.post(`${import.meta.env.REACT_APP_API_URL}/hourPayments/create`, hourlyPayData);
+      await axios.post(`localhost:8080/hourPayments/create`, hourlyPayData);
       showSuccess('Pago por hora registrado correctamente');
       setRefreshHourlyTable(prev => !prev);
       closeHourlyModal();

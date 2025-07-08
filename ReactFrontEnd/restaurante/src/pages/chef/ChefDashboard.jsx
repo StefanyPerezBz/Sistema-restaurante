@@ -50,11 +50,11 @@ export default function ChefDashboard() {
         setLoading(true);
         
         // Obtener datos de inventario
-        const inventoryResponse = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/inventory/view`);
+        const inventoryResponse = await axios.get(`localhost:8080/api/inventory/view`);
         setInventoryData(inventoryResponse.data);
 
         // Obtener datos de alimentos
-        const foodResponse = await axios.get(`${import.meta.env.REACT_APP_API_URL}/api/food/all`);
+        const foodResponse = await axios.get(`localhost:8080/api/food/all`);
         setFoodData(foodResponse.data);
 
         setLoading(false);

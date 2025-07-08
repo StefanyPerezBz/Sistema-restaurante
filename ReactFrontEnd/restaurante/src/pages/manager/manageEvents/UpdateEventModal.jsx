@@ -76,7 +76,7 @@ const UpdateEventModal = ({ event, handleClose }) => {
       } else if (value !== event.eventName) {
         try {
           const response = await axios.get(
-            `${import.meta.env.REACT_APP_API_URL}/api/events/check-name?name=${encodeURIComponent(value)}`
+            `localhost:8080/api/events/check-name?name=${encodeURIComponent(value)}`
           );
           if (response.data.exists) {
             error = 'Ya existe un evento con este nombre';
@@ -240,7 +240,7 @@ const UpdateEventModal = ({ event, handleClose }) => {
         description: formData.description
       };
 
-      await axios.put(`${import.meta.env.REACT_APP_API_URL}/api/events/update/${event.eventID}`, updatedEvent);
+      await axios.put(`localhost:8080/api/events/update/${event.eventID}`, updatedEvent);
 
       Swal.fire({
         icon: 'success',

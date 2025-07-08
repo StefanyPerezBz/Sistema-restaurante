@@ -118,7 +118,7 @@ function ViewAttendance() {
   // Obtener datos de asistencia
   const fetchAttendanceData = () => {
     setLoading(true);
-    axios.get(`${import.meta.env.REACT_APP_API_URL}/current-date`)
+    axios.get(`localhost:8080/current-date`)
       .then(response => {
         setAttendanceData(response.data);
         setLoading(false);
@@ -133,7 +133,7 @@ function ViewAttendance() {
   // Obtener datos de empleados ausentes
   const fetchAbsenteesData = () => {
     setLoadingAbsentees(true);
-    axios.get(`${import.meta.env.REACT_APP_API_URL}/employeeDetails`)
+    axios.get(`localhost:8080/employeeDetails`)
       .then(response => {
         const employees = response.data.map(employee => ({
           empId: employee[0],
@@ -143,7 +143,7 @@ function ViewAttendance() {
         setAbsenteesData(employees);
         
         // Obtener empleados ya marcados como ausentes
-        axios.get(`${import.meta.env.REACT_APP_API_URL}/current-date`)
+        axios.get(`localhost:8080/current-date`)
           .then(attendanceResponse => {
             const absentIds = attendanceResponse.data
               .filter(att => att.inTime === "absent")
@@ -242,7 +242,7 @@ function ViewAttendance() {
   };
 
   const deleteAttendance = (empId, date) => {
-    axios.delete(`${import.meta.env.REACT_APP_API_URL}/DeleteAttendance/${empId}/${date}`)
+    axios.delete(`localhost:8080/DeleteAttendance/${empId}/${date}`)
       .then(response => {
         showSuccessAlert('Éxito', 'Registro de asistencia eliminado correctamente');
         fetchAttendanceData();
@@ -255,7 +255,7 @@ function ViewAttendance() {
   };
 
   const handleSubmitEdit = (formData) => {
-    axios.put(`${import.meta.env.REACT_APP_API_URL}/update`, formData)
+    axios.put(`localhost:8080/update`, formData)
       .then(response => {
         showSuccessAlert('Éxito', 'Asistencia actualizada correctamente');
         fetchAttendanceData();
@@ -300,7 +300,7 @@ function ViewAttendance() {
           outTime: ""
         }));
 
-        axios.post(`${import.meta.env.REACT_APP_API_URL}/attendances`, attendanceData)
+        axios.post(`localhost:8080/attendances`, attendanceData)
           .then(response => {
             const newMarkedIds = unmarkedEmployees.map(emp => emp.empId);
             setMarkedAbsentees(prev => [...prev, ...newMarkedIds]);
@@ -346,7 +346,7 @@ function ViewAttendance() {
           outTime: ""
         };
 
-        axios.post(`${import.meta.env.REACT_APP_API_URL}/attendances`, [attendanceData])
+        axios.post(`localhost:8080/attendances`, [attendanceData])
           .then(response => {
             setMarkedAbsentees(prev => [...prev, employee.empId]);
             showSuccessAlert('Éxito', 'Empleado marcado como ausente');
