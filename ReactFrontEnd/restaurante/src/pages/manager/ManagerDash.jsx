@@ -140,14 +140,14 @@ export default function ManagerDash() {
         monthlyRevenueRes,
         allEventsRes
       ] = await Promise.all([
-        axios.get(`localhost:8080/api/table/all`),
-        axios.get(`localhost:8080/api/events/next-event`),
-        axios.get(`localhost:8080/api/user/manage-employees`),
-        axios.get(`localhost:8080/api/orders`),
-        axios.get(`localhost:8080/api/payment/getAllPayments`),
-        axios.get(`localhost:8080/api/food/available`),
-        axios.get(`localhost:8080/api/orders/monthly-sales-revenue`),
-        axios.get(`localhost:8080/api/events/view-events`)
+        axios.get(`http://localhost:8080/api/table/all`),
+        axios.get(`http://localhost:8080/api/events/next-event`),
+        axios.get(`http://localhost:8080/api/user/manage-employees`),
+        axios.get(`http://localhost:8080/api/orders`),
+        axios.get(`http://localhost:8080/api/payment/getAllPayments`),
+        axios.get(`http://localhost:8080/api/food/available`),
+        axios.get(`http://localhost:8080/api/orders/monthly-sales-revenue`),
+        axios.get(`http://localhost:8080/api/events/view-events`)
       ]);
 
       setTables(tablesRes.data);

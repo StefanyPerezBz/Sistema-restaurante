@@ -123,7 +123,7 @@ function Attendance() {
   // Obtener datos de empleados
   const fetchEmployeeData = () => {
     setLoading(true);
-    axios.get(`localhost:8080/employeeIdsAndPositions`)
+    axios.get(`http://localhost:8080/employeeIdsAndPositions`)
       .then(response => {
         const filteredData = response.data.filter(employee => employee[2] !== "manager");
         const initialAttendance = filteredData.map(employee => ({
@@ -138,7 +138,7 @@ function Attendance() {
         }));
 
         // Obtener registros existentes para hoy
-        axios.get(`localhost:8080/current-date`)
+        axios.get(`http://localhost:8080/current-date`)
           .then(attendanceResponse => {
             const updatedAttendance = initialAttendance.map(emp => {
               const existingRecord = attendanceResponse.data.find(
@@ -400,7 +400,7 @@ function Attendance() {
     const timeField = isInTime ? 'inTime' : 'outTime';
     const successMessage = isInTime ? 'Entrada registrada' : 'Salida registrada';
 
-    axios.post(`localhost:8080/${endpoint}`, {
+    axios.post(`http://localhost:8080/${endpoint}`, {
       empId: empId,
       empName: empName,
       position: position,

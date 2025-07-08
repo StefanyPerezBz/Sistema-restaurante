@@ -44,8 +44,8 @@ const ViewAllEmployees = () => {
             try {
                 setPending(true);
                 const [employeesResponse, jobRolesResponse] = await Promise.all([
-                    axios.get(`localhost:8080/api/user/manage-employees`),
-                    axios.get(`localhost:8080/api/user/job-roles`)
+                    axios.get(`http://localhost:8080/api/user/manage-employees`),
+                    axios.get(`http://localhost:8080/api/user/job-roles`)
                 ]);
                 setEmployees(employeesResponse.data);
                 setFilteredEmployees(employeesResponse.data);
@@ -102,7 +102,7 @@ const ViewAllEmployees = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`localhost:8080/api/user/delete/${id}`);
+                    await axios.delete(`http://localhost:8080/api/user/delete/${id}`);
                     setRefresh(!refresh);
                     Swal.fire(
                         'Eliminado!',

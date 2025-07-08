@@ -88,7 +88,7 @@ const MonthlyProfit = () => {
   // Función para obtener gastos mensuales
   const fetchMonthlyExpenses = async () => {
     try {
-      const response = await fetch(`localhost:8080/api/payment/current-month`);
+      const response = await fetch(`http://localhost:8080/api/payment/current-month`);
       if (!response.ok) throw new Error('Error al obtener gastos mensuales');
       const data = await response.json();
       setExpenses(data);
@@ -106,7 +106,7 @@ const MonthlyProfit = () => {
   // Función para obtener importes por tipo de factura
   const fetchBillTypeAmounts = async () => {
     try {
-      const response = await fetch(`localhost:8080/api/payment/current-month`);
+      const response = await fetch(`http://localhost:8080/api/payment/current-month`);
       if (!response.ok) throw new Error('Error al obtener tipos de factura');
       
       const data = await response.json();
@@ -140,7 +140,7 @@ const MonthlyProfit = () => {
   // Función para obtener salarios mensuales
   const fetchMonthlySalary = async () => {
     try {
-      const response = await fetch(`localhost:8080/api/salary/getTotalGrossPaymentForCurrentMonth`);
+      const response = await fetch(`http://localhost:8080/api/salary/getTotalGrossPaymentForCurrentMonth`);
       if (!response.ok) throw new Error('Error al obtener salarios');
       
       const text = await response.text();
@@ -161,7 +161,7 @@ const MonthlyProfit = () => {
   // Función para obtener presupuesto de eventos
   const fetchTotalEventBudgeforMonth = async () => {
     try {
-      const response = await fetch(`localhost:8080/api/events/monthly-total-budget`);
+      const response = await fetch(`http://localhost:8080/api/events/monthly-total-budget`);
       if (!response.ok) throw new Error('Error al obtener presupuesto de eventos');
       
       const text = await response.text();
@@ -182,7 +182,7 @@ const MonthlyProfit = () => {
   // Función para obtener compras de inventario (con manejo robusto de errores)
   const fetchTotalInventoryPurchasesForMonth = async () => {
     try {
-      const response = await fetch(`localhost:8080/api/inventory/total-price/month`);
+      const response = await fetch(`http://localhost:8080/api/inventory/total-price/month`);
       if (!response.ok) throw new Error('Error al obtener compras de inventario');
       
       const text = await response.text();
@@ -203,7 +203,7 @@ const MonthlyProfit = () => {
   // Función para obtener ingresos por ventas
   const fetchMonthlySalesRevenue = async () => {
     try {
-      const response = await fetch(`localhost:8080/api/orders/monthly-sales-revenue`);
+      const response = await fetch(`http://localhost:8080/api/orders/monthly-sales-revenue`);
       if (!response.ok) throw new Error('Error al obtener ingresos por ventas');
       
       const salesRevenue = await response.json();
@@ -223,7 +223,7 @@ const MonthlyProfit = () => {
   // Función para obtener ingresos por eventos
   const fetchEventRevenue = async () => {
     try {
-      const response = await fetch(`localhost:8080/api/events/monthly-total-revenue`);
+      const response = await fetch(`http://localhost:8080/api/events/monthly-total-revenue`);
       if (!response.ok) throw new Error('Error al obtener ingresos de eventos');
       
       const eventRevenue = await response.json();
@@ -243,7 +243,7 @@ const MonthlyProfit = () => {
   // Función para obtener datos del mes anterior
   const fetchPreviousMonthData = async () => {
     try {
-      const response = await fetch(`localhost:8080/api/income/previous-month/${previousMonth}`);
+      const response = await fetch(`http://localhost:8080/api/income/previous-month/${previousMonth}`);
       if (!response.ok) throw new Error('Error al obtener datos del mes anterior');
       
       const data = await response.json();
@@ -304,7 +304,7 @@ const MonthlyProfit = () => {
         totalExpenses: totalExpenses
       };
 
-      const response = await fetch(`localhost:8080/api/income/save-monthly`, {
+      const response = await fetch(`http://localhost:8080/api/income/save-monthly`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

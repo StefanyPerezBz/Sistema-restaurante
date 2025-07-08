@@ -27,7 +27,7 @@ export default function AllOrders() {
     const fetchOrders = async () => {
         try {
             setPending(true);
-            const response = await axios.get(`localhost:8080/api/orders/created-date`, {
+            const response = await axios.get(`http://localhost:8080/api/orders/created-date`, {
                 params: {
                     createdDate: getTodayDate()
                 }
@@ -78,7 +78,7 @@ export default function AllOrders() {
 
         if (result.isConfirmed) {
             try {
-                await axios.put(`localhost:8080/api/orders/status-update/${orderId}/${status}`);
+                await axios.put(`http://localhost:8080/api/orders/status-update/${orderId}/${status}`);
                 Swal.fire({
                     icon: 'success',
                     title: '¡Éxito!',

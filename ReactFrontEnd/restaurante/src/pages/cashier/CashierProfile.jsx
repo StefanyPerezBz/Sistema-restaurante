@@ -79,7 +79,7 @@ export default function CashierProfile() {
 
     try {
       const response = await axios.post(
-        `localhost:8080/api/food/upload`,
+        `http://localhost:8080/api/food/upload`,
         formData,
         {
           headers: {
@@ -173,7 +173,7 @@ export default function CashierProfile() {
       };
 
       const response = await axios.put(
-        `localhost:8080/api/employees/update/${currentUser.id}`,
+        `http://localhost:8080/api/employees/update/${currentUser.id}`,
         updateData,
         {
           headers: {
@@ -205,7 +205,7 @@ export default function CashierProfile() {
   // Imagen por defecto si no hay una imagen de perfil
   const profileImageSrc = imageFileURL || 
     (currentUser.profilePicture 
-      ? `localhost:8080/api/food/image/${currentUser.profilePicture}`
+      ? `http://localhost:8080/api/food/image/${currentUser.profilePicture}`
       : '/default-profile.png');
 
   return (

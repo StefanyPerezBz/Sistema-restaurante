@@ -33,7 +33,7 @@ export default function PreparingOrders() {
     const fetchOrders = async () => {
         try {
             setPending(true);
-            const response = await axios.get(`localhost:8080/api/orders/created-date`, {
+            const response = await axios.get(`http://localhost:8080/api/orders/created-date`, {
                 params: {
                     createdDate: getTodayDate()
                 }
@@ -66,7 +66,7 @@ export default function PreparingOrders() {
 
         if (result.isConfirmed) {
             try {
-                await axios.put(`localhost:8080/api/orders/status-update/${orderId}/Ready`);
+                await axios.put(`http://localhost:8080/api/orders/status-update/${orderId}/Ready`);
                 Swal.fire({
                     icon: 'success',
                     title: '¡Éxito!',

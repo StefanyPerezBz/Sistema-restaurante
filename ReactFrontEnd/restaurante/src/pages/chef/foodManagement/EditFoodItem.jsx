@@ -22,7 +22,7 @@ function EditFoodItem({ foodId, onSubmit, onCancel }) {
     useEffect(() => {
         const fetchItemDetails = async () => {
             try {
-                const response = await axios.get(`localhost:8080/api/food/get/${foodId}`);
+                const response = await axios.get(`http://localhost:8080/api/food/get/${foodId}`);
                 const { foodName, foodPrice, foodImageURL } = response.data;
                 setName(foodName);
                 setPrice(foodPrice);
@@ -30,7 +30,7 @@ function EditFoodItem({ foodId, onSubmit, onCancel }) {
 
                 // Mostrar vista previa de la imagen existente
                 if (foodImageURL) {
-                    setPreviewImage(`localhost:8080/api/food/image/${foodImageURL}`);
+                    setPreviewImage(`http://localhost:8080/api/food/image/${foodImageURL}`);
                 }
             } catch (error) {
                 console.error('Error al obtener los detalles del artículo:', error);
@@ -100,7 +100,7 @@ function EditFoodItem({ foodId, onSubmit, onCancel }) {
                 foodImageURL: imageUrl
             };
 
-            await axios.put(`localhost:8080/api/food/edit/${foodId}`, updatedItem);
+            await axios.put(`http://localhost:8080/api/food/edit/${foodId}`, updatedItem);
 
             Swal.fire({
                 title: '¡Éxito!',
@@ -130,7 +130,7 @@ function EditFoodItem({ foodId, onSubmit, onCancel }) {
 
         try {
             const response = await axios.post(
-                `localhost:8080/api/food/upload-image/${foodId}`,
+                `http://localhost:8080/api/food/upload-image/${foodId}`,
                 formData,
                 {
                     headers: {

@@ -113,7 +113,7 @@ const DoneEventModal = ({ event, handleClose, onSuccess }) => {
                 status: 'completed'
             };
 
-            await axios.put(`localhost:8080/api/events/update/${event.eventID}`, updatedEvent);
+            await axios.put(`http://localhost:8080/api/events/update/${event.eventID}`, updatedEvent);
 
             await Swal.fire({
                 icon: 'success',

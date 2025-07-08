@@ -42,7 +42,7 @@ export const ViewOrder = () => {
 
         const fetchOrderDetails = async () => {
             try {
-                const response = await axios.get(`localhost:8080/api/orders/${orderIDFromUrl}`);
+                const response = await axios.get(`http://localhost:8080/api/orders/${orderIDFromUrl}`);
 
                 if (response.status === 200) {
                     const { orderItems, tableNumber, specialNote, subTotal, discountPercentage, totalAfterDiscount, customer } = response.data;

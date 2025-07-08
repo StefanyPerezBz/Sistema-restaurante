@@ -13,7 +13,7 @@ function ShowFeedback() {
     const fetchFeedback = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`localhost:8080/showFeedback`);
+        const response = await axios.get(`http://localhost:8080/showFeedback`);
         setFeedbackList(response.data);
         setError(null);
       } catch (error) {

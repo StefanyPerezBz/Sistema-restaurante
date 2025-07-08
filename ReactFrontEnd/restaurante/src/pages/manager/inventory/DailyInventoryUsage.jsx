@@ -15,7 +15,7 @@ export function DailyInventoryUsage({ selectedDate, onCancel }) {
                 setError(null);
                 
                 const response = await axios.get(
-                    `localhost:8080/api/inventory/inventory-usage-log/${selectedDate}`
+                    `http://localhost:8080/api/inventory/inventory-usage-log/${selectedDate}`
                 );
 
                 setApiData(response.data);

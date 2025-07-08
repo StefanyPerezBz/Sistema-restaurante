@@ -63,7 +63,7 @@ function BonusesTable({ fetchBonuses }) {
 
   const confirmDeleteBonus = async () => {
     try {
-      await axios.delete(`localhost:8080/api/bonus/${deleteBonusId}`);
+      await axios.delete(`http://localhost:8080/api/bonus/${deleteBonusId}`);
       setBonuses(bonuses.filter(bonus => bonus.id !== deleteBonusId));
       Swal.fire({
         title: 'Éxito',
@@ -138,7 +138,7 @@ function BonusesTable({ fetchBonuses }) {
     }
 
     try {
-      await axios.put(`localhost:8080/api/bonus/${editBonusData.id}`, {
+      await axios.put(`http://localhost:8080/api/bonus/${editBonusData.id}`, {
         empName: editBonusData.empName,
         bonusType: editBonusData.bonusType,
         bonus: editBonusData.bonus

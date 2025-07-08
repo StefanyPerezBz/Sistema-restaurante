@@ -80,7 +80,7 @@ export default function UpdateOrder() {
 
     const showTableSelection = async () => {
         try {
-            const { data: tables } = await axios.get(`localhost:8080/api/table/available`);
+            const { data: tables } = await axios.get(`http://localhost:8080/api/table/available`);
 
             // Incluir la mesa actual aunque no esté disponible
             const currentTable = tableList.find(table => table.tableNumber === tableNumberStatic);
@@ -135,7 +135,7 @@ export default function UpdateOrder() {
         const orderIDFromUrl = urlParams.get('order');
         fetchTables();
 
-        axios.get(`localhost:8080/api/orders/${orderIDFromUrl}`)
+        axios.get(`http://localhost:8080/api/orders/${orderIDFromUrl}`)
             .then(response => {
                 if (response.status === 200) {
                     setOrderResponse(response.data);
@@ -196,7 +196,7 @@ export default function UpdateOrder() {
 
     // ==================== MANEJO DE DATOS ====================
     const fetchTables = () => {
-        axios.get(`localhost:8080/api/table/all`)
+        axios.get(`http://localhost:8080/api/table/all`)
             .then(response => {
                 setTableList(response.data);
             })
@@ -356,14 +356,14 @@ export default function UpdateOrder() {
                 if (tableNumber !== tableNumberStatic) {
                     if (tableNumberStatic > 0) {
                         await axios.put(
-                            `localhost:8080/api/table/by-number/${tableNumberStatic}/availability`,
+                            `http://localhost:8080/api/table/by-number/${tableNumberStatic}/availability`,
                             null,
                             { params: { availability: true } }
                         );
                     }
                     if (tableNumber > 0) {
                         await axios.put(
-                            `localhost:8080/api/table/by-number/${tableNumber}/availability`,
+                            `http://localhost:8080/api/table/by-number/${tableNumber}/availability`,
                             null,
                             { params: { availability: false } }
                         );
@@ -371,7 +371,7 @@ export default function UpdateOrder() {
                 }
 
                 const response = await axios.put(
-                    `localhost:8080/api/orders/${OrderResponse.orderId}`,
+                    `http://localhost:8080/api/orders/${OrderResponse.orderId}`,
                     orderJSON,
                     { headers: { "Content-Type": "application/json" } }
                 );

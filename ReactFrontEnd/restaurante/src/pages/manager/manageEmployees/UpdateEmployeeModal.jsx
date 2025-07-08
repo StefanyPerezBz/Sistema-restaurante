@@ -247,7 +247,7 @@ const UpdateEmployeeModal = ({ employee, handleClose, onUpdate }) => {
             }
 
             const response = await axios.put(
-                `localhost:8080/api/employees/update/${employee.id}`,
+                `http://localhost:8080/api/employees/update/${employee.id}`,
                 changes,
                 {
                     headers: {

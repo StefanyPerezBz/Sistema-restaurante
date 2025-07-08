@@ -23,7 +23,7 @@ export default function Bill() {
         const urlParams = new URLSearchParams(window.location.search);
         const orderIDFromUrl = urlParams.get('order');
 
-        axios.get(`localhost:8080/api/orders/${orderIDFromUrl}`)
+        axios.get(`http://localhost:8080/api/orders/${orderIDFromUrl}`)
             .then(response => {
                 if (response.status === 200) {
                     setOrderResponse(response.data);
@@ -206,7 +206,7 @@ export default function Bill() {
                 specialNote: note
             };
 
-            const response = await axios.put(`localhost:8080/api/orders/${OrderResponse.orderId}`, orderJSON, {
+            const response = await axios.put(`http://localhost:8080/api/orders/${OrderResponse.orderId}`, orderJSON, {
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -214,7 +214,7 @@ export default function Bill() {
 
             if (response.status === 200) {
                 if (tableNumber > 0) {
-                    await axios.put(`localhost:8080/api/table/${tableNumber}/availability?availability=true`);
+                    await axios.put(`http://localhost:8080/api/table/${tableNumber}/availability?availability=true`);
                 }
 
                 Swal.fire({

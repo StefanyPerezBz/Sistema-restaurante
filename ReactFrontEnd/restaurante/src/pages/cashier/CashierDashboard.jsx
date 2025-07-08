@@ -105,19 +105,19 @@ export default function CashierDashboard() {
       setMenuCategoryData(null);
 
       // Obtener datos de empleados
-      const employeesRes = await axios.get(`localhost:8080/api/user/manage-employees`);
+      const employeesRes = await axios.get(`http://localhost:8080/api/user/manage-employees`);
       setEmployeeCount(employeesRes.data?.length ?? 0);
 
       // Obtener datos del menú
-      const menuItemsRes = await axios.get(`localhost:8080/api/food/available`);
+      const menuItemsRes = await axios.get(`http://localhost:8080/api/food/available`);
       setMenuItemsCount(menuItemsRes.data?.length ?? 0);
 
       // Obtener datos de mesas
-      const tablesRes = await axios.get(`localhost:8080/api/table/all`);
+      const tablesRes = await axios.get(`http://localhost:8080/api/table/all`);
       setAvailableTables(tablesRes.data?.filter(table => table.tableAvailability)?.length ?? 0);
 
       // Obtener datos de órdenes
-      const ordersRes = await axios.get(`localhost:8080/api/orders/all-orders-general`);
+      const ordersRes = await axios.get(`http://localhost:8080/api/orders/all-orders-general`);
       
       // Calcular ingresos diarios (solo órdenes completadas hoy)
       const today = new Date().toISOString().split('T')[0];
@@ -131,7 +131,7 @@ export default function CashierDashboard() {
 
       // Procesar datos de asistencia (si hay endpoint disponible)
       try {
-        const attendanceRes = await axios.get(`localhost:8080/current-date`);
+        const attendanceRes = await axios.get(`http://localhost:8080/current-date`);
         if (attendanceRes.data && Array.isArray(attendanceRes.data)) {
           const present = attendanceRes.data.filter(a => a.inTime && a.inTime !== "absent").length;
           const absent = attendanceRes.data.filter(a => a.inTime === "absent").length;

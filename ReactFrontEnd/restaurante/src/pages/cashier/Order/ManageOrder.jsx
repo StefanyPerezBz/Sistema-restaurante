@@ -24,7 +24,7 @@ export default function ManageOrder() {
     const fetchOrders = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`localhost:8080/api/orders/all-orders-general`);
+            const response = await fetch(`http://localhost:8080/api/orders/all-orders-general`);
             const data = await response.json();
 
             const formatDate = (date) => {
