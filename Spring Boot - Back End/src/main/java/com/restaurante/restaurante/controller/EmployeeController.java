@@ -24,11 +24,6 @@ public class EmployeeController {
         return employeeService.createEmployee(newEmployee);
     }
 
-    //@PutMapping("update/{id}") // Actualizar nombre, apellido, correo electrónico, contraseña y foto de perfil.
-    //public Employee updateEmployee(@PathVariable Integer id, @RequestBody Employee updatedEmployee) {
-       // return employeeService.updateEmployee(id, updatedEmployee);
-    //}
-
     @PutMapping("/update/{id}")
     public ResponseEntity<Employee> updateEmployee(
             @PathVariable Integer id,

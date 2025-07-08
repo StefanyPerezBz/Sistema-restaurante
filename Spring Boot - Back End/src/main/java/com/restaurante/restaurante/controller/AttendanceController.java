@@ -93,10 +93,8 @@ public class AttendanceController {
         }
     }
 
-
     // Obtener asistencia en la fecha actual
     private final AttendanceService attendanceService;
-
 
     // Inyección del constructor de AttendanceService
     public AttendanceController(AttendanceService attendanceService) {
@@ -141,9 +139,6 @@ public class AttendanceController {
 
     @GetMapping("/current-month")
     public ResponseEntity<List<Attendance>> getAttendanceForCurrentMonth() {
-        //List<Attendance> attendanceList = attendanceService.getAttendanceForCurrentMonth();
-       // return new ResponseEntity<>(attendanceList, HttpStatus.OK);
-
         //
         YearMonth currentYearMonth = YearMonth.now();
         LocalDate firstDayOfMonth = currentYearMonth.atDay(1);
@@ -167,7 +162,6 @@ public class AttendanceController {
         //
         try {
             // Parsear la fecha
-            //LocalDate date = LocalDate.parse(request.getDate());
             LocalDate date = request.getDate();
 
             // Obtener registro de asistencia
@@ -191,17 +185,6 @@ public class AttendanceController {
                     .body("Error al actualizar: " + e.getMessage());
         }
 
-       // Attendance attendance = attendanceRepository.findByEmpIdAndDate(request.getEmpId(), request.getDate());
-        //if (attendance == null) {
-            //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró el registro de asistencia.");
-        //}
-
-        //attendance.setInTime(request.getInTime());
-        //attendance.setOutTime(request.getOutTime());
-
-        //attendanceRepository.save(attendance);
-
-        //return ResponseEntity.ok("Registro de asistencia actualizado exitosamente.");
     }
 
     //Eliminar registros de asistencia

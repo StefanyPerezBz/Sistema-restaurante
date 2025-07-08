@@ -24,21 +24,6 @@ public class LoginController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
-    //@PostMapping("/login")
-    //public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
-        //String username = credentials.get("username");
-        //String password = credentials.get("password");
-
-        //Employee emplogin= loginRepository.findByUsernameAndPassword(username, password);
-
-        //if (emplogin != null) {
-            //return ResponseEntity.ok(emplogin); // Return the whole Employee object
-        //} else {
-            //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nombre de usuario o contraseña no válidos");
-        //}
-    //}
-
     //
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
@@ -55,20 +40,6 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nombre de usuario o contraseña no válidos");
         }
     }
-
-
-//    @GetMapping("/userdetails")
-//    public ResponseEntity<?> getUserDetails(@RequestParam String username, @RequestParam String password) {
-//        Employee empLogin = loginRepository.findByUsernameAndPassword(username, password);
-//
-//        if (empLogin != null) {
-//            // You can return the entire user object or specific user details here
-//            return ResponseEntity.ok(empLogin);
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-//        }
-//    }
-
 
 
 }

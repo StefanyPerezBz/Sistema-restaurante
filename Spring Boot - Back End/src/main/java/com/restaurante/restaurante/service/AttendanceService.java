@@ -102,15 +102,12 @@ public class AttendanceService {
 
     //delete
 
-
     public void deleteAttendance(String empId, LocalDate date) {
         attendanceRepository.deleteByEmpIdAndDate(empId, date);
     }
 
 
     //current month attendance
-
-
     public List<Attendance> getAttendanceForCurrentMonth() {
         // Obtener el año y mes actual
         YearMonth currentYearMonth = YearMonth.now();
@@ -124,10 +121,6 @@ public class AttendanceService {
         // Recuperar registros de asistencia dentro del mes actual
         return attendanceRepository.findByDateBetween(firstDayOfMonth, lastDayOfMonth);
     }
-
-//Search acording to empid and today or this month data
-
-
 
 }
 

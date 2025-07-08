@@ -35,7 +35,7 @@ public class SecurityConfig {
 
     @PostConstruct
     public void init() {
-        System.out.println("✅ SecurityConfig loaded");
+        System.out.println("✅ Configuración de seguridad cargada");
     }
 
 }

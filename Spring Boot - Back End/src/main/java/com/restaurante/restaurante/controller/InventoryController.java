@@ -28,9 +28,6 @@ public class InventoryController {
 
     @PostMapping("/add") //agregar el artículo del inventario
     public ResponseEntity<String> addItemToInventory(@RequestBody InventoryItem item) {
-        //inventoryService.addItemInventory(item);
-        //return ResponseEntity.ok("Ingrediente añadido al inventario con éxito");
-
         // Calcular totalPrice antes de guardar
         try {
             // Validación básica en el controlador
@@ -64,11 +61,6 @@ public class InventoryController {
     }
     @PutMapping("/edit/{itemId}")//editar elemento por id
     public ResponseEntity<String> editInventoryItem(@PathVariable long itemId, @RequestBody InventoryItem updateItem){
-        //if(inventoryService.editInventoryItem(itemId,updateItem)){
-            //return ResponseEntity.ok("Ingrediente de inventario actualizado exitosamente");
-        //}else {
-            //throw new ItemNotFoundExeption(itemId);
-        //}
         // Calcular totalPrice antes de actualizar
         try {
             if (inventoryService.editInventoryItem(itemId, updateItem)) {
@@ -84,6 +76,7 @@ public class InventoryController {
             return ResponseEntity.internalServerError().body("Error al actualizar el artículo");
         }
     }
+
     @DeleteMapping("/delete/{itemId}")
     public ResponseEntity<String> deleteInventoryItem(@PathVariable long itemId){
         boolean success = inventoryService.deleteInventoryItemById(itemId);
@@ -95,6 +88,7 @@ public class InventoryController {
         }
 
     }
+
     @PutMapping("/use/{itemId}/{quantity}") //Disminuir y actualizar el inventario y el estado de actualización de la tienda en otra tabla
     public ResponseEntity<String> useInventoryItem(@PathVariable long itemId, @PathVariable float quantity){
         boolean success = inventoryService.useInventoryItem(itemId,quantity);

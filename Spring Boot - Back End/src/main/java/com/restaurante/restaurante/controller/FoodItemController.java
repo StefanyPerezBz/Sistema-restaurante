@@ -31,7 +31,7 @@ public class FoodItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFoodItem);                        // Http response status
     }
 
-    @GetMapping("/categories") //El método recupera una lista de categorías de alimentos.
+    @GetMapping("/categories") //El metodo recupera una lista de categorías de alimentos.
     public ResponseEntity<List<String>> getAllCategories() {                                          // created list
         List<String> categories = foodItemService.getAllCategories();
         return ResponseEntity.ok(categories);

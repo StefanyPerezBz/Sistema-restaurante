@@ -55,8 +55,6 @@ public class TableManageController {
         // Actualizar la disponibilidad de la mesa por ID
     ResponseEntity<String> updateTableAvailability(@PathVariable Long id,
                                                    @RequestParam boolean tableAvailability) {
-        //tableManageService.updateTableAvailability(id, availability);
-        //return ResponseEntity.ok("Disponibilidad de mesa actualizada con éxito");
         try {
             tableManageService.updateTableAvailability(id, tableAvailability);
             return ResponseEntity.ok("Disponibilidad de mesa actualizada con éxito");
@@ -79,12 +77,6 @@ public class TableManageController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-    //@GetMapping("/available") // Obtener mesas disponibles
-    //ResponseEntity<List<TableManage>> getAvailableTables() {
-    //List<TableManage> availableTables = tableManageService.getAvailableTables();
-    //return ResponseEntity.ok(availableTables);
-    //}
 
     @GetMapping("/available")
     public ResponseEntity<List<TableManage>> getAvailableTables() {

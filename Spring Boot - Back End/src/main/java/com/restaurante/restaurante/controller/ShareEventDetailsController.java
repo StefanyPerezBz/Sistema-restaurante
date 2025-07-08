@@ -27,9 +27,6 @@ public class ShareEventDetailsController {
 
     @PostMapping("/share-event-details")
     public void shareEventDetails(@RequestBody Event event) {
-        // Retrieve event details from the database
-//        Event storedEvent = shareEventDetailsRepository.findByEventID(event.getEventID());
-//        System.out.println(storedEvent);
 
         event = shareEventDetailsRepository.findByEventID(event.getEventID());
         System.out.println("Detalles del evento: " + event.getEventName() + " " + event.getEventDate() + " " + event.getStartTime() + " " + event.getTicketPrice());
