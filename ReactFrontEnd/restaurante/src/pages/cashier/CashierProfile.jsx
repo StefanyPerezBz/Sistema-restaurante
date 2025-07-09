@@ -206,7 +206,7 @@ export default function CashierProfile() {
   const profileImageSrc = imageFileURL || 
     (currentUser.profilePicture 
       ? `http://localhost:8080/api/food/image/${currentUser.profilePicture}`
-      : '/default-profile.png');
+      : '/public/avatar.png');
 
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { BiCoinStack } from "react-icons/bi";
 import { Sidebar } from "flowbite-react";
@@ -7,16 +7,25 @@ import { HiArrowSmRight, HiUser, HiClipboardCheck, HiOutlineUsers } from "react-
 import { IoFastFoodOutline } from "react-icons/io5";
 import { RiUserShared2Fill } from "react-icons/ri";
 import { logOutSuccess } from '../redux/user/userSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { FaChartPie } from "react-icons/fa";
-
+import UnauthorizedChef from './UnauthorizedChef';
 
 export default function ChefSideBar() {
     const location = useLocation();
     const [tab, setTab] = useState('');
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { currentUser } = useSelector((state) => state.user);
     const [orders, setOrders] = useState([]);
+
+    // Verificación de rol al montar el componente
+    useEffect(() => {
+        if (!currentUser || currentUser.role !== 'chef') {
+            navigate('/unauthorized-cashier');
+        }
+    }, [currentUser, navigate]);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
@@ -24,11 +33,12 @@ export default function ChefSideBar() {
         if (tabFromUrl) {
             setTab(tabFromUrl);
         }
-        fetchOrders();
-    }, [location.search]);
+        if (currentUser && currentUser.role === 'chef') {
+            fetchOrders();
+        }
+    }, [location.search, currentUser]);
 
     const handleLogOut = async () => {
-
         try {
             dispatch(logOutSuccess());
         } catch (error) {
@@ -38,82 +48,79 @@ export default function ChefSideBar() {
 
     // Get today's date
     const today = new Date();
-
-    // Format the date as YYYY-MM-DD
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-
-    // Construct the date string in YYYY-MM-DD format
     const createdDate = `${year}-${month}-${day}`;
-    console.log(createdDate);
 
     const fetchOrders = async () => {
         try {
             const response = await axios.get(`http://localhost:8080/api/orders/created-date`, {
-                params: {
-                    createdDate: createdDate
-                }
+                params: { createdDate }
             });
             setOrders(response.data);
-            console.log(response.data);
         } catch (error) {
             console.error('Error fetching orders:', error);
         }
     };
 
+    // No renderizar nada si no es chef
+    if (!currentUser || currentUser.role !== 'chef') {
+        return null;
+    }
 
     return (
         <Sidebar className='w-full md:w-56 h-full'>
             <Sidebar.Items>
                 <Sidebar.ItemGroup>
-                    <div className='h-full '>
+                    <div className='h-full'>
                         <div className=''>
                             <Link to='/chef?tab=dashboard'>
-                                <Sidebar.Item active={tab === 'dashboard'} icon={FaChartPie} as='div' >
+                                <Sidebar.Item active={tab === 'dashboard'} icon={FaChartPie} as='div'>
                                     Inicio
                                 </Sidebar.Item>
                             </Link>
                             <Link to='/chef?tab=inventory'>
-                                <Sidebar.Item active={tab === 'inventory'} icon={BiCoinStack} as='div' >
+                                <Sidebar.Item active={tab === 'inventory'} icon={BiCoinStack} as='div'>
                                     Inventario
                                 </Sidebar.Item>
                             </Link>
                             <Link to='/chef?tab=allFood'>
-                                <Sidebar.Item active={tab === 'allFood'} icon={IoFastFoodOutline} as='div' >
+                                <Sidebar.Item active={tab === 'allFood'} icon={IoFastFoodOutline} as='div'>
                                     Menú
                                 </Sidebar.Item>
                             </Link>
-                            <Sidebar.Collapse icon={HiClipboardCheck} label={`Órdenes - ${orders.filter(order =>
-                                ["Pending", "Processing", "Canceled", "Ready", "Completed"].includes(order.orderStatus)
-                            ).length
-                                }`} className='w-full'>
+                            <Sidebar.Collapse 
+                                icon={HiClipboardCheck} 
+                                label={`Órdenes - ${orders.filter(order =>
+                                    ["Pending", "Processing", "Canceled", "Ready", "Completed"].includes(order.orderStatus)
+                                ).length}`} 
+                                className='w-full'
+                            >
                                 <Link to='/chef?tab=allOrders'>
-                                    <Sidebar.Item className=' ml-0 justify-self-start' active={tab === 'allOrders'} >Todas las órdenes </Sidebar.Item>
+                                    <Sidebar.Item className='ml-0 justify-self-start' active={tab === 'allOrders'}>Todas las órdenes</Sidebar.Item>
                                 </Link>
                                 <Link to='/chef?tab=availableOrders'>
-                                    <Sidebar.Item className=' ml-0 justify-self-start' active={tab === 'availableOrders'} >Órdenes disponibles </Sidebar.Item>
+                                    <Sidebar.Item className='ml-0 justify-self-start' active={tab === 'availableOrders'}>Órdenes disponibles</Sidebar.Item>
                                 </Link>
                                 <Link to='/chef?tab=preparingOrders'>
-                                    <Sidebar.Item className=' ml-0 justify-self-start' active={tab === 'preparingOrders'} >Órdenes en preparación</Sidebar.Item>
+                                    <Sidebar.Item className='ml-0 justify-self-start' active={tab === 'preparingOrders'}>Órdenes en preparación</Sidebar.Item>
                                 </Link>
                                 <Link to='/chef?tab=finishedOrders'>
-                                    <Sidebar.Item active={tab === 'finishedOrders'} >Órdenes finalizadas</Sidebar.Item>
+                                    <Sidebar.Item active={tab === 'finishedOrders'}>Órdenes finalizadas</Sidebar.Item>
                                 </Link>
                                 <Link to='/chef?tab=canceledOrders'>
-                                    <Sidebar.Item active={tab === 'canceledOrders'} >Órdenes canceladas</Sidebar.Item>
+                                    <Sidebar.Item active={tab === 'canceledOrders'}>Órdenes canceladas</Sidebar.Item>
                                 </Link>
-
                             </Sidebar.Collapse>
                         </div>
                         <Sidebar.Collapse label='Asistencia' icon={HiUser}>
                             <Link to='/chef?tab=addAttendance'>
-                                <Sidebar.Item active={tab === 'addAttendance'} icon={RiUserShared2Fill} as='div'> Agregar </Sidebar.Item>
+                                <Sidebar.Item active={tab === 'addAttendance'} icon={RiUserShared2Fill} as='div'>Agregar</Sidebar.Item>
                             </Link>
                             <Link to='/chef?tab=viewAttendance'>
-                                <Sidebar.Item active={tab === 'viewAttendance'} icon={HiOutlineUsers} as='div'> Ver </Sidebar.Item>
+                                <Sidebar.Item active={tab === 'viewAttendance'} icon={HiOutlineUsers} as='div'>Ver</Sidebar.Item>
                             </Link>
-
                         </Sidebar.Collapse>
                         <div className='mt-auto'>
                             <Link to='/chef?tab=profile'>
@@ -121,7 +128,7 @@ export default function ChefSideBar() {
                                     Perfil
                                 </Sidebar.Item>
                             </Link>
-                            <Sidebar.Item icon={HiArrowSmRight} className='cursor-pointer' onClick={handleLogOut} >
+                            <Sidebar.Item icon={HiArrowSmRight} className='cursor-pointer' onClick={handleLogOut}>
                                 Salir
                             </Sidebar.Item>
                         </div>
@@ -129,7 +136,5 @@ export default function ChefSideBar() {
                 </Sidebar.ItemGroup>
             </Sidebar.Items>
         </Sidebar>
-
-
-    )
+    );
 }

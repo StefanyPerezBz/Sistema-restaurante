@@ -1,6 +1,6 @@
-import React from 'react'
-import { useDispatch } from 'react-redux';
-import { Link, useLocation } from 'react-router-dom';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { FaChartPie } from "react-icons/fa";
 import { Sidebar } from "flowbite-react";
@@ -10,12 +10,20 @@ import { logOutSuccess } from '../redux/user/userSlice';
 import { RiUserShared2Fill } from "react-icons/ri";
 import { HiOutlineUsers } from "react-icons/hi";
 
-
-
 export default function CashierSideBar() {
     const location = useLocation();
     const [tab, setTab] = useState('');
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { currentUser } = useSelector((state) => state.user);
+
+    // Redirigir inmediatamente si no tiene permisos
+    useEffect(() => {
+        if (!currentUser || currentUser.role !== 'cashier') {
+            navigate('/unauthorized-cashier');
+            return;
+        }
+    }, [currentUser, navigate]);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
@@ -33,6 +41,11 @@ export default function CashierSideBar() {
         }
     }
 
+    // No renderizar nada si no es cajero (ya que se redirige)
+    if (!currentUser || currentUser.role !== 'cashier') {
+        return null;
+    }
+
     return (
         <Sidebar className='w-full md:w-56'>
             <Sidebar.Items>
@@ -45,12 +58,15 @@ export default function CashierSideBar() {
                     
                     <Sidebar.Collapse label='Asistencia' icon={HiUser}>
                         <Link to='/cashier?tab=addAttendance'>
-                            <Sidebar.Item active={tab === 'addAttendance'} icon={RiUserShared2Fill } as='div'> Agregar </Sidebar.Item>
+                            <Sidebar.Item active={tab === 'addAttendance'} icon={RiUserShared2Fill} as='div'>
+                                Agregar
+                            </Sidebar.Item>
                         </Link>
                         <Link to='/cashier?tab=viewAttendance'>
-                            <Sidebar.Item active={tab === 'viewAttendance'} icon={HiOutlineUsers } as='div'> Ver </Sidebar.Item>
+                            <Sidebar.Item active={tab === 'viewAttendance'} icon={HiOutlineUsers} as='div'>
+                                Ver
+                            </Sidebar.Item>
                         </Link>
-
                     </Sidebar.Collapse>
 
                     <Link to='/cashier?tab=orders'>
@@ -58,19 +74,18 @@ export default function CashierSideBar() {
                             Órdenes
                         </Sidebar.Item>
                     </Link>
+                    
                     <Link to='/cashier?tab=profile'>
                         <Sidebar.Item active={tab === 'profile'} icon={HiUser} label={"Cajero"} labelColor='red' as='div'>
                             Perfil
                         </Sidebar.Item>
                     </Link>
 
-                    <Sidebar.Item icon={HiArrowSmRight} className='cursor-pointer' onClick={handleLogOut} >
+                    <Sidebar.Item icon={HiArrowSmRight} className='cursor-pointer' onClick={handleLogOut}>
                         Salir
                     </Sidebar.Item>
-
-
                 </Sidebar.ItemGroup>
             </Sidebar.Items>
         </Sidebar>
-    )
+    );
 }
