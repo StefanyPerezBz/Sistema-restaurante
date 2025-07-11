@@ -10,7 +10,6 @@ import { logOutSuccess } from '../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { FaChartPie } from "react-icons/fa";
-import UnauthorizedChef from './UnauthorizedChef';
 
 export default function ChefSideBar() {
     const location = useLocation();
@@ -20,20 +19,13 @@ export default function ChefSideBar() {
     const { currentUser } = useSelector((state) => state.user);
     const [orders, setOrders] = useState([]);
 
-    // Verificación de rol al montar el componente
-    useEffect(() => {
-        if (!currentUser || currentUser.role !== 'chef') {
-            navigate('/unauthorized-cashier');
-        }
-    }, [currentUser, navigate]);
-
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
         const tabFromUrl = urlParams.get('tab');
         if (tabFromUrl) {
             setTab(tabFromUrl);
         }
-        if (currentUser && currentUser.role === 'chef') {
+        if (currentUser) {
             fetchOrders();
         }
     }, [location.search, currentUser]);
@@ -63,11 +55,6 @@ export default function ChefSideBar() {
             console.error('Error fetching orders:', error);
         }
     };
-
-    // No renderizar nada si no es chef
-    if (!currentUser || currentUser.role !== 'chef') {
-        return null;
-    }
 
     return (
         <Sidebar className='w-full md:w-56 h-full'>

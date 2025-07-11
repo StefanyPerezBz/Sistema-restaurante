@@ -17,14 +17,6 @@ export default function CashierSideBar() {
     const navigate = useNavigate();
     const { currentUser } = useSelector((state) => state.user);
 
-    // Redirigir inmediatamente si no tiene permisos
-    useEffect(() => {
-        if (!currentUser || currentUser.role !== 'cashier') {
-            navigate('/unauthorized-cashier');
-            return;
-        }
-    }, [currentUser, navigate]);
-
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
         const tabFromUrl = urlParams.get('tab');
@@ -39,11 +31,6 @@ export default function CashierSideBar() {
         } catch (error) {
             console.log(error.message);
         }
-    }
-
-    // No renderizar nada si no es cajero (ya que se redirige)
-    if (!currentUser || currentUser.role !== 'cashier') {
-        return null;
     }
 
     return (

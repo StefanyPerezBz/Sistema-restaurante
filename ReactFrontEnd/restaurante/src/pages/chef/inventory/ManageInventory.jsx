@@ -37,24 +37,29 @@ export default function ManageInventory() {
   };
 
   const fetchTodayUsage = async () => {
-    setUsageLoading(true);
+    setUsageLoading(true); // Activar el estado de carga
     try {
-      const currentDate = new Date();
-      currentDate.setDate(currentDate.getDate() + 0);
-      const increasedDate = currentDate.toISOString().split('T')[0];
-      
-      const response = await axios.get(`http://localhost:8080/api/inventory/inventory-usage-log/${increasedDate}`);
-      setTodayUsage(response.data);
+      // Formatear fecha actual de manera más eficiente
+      const today = new Date().toISOString().split('T')[0];
+      console.log("Fetching usage for date:", today);
+
+      // Agregar timestamp para evitar caché
+      const response = await axios.get(
+        `http://localhost:8080/api/inventory/inventory-usage-log/${today}?_=${new Date().getTime()}`
+      );
+
+      console.log("Response data:", response.data);
+      setTodayUsage(response.data || []); // Asegurar array vacío si es null/undefined
     } catch (error) {
-      console.error("Error al obtener el uso de hoy", error);
+      console.error("Error fetching today's usage:", error);
+      setTodayUsage([]); // Establecer array vacío en caso de error
       Swal.fire({
-        title: 'Error!',
+        title: 'Error',
         text: 'No se pudo cargar el uso de hoy',
-        icon: 'error',
-        confirmButtonText: 'Ok'
+        icon: 'error'
       });
     } finally {
-      setUsageLoading(false);
+      setUsageLoading(false); // Desactivar carga independientemente del resultado
     }
   };
 
@@ -135,9 +140,9 @@ export default function ManageInventory() {
     {
       name: 'Acción',
       cell: row => (
-        <Button 
-          size='sm' 
-          color='success' 
+        <Button
+          size='sm'
+          color='success'
           className='bg-green-500 hover:bg-green-600'
           onClick={() => handleUseItem(row.id)}
         >
@@ -205,7 +210,7 @@ export default function ManageInventory() {
           <div className='bg-white p-4 rounded-lg shadow mb-4'>
             <h2 className="text-xl font-bold text-gray-800">Inventario disponible</h2>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow overflow-hidden">
             {loading ? (
               <div className="flex justify-center items-center h-64">
