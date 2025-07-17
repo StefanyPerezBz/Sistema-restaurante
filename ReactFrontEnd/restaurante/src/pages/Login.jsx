@@ -80,7 +80,7 @@ export default function Login() {
         try {
             setRedirecting(true);
             dispatch(logInStart());
-            const response = await axios.post(`http://localhost:8080/api/user/login`, formData);
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/user/login`, formData);
             const data = response.data;
             setEmployee(data);
 

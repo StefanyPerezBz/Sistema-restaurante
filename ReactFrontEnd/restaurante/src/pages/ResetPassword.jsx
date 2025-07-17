@@ -55,7 +55,7 @@ function ResetPassword() {
 
         try {
             setLoading(true);
-            const response = await axios.post(`http://localhost:8080/reset-password-request`, { username });
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/reset-password-request`, { username });
             
             await MySwal.fire({
                 title: 'Código enviado',
@@ -104,7 +104,7 @@ function ResetPassword() {
 
         try {
             setLoading(true);
-            const response = await axios.post(`http://localhost:8080/verify-otp`, { 
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify-otp`, { 
                 username,
                 otp 
             });
@@ -174,7 +174,7 @@ function ResetPassword() {
 
         try {
             setLoading(true);
-            const response = await axios.post(`http://localhost:8080/reset-password`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/reset-password`, {
                 username,
                 newPassword,
                 confirmPassword
