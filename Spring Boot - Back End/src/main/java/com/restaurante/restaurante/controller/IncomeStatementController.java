@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/income")
 public class IncomeStatementController {
     @Autowired

@@ -14,8 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/user")
 public class ManageEmployeeController {
     @Autowired

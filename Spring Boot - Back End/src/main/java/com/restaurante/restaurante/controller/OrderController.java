@@ -20,8 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-//@CrossOrigin("http://localhost:3000")
-@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
+@CrossOrigin("http://localhost:3000")
 @RequestMapping("/api/orders")
 public class OrderController {
 

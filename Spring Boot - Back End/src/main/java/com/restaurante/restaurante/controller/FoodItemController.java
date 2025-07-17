@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController                                                                                      // connect to ApI/UI
-//@CrossOrigin("http://localhost:3000")
-@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
+@CrossOrigin("http://localhost:3000")
 @RequestMapping("/api/food")
 public class FoodItemController {
 

@@ -7,8 +7,7 @@ import com.restaurante.restaurante.service.ShareEventDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/inform")
 public class ShareEventDetailsController {
     private final EmailService emailService;
