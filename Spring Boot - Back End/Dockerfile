@@ -1,21 +1,18 @@
-# Etapa 1: Construcción
+# Build stage
 FROM maven:3.8.5-openjdk-17-slim AS build
 
 WORKDIR /app
-
 COPY . .
 
-RUN chmod +x mvnw
+# Clean any existing build artifacts
+RUN rm -rf target/
 
-RUN ./mvnw clean package -DskipTests
+# Run Maven directly (not using the wrapper)
+RUN mvn clean package -DskipTests
 
-# Etapa 2: Ejecución
+# Runtime stage
 FROM openjdk:17-jdk-slim
-
 WORKDIR /app
-
 COPY --from=build /app/target/*.jar app.jar
-
 EXPOSE 8080
-
 ENTRYPOINT ["java", "-jar", "app.jar"]
