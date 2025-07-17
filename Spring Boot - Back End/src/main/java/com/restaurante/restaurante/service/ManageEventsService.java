@@ -47,32 +47,32 @@ public class ManageEventsService {
         return eventID;
     }
 
-    // Find Total revenue of events for current month
+    // Encuentre los ingresos totales de los eventos para el mes actual
     @Transactional
     public double getTotalRevenueForCurrentMonth() {
         Double totalRevenue = manageEventsRepository.findTotalRevenueForCurrentMonth();
         return totalRevenue != null ? totalRevenue : 0.0;
     }
 
-    // Find Total revenue of events for current year
+    // Encuentre los ingresos totales de los eventos para el año actual
     @Transactional
     public double getTotalRevenueForCurrentYear() {
         Double totalRevenue = manageEventsRepository.findTotalRevenueForCurrentYear();
         return totalRevenue != null ? totalRevenue : 0.0;
     }
 
-    // Find Total budget of events for current month
+    // Encuentre el presupuesto total de eventos para el mes actual
     public double getTotalEventBudgetForCurrentMonth() {
         return manageEventsRepository.findTotalEventBudgetForCurrentMonth();
     }
 
-    // Find Total budget of events for current year
+    // Encuentre la recaudacion total de eventos para el año actual
     public double getTotalEventBudgetForCurrentYear() {
         Double totalBudget = manageEventsRepository.findTotalEventBudgetForCurrentYear();
         return totalBudget != null ? totalBudget : 0.0;
     }
 
-    // Find the next event after the current date
+    // Encuentra el próximo evento después de la fecha actual
     public Event getNextEvent() {
         LocalDate currentDate = LocalDate.now();
         return manageEventsRepository.findFirstByEventDateAfterOrderByEventDateAsc(currentDate).orElse(null);

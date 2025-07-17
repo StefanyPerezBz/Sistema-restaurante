@@ -17,7 +17,7 @@ public class PaymentService {
     private PaymentRepository paymentRepository;
 
     public Payment addPayment(Payment payment) {
-        // Check if a payment with the same billType exists for the current month
+        // Verificar si existe un pago con el mismo tipo de factura para el mes actual
         LocalDate payDate = payment.getPayDate();
         int month = payDate.getMonthValue();
         int year = payDate.getYear();

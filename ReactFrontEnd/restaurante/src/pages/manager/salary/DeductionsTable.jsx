@@ -26,7 +26,6 @@ function DeductionsTable({ fetchDeductions }) {
   });
   const [pending, setPending] = useState(true);
 
-  // Deduction types options
   const deductionTypeOptions = [
     { value: 'Tardanza reiterada', label: 'Tardanza reiterada' },
     { value: 'Falta injustificada', label: 'Falta injustificada' },
@@ -270,7 +269,6 @@ function DeductionsTable({ fetchDeductions }) {
         />
       </div>
 
-      {/* Delete Confirmation Modal */}
       <Modal show={deleteModalOpen} size="md" onClose={closeDeleteModal} popup>
         <Modal.Header />
         <Modal.Body>
@@ -291,7 +289,6 @@ function DeductionsTable({ fetchDeductions }) {
         </Modal.Body>
       </Modal>
 
-      {/* Edit Deduction Modal */}
       <Modal show={editModalOpen} size="md" onClose={() => setEditModalOpen(false)} popup>
         <Modal.Header />
         <Modal.Body>

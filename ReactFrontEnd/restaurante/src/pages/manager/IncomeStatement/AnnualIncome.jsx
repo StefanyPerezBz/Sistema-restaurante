@@ -30,7 +30,6 @@ const AnnualIncome = () => {
   const [netProfit, setNetProfit] = useState(0);
   const currentYear = new Date().getFullYear();
 
-  // States for previous year data
   const [previousYearTotalIncome, setPreviousYearTotalIncome] = useState(0);
   const [previousYearTotalExpenses, setPreviousYearTotalExpenses] = useState(0);
   const [previousYearNetProfit, setPreviousYearNetProfit] = useState(0);
@@ -55,7 +54,6 @@ const AnnualIncome = () => {
     calculateNetProfit();
   }, [billTypeAmounts, salesRevenue, eventRevenue, totalAnnualExpenses, totalRevenue, totalIncome, tax, totalAnnualSalary, totalEventBudgetforYear, totalInventoryPurchasesForYear]);
 
-  // Fetch annual expenses from API
   const fetchAnnualExpenses = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/payment/current-year`);
@@ -75,7 +73,6 @@ const AnnualIncome = () => {
     }
   };
 
-  // Fetch bill type amounts from the API
   const fetchBillTypeAmounts = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/payment/current-year`);
@@ -111,7 +108,6 @@ const AnnualIncome = () => {
     }
   };
 
-  // Fetch annual salary from the API
   const fetchAnnualSalary = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/salary/getTotalGrossPaymentForCurrentYear`);
@@ -131,7 +127,6 @@ const AnnualIncome = () => {
     }
   };
 
-  // Fetch total event budget for the year from the API
   const fetchTotalEventBudgetforYear = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/events/annual-total-budget`);
@@ -151,7 +146,6 @@ const AnnualIncome = () => {
     }
   };
 
-  // Fetch total inventory purchases for the year from the API
   const fetchTotalInventoryPurchasesForYear = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/inventory/total-price/year`);
@@ -171,7 +165,6 @@ const AnnualIncome = () => {
     }
   };
 
-  // Fetch annual sales revenue from the API
   const fetchAnnualSalesRevenue = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/orders/annaul-sales-revenue`);
@@ -191,7 +184,6 @@ const AnnualIncome = () => {
     }
   };
 
-  // Fetch event revenue from the API
   const fetchEventRevenue = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/events/annual-total-revenue`);
@@ -211,7 +203,6 @@ const AnnualIncome = () => {
     }
   };
 
-  // Fetch previous year data from the API
   const fetchPreviousYearData = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/income/previous-year/${previousYear}`);
@@ -273,13 +264,11 @@ const AnnualIncome = () => {
     }
   };
 
-  // Calculate total revenue
   const calculateTotalAnnualRevenue = () => {
     const totalRev = salesRevenue + eventRevenue;
     setTotalRevenue(totalRev);
   };
 
-  // Calculate total expenses
   const calculateTotalAnnualExpenses = () => {
     const totalEx = billTypeAmounts.reduce((accumulator, item) => {
       return accumulator + item.totalAmount;
@@ -288,13 +277,11 @@ const AnnualIncome = () => {
     setTotalAnnualExpenses(totalExpenses);
   };
 
-  // Calculate total income
   const calculateTotalAnnualIncome = () => {
     const totalIn = totalRevenue - totalAnnualExpenses;
     setTotalIncome(totalIn);
   };
 
-  // Calculate tax (IGV 18% en Perú)
   const calculateTax = () => {
     if (totalIncome > 0) {
       const taxAmount = totalIncome * 0.18; // IGV general es 18%
@@ -304,7 +291,6 @@ const AnnualIncome = () => {
     }
   };
 
-  // Calculate net profit
   const calculateNetProfit = () => {
     const net = totalIncome - tax;
     setNetProfit(net);

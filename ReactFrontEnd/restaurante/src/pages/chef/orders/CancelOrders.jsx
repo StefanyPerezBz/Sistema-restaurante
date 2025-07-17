@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 export default function CancelOrders() {
     const [orders, setOrders] = useState([]);
     const [pending, setPending] = useState(true);
-    const [viewMode, setViewMode] = useState('table'); // 'table' or 'accordion'
+    const [viewMode, setViewMode] = useState('table'); 
     const [filteredOrders, setFilteredOrders] = useState([]);
 
     useEffect(() => {
@@ -17,7 +17,6 @@ export default function CancelOrders() {
     }, []);
 
     useEffect(() => {
-        // Filter orders to only show Canceled status
         const canceledOrders = orders.filter(order => order.orderStatus === 'Canceled');
         setFilteredOrders(canceledOrders);
     }, [orders]);

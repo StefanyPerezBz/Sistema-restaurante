@@ -198,7 +198,6 @@ export default function TableManage() {
                 ))}
             </div>
             
-            {/* Delete Confirmation Modal */}
             <Modal show={deleteTableModel} onClose={() => setDeleteTableModel(false)} popup>
                 <Modal.Header />
                 <Modal.Body>
@@ -219,7 +218,6 @@ export default function TableManage() {
                 </Modal.Body>
             </Modal>
 
-            {/* Add Table Modal */}
             <Modal show={addNewTableModel} onClose={() => {
                 setAddNewTableModel(false);
                 setTableNumber('');

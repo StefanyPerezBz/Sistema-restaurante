@@ -35,10 +35,8 @@ function UseItemPopup({ item, onConfirm, onCancel, onReloadItems }) {
         if (!validateInput()) return;
 
         try {
-            // Make a PUT request to the API endpoint to decrement the item quantity
             await axios.put(`http://localhost:8080/api/inventory/use/${item.id}/${quantityUsed}`);
 
-            // Show success message
             Swal.fire({
                 title: 'Éxito',
                 text: 'Cantidad actualizada correctamente',
@@ -46,13 +44,10 @@ function UseItemPopup({ item, onConfirm, onCancel, onReloadItems }) {
                 confirmButtonText: 'OK'
             });
 
-            // Call the onConfirm function with the quantity used
             onConfirm(parseInt(quantityUsed));
 
-            // Reload items in the table
             onReloadItems();
             
-            // Close the popup window
             onCancel();
 
         } catch (error) {
@@ -84,7 +79,7 @@ function UseItemPopup({ item, onConfirm, onCancel, onReloadItems }) {
                                 placeholder="Ingresar cantidad a usar"
                                 onChange={(e) => {
                                     setQuantityUsed(e.target.value);
-                                    setError(''); // Clear error when user types
+                                    setError(''); 
                                 }}
                                 min="1"
                                 step="1"

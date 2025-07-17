@@ -278,7 +278,6 @@ export default function UpdateOrderItems() {
                     )}
                     
                     <div className="mx-auto justify-center flex flex-col lg:flex-row lg:space-x-6 space-y-6 lg:space-y-0">
-                        {/* Left Panel - Food Items */}
                         <div className="w-full lg:w-3/5">
                             <div className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-4">
                                 <h1 className="mb-4 text-xl font-bold dark:text-white">
@@ -309,7 +308,6 @@ export default function UpdateOrderItems() {
                                     </div>
                                 </div>
                                 
-                                {/* Category Tabs - Responsive */}
                                 <div className="mb-4 flex overflow-x-auto pb-2 space-x-2 sm:space-x-4 p-2 bg-white rounded-lg shadow-md dark:bg-gray-600">
                                     {["All", "Main Dish", "Side Dish", "Beverages"].map(category => (
                                         <button 
@@ -326,7 +324,6 @@ export default function UpdateOrderItems() {
                                     ))}
                                 </div>
 
-                                {/* Food Items Grid - Responsive */}
                                 <div className="p-2 max-h-[calc(100vh-17rem)] h-auto rounded-lg overflow-auto">
                                     <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                         {filteredFoodItems.length < 1 ? (
@@ -365,7 +362,6 @@ export default function UpdateOrderItems() {
                             </div>
                         </div>
 
-                        {/* Right Panel - Order Summary */}
                         <div className="w-full lg:w-2/5">
                             <div className="bg-white dark:bg-gray-700 rounded-lg border shadow-md p-4 flex flex-col h-full">
                                 <div className="overflow-auto flex-grow max-h-[calc(100vh-18rem)]">

@@ -20,7 +20,6 @@ export default function ManageOrder() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Status options for Select2
     const statusOptions = [
         { value: 'All', label: 'Ver todo' },
         { value: 'Pending', label: 'Pendiente' },
@@ -51,7 +50,7 @@ export default function ManageOrder() {
             }
             const data = await response.json();
             setOrders(data);
-            setOriginalOrders(data); // Store original data for resetting filters
+            setOriginalOrders(data); 
             setIsLoading(false);
         } catch (error) {
             console.error('Error fetching orders:', error);
@@ -63,12 +62,10 @@ export default function ManageOrder() {
 
     const filteredOrders = useMemo(() => {
         return orders.filter(order => {
-            // Check if the order status matches the selected status
             if (selectedStatus !== 'All' && order.orderStatus !== selectedStatus) {
                 return false;
             }
 
-            // Check if search query is provided
             if (searchQuery.trim() !== "") {
                 if (searchCriteria === 'id') {
                     return order.orderId.toString().includes(searchQuery);
@@ -86,7 +83,7 @@ export default function ManageOrder() {
                     }
                 }
             }
-            return true; // If no search query provided, include all orders
+            return true; 
         });
     }, [orders, searchQuery, searchCriteria, selectedStatus]);
 
@@ -107,7 +104,6 @@ export default function ManageOrder() {
         }
     };
 
-    // Pagination calculations
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
@@ -157,7 +153,6 @@ export default function ManageOrder() {
             if (response.status === 204 || response.ok) {
                 await axios.put(`http://localhost:8080/api/table/${order.tableNumber}/availability?availability=true`);
 
-                // Show success alert
                 MySwal.fire({
                     title: '¡Eliminado!',
                     text: `El pedido #${orderId} ha sido eliminado.`,
@@ -167,7 +162,6 @@ export default function ManageOrder() {
                     showConfirmButton: false
                 });
 
-                // Update both orders states
                 setOrders(prev => prev.filter(o => o.orderId !== orderId));
                 setOriginalOrders(prev => prev.filter(o => o.orderId !== orderId));
             } else {
@@ -214,20 +208,18 @@ export default function ManageOrder() {
 
     const handleStatusChange = (selectedOption) => {
         setSelectedStatus(selectedOption.value);
-        setCurrentPage(1); // Reset to first page when filter changes
+        setCurrentPage(1); 
     };
 
     const handleSearchCriteriaChange = (selectedOption) => {
         setSearchCriteria(selectedOption.value);
-        setSearchQuery(''); // Clear search query when criteria changes
+        setSearchQuery(''); 
     };
 
-    // Generate pagination buttons
     const renderPaginationButtons = () => {
         const buttons = [];
         const maxVisibleButtons = 5;
 
-        // Always show first page
         buttons.push(
             <button
                 key={1}
@@ -239,23 +231,19 @@ export default function ManageOrder() {
         );
 
         if (totalPages > 1) {
-            // Show ellipsis if current page is more than 3 pages from the start
             if (currentPage > maxVisibleButtons - 1) {
                 buttons.push(<span key="start-ellipsis" className="mx-1 px-2 py-2">...</span>);
             }
 
-            // Calculate range of pages to show around current page
             let startPage = Math.max(2, currentPage - 1);
             let endPage = Math.min(totalPages - 1, currentPage + 1);
 
-            // Adjust if we're near the start or end
             if (currentPage <= maxVisibleButtons - 1) {
                 endPage = maxVisibleButtons;
             } else if (currentPage >= totalPages - (maxVisibleButtons - 2)) {
                 startPage = totalPages - (maxVisibleButtons - 1);
             }
 
-            // Show page numbers
             for (let i = startPage; i <= endPage; i++) {
                 if (i > 1 && i < totalPages) {
                     buttons.push(
@@ -410,7 +398,7 @@ export default function ManageOrder() {
                                                     key={order.orderId}
                                                     className="hover:bg-gray-100 dark:hover:bg-gray-400 cursor-pointer"
                                                     onClick={(e) => {
-                                                        // Only redirect if the click wasn't on a button
+                                                        
                                                         if (!e.target.closest('button, a')) {
                                                             redirectToOrderView(order.orderId, e);
                                                         }
@@ -467,7 +455,6 @@ export default function ManageOrder() {
                                 </table>
                             </div>
 
-                            {/* Pagination */}
                             {filteredOrders.length > 0 && (
                                 <div className="flex justify-center mt-4">
                                     <button

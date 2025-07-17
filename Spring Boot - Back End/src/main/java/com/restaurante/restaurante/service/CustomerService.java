@@ -89,50 +89,50 @@ public class CustomerService {
         String mobileNumber = customerDTO.getCusMobile();
         Long customerId = customerDTO.getCusId();
 
-        if (email != null && !email.isEmpty() && !isValidEmail(email)) {  //If the email is not null, not empty, and does not match the valid email format
-            throw new IllegalArgumentException("Formato de correo electrónico no válido: " + email);  // is thrown with the message “Invalid email format: {email}”.
+        if (email != null && !email.isEmpty() && !isValidEmail(email)) {  //Si el correo electrónico no es nulo, no está vacío y no coincide con el formato de correo electrónico válido
+            throw new IllegalArgumentException("Formato de correo electrónico no válido: " + email);  // Se lanza con el mensaje “Formato de correo electrónico no válido: {email}”.
         }
 
-        if (!isValidMobileNumber(mobileNumber)) { //The method checks if the mobile number is valid
+        if (!isValidMobileNumber(mobileNumber)) { //El metodo verifica si el número de móvil es válido
             throw new IllegalArgumentException("Número de móvil no válido: " + mobileNumber);
         }
 
-        if (customerRepository.existsByCusMobile(mobileNumber) && Objects.equals(processType, "Create")) {    //If the process type is “Create” and a customer with
-                                                                                                                  // the same mobile number already exists in the repository
+        if (customerRepository.existsByCusMobile(mobileNumber) && Objects.equals(processType, "Create")) {    //Si el tipo de proceso es “Crear” y un cliente con
+                                                                                                                  // El mismo número de móvil ya existe en el repositorio
             throw new CustomerDuplicateMobileNumberException("El número de móvil ya existe: " + mobileNumber);
         }
 
         if (customerRepository.existsByCusMobileAndCusIdNot(mobileNumber, customerId) && Objects.equals(processType, "Update")){
             throw new CustomerDuplicateMobileNumberException("El número de móvil ya existe: " + mobileNumber);
-        }//f the process type is “Update” and a customer with the same mobile number (excluding the current customer ID) exists, the same exception is thrown.
+        }//Si el tipo de proceso es “Actualizar” y existe un cliente con el mismo número de teléfono móvil (excluyendo el ID del cliente actual), se lanza la misma excepción.
     }
 
-    private boolean isValidEmail(String email) { //method checks whether the provided email matches the specified regular expression for valid email formats.
+    private boolean isValidEmail(String email) { //El metodo verifica si el correo electrónico proporcionado coincide con la expresión regular especificada para formatos de correo electrónico válidos.
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return email.matches(emailRegex);
     }
 
-    private boolean isValidMobileNumber(String mobileNumber) {      //method verifies that the mobile number has exactly 10 digits and consists of numeric characters only.
+    private boolean isValidMobileNumber(String mobileNumber) {      //El metodo verifica que el número de móvil tenga exactamente 9 dígitos y conste únicamente de caracteres numéricos.
         return mobileNumber.length() == 9 && mobileNumber.matches("\\d+");
     }
 
-    private CustomerDTO convertToDTO(Customer customer) { //This method converts a Customer entity object into a CustomerDTO (Data Transfer Object)
+    private CustomerDTO convertToDTO(Customer customer) { //Este metodo convierte un objeto de entidad Cliente en un CustomerDTO (Objeto de transferencia de datos)
         CustomerDTO customerDTO = new CustomerDTO();
-        BeanUtils.copyProperties(customer, customerDTO); //It initializes a new CustomerDTO and copies properties from the customer object using BeanUtils.copyProperties.
+        BeanUtils.copyProperties(customer, customerDTO); //Inicializa un nuevo CustomerDTO y copia propiedades del objeto de cliente utilizando BeanUtils.copyProperties.
         customerDTO.setEmployeeId(customer.getEmployee().getId());
         return customerDTO;
     }
 
-    private Customer convertToEntity(CustomerDTO customerDTO) { //This method performs the reverse operation:
-                                                                // it converts a CustomerDTO back into a Customer entity.
+    private Customer convertToEntity(CustomerDTO customerDTO) { //Este metodo realiza la operación inversa:
+                                                                // Convierte un CustomerDTO nuevamente en una entidad Cliente.
         Customer customer = new Customer();
-        BeanUtils.copyProperties(customerDTO, customer); //A new Customer object is created, and properties are copied from the customerDTO.
-                                                         // An Employee object is also created, and its id is set based on the employeeId from the customerDTO.
+        BeanUtils.copyProperties(customerDTO, customer); //Se crea un nuevo objeto Cliente y se copian las propiedades del customerDTO.
+                                                         //También se crea un objeto Empleado, y su identificación se establece en función del EmployeeId del customerDTO.
         Employee employee = new Employee();
         employee.setId(customerDTO.getEmployeeId());
         customer.setEmployee(employee);
 
-        return customer;    //the Employee is associated with the customer, and the resulting customer entity is returned.
+        return customer;    //El empleado se asocia con el cliente y se devuelve la entidad de cliente resultante.
     }
 
     public String getCustomerNameById(Long customerId) {

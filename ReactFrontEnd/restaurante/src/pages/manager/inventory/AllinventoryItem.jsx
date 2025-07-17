@@ -108,7 +108,6 @@ export default function AllinventoryItem() {
       <section className="bg-gray-100 dark:bg-gray-800 min-h-screen">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Left column - Inventory Table */}
             <div className="w-full lg:w-2/3 bg-white dark:bg-gray-700 rounded-lg shadow p-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                 <h2 className="text-2xl font-semibold">Inventario</h2>
@@ -117,7 +116,6 @@ export default function AllinventoryItem() {
                 </Button>
               </div>
 
-              {/* Pagination Top */}
               <div className="flex justify-end mb-3">
                 <Pagination
                   currentPage={currentPage}
@@ -126,7 +124,6 @@ export default function AllinventoryItem() {
                 />
               </div>
 
-              {/* Responsive Table */}
               <div className="overflow-x-auto rounded-lg shadow">
                 <Table hoverable className="w-full">
                   <Table.Head className="bg-green-100 dark:bg-gray-700">
@@ -171,7 +168,6 @@ export default function AllinventoryItem() {
                 </Table>
               </div>
 
-              {/* Pagination Bottom */}
               <div className="flex justify-end mt-3">
                 <Pagination
                   currentPage={currentPage}
@@ -181,7 +177,6 @@ export default function AllinventoryItem() {
               </div>
             </div>
 
-            {/* Right column - Daily Usage */}
             <div className="w-full lg:w-1/3 bg-white dark:bg-gray-700 rounded-lg shadow p-6 flex flex-col items-center">
               <h2 className="text-2xl font-semibold mb-6 text-center">Verificar uso diario</h2>
               
@@ -212,7 +207,6 @@ export default function AllinventoryItem() {
         </div>
       </section>
 
-      {/* Modals */}
       {isOpenDailyUsageWindow && (
         <DailyInventoryUsage
           selectedDate={selectedDate}

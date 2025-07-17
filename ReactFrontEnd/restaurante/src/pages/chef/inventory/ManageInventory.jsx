@@ -154,7 +154,6 @@ export default function ManageInventory() {
     }
   ];
 
-  // DataTable columns for today's usage
   const usageColumns = [
     {
       name: '#',
@@ -205,7 +204,6 @@ export default function ManageInventory() {
   return (
     <Fragment>
       <div className='min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 bg-gray-100'>
-        {/* Left column - Inventory */}
         <div className='p-4 border-r border-gray-200'>
           <div className='bg-white p-4 rounded-lg shadow mb-4'>
             <h2 className="text-xl font-bold text-gray-800">Inventario disponible</h2>
@@ -238,7 +236,6 @@ export default function ManageInventory() {
           </div>
         </div>
 
-        {/* Right column - Today's Usage */}
         <div className='p-4'>
           <div className='bg-white p-4 rounded-lg shadow mb-4'>
             <h2 className="text-xl font-bold text-gray-800">Uso del artículo hoy</h2>
@@ -272,7 +269,6 @@ export default function ManageInventory() {
         </div>
       </div>
 
-      {/* Popup window */}
       {showPopup && selectedItem && (
         <UseItemPopup
           item={selectedItem}

@@ -72,31 +72,31 @@ public class EmployeeService {
     }
 
 
-//Absent Employees
+//Empleados ausentes
     @Autowired
     private InAttendanceRepository inAttendanceRepository;
 
     public List<Map<String, String>> findEmployeesNotInAttendanceToday() {
-        // Get current date
+        // Obtener fecha actual
         LocalDate currentDate = LocalDate.now();
 
-        // Fetch all employees
+        // Buscar a todos los empleados
         List<Employee> allEmployees = employeeRepository.findAll();
 
-        // Fetch employees present in InAttendance table for the current date
+        // Obtener los empleados presentes en la tabla InAttendance para la fecha actual
         List<InAttendance> employeesInAttendance = inAttendanceRepository.findByDate(currentDate);
 
-        // Extract empIds from employeesInAttendance
+        // Extraer empIds de empleados en asistencia
         List<String> empIdsInAttendance = employeesInAttendance.stream()
                 .map(InAttendance::getEmpId)
                 .collect(Collectors.toList());
 
-        // Filter out employees whose empIds are not in employeesInAttendance
+        // Filtrar empleados cuyos empIds no están en empleadosInAttendance
         List<Employee> employeesNotInAttendance = allEmployees.stream()
                 .filter(employee -> !empIdsInAttendance.contains("EMP0" + String.format("%02d", employee.getId())))
                 .collect(Collectors.toList());
 
-        // Create a list of maps containing employee id and position
+        // Crear una lista de mapas que contengan la identificación y el puesto del empleado
         List<Map<String, String>> employeesWithPositions = employeesNotInAttendance.stream()
                 .map(employee -> Map.of("empId", "EMP0" + String.format("%02d", employee.getId()), "position", employee.getPosition()))
                 .collect(Collectors.toList());

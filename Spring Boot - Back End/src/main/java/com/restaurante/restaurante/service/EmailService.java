@@ -22,7 +22,7 @@ public class EmailService implements EmailRepository {
     public void sendEmail(String to, String subject, String message) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-        helper.setFrom(senderEmail); // Set sender email
+        helper.setFrom(senderEmail); // Establecer correo electrónico del remitente
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(message);

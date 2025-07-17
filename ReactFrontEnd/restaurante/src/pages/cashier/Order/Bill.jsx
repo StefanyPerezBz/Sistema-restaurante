@@ -64,7 +64,6 @@ export default function Bill() {
         const newTotalAfterDiscount = newSubtotal - discountAmount;
         setTotalAfterDiscount(newTotalAfterDiscount);
 
-        // Calculate change when cash amount changes
         if (paymentMethod?.value === 'cash' && cashAmount !== '') {
             const numericCashAmount = parseFloat(cashAmount);
             if (!isNaN(numericCashAmount)) {

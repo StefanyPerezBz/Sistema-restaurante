@@ -21,21 +21,16 @@ export default function ManageOrder() {
             const response = await fetch('http://localhost:8080/api/orders/all-orders-general');
             const data = await response.json();
 
-            // Function to format date in YYYY-MM-DD format
             const formatDate = (date) => {
                 return new Date(date).toLocaleDateString('en-US', { timeZone: 'America/Lima' });
             };
 
-            // Get today's date in Sri Lanka 
             const today = formatDate(new Date());
 
-            // Filter orders for today
             const todayOrders = data.filter(order => {
-                // Convert order date to Sri Lanka timezone
                 const orderDate = formatDate(order.orderDateTime);
                 return orderDate === today;
             });
-            // Set the filtered orders
             setOrders(todayOrders);
         } catch (error) {
             console.error('Error al recuperar pedidos:', error);
@@ -44,7 +39,6 @@ export default function ManageOrder() {
 
     const handleCancelOrder = async (order) => {
 
-        // console.log(order);
         const orderId = order.orderId;
         try {
             const response = await fetch(`http://localhost:8080/api/orders/status-update/${orderId}/Canceled`, {
@@ -117,7 +111,6 @@ export default function ManageOrder() {
     };
 
     const toggleCancelModal = (order, event) => {
-        // Stop event propagation
         if (event) {
             event.stopPropagation();
         }

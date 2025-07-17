@@ -44,14 +44,14 @@ public class MonthSalaryService {
             LocalDate startOfMonth = currentMonth.atDay(1);
             LocalDate endOfMonth = currentMonth.atEndOfMonth();
 
-            // Fetch all daily salaries for the current month
+            // Obtener todos los salarios diarios del mes actual
             List<DailySalary> dailySalaries = dailySalaryRepository.findByDateBetween(startOfMonth, endOfMonth);
 
-            // Group daily salaries by employee name
+            // Salarios diarios grupales por nombre del empleado
             Map<String, List<DailySalary>> dailySalariesByEmp = dailySalaries.stream()
                     .collect(Collectors.groupingBy(DailySalary::getEmpName));
 
-            // Fetch all bonuses and deductions
+            // Obtenga todas las bonificaciones y deducciones
             List<Bonus> bonuses = bonusRepository.findAll();
             Map<String, List<Bonus>> bonusMap = bonuses.stream()
                     .collect(Collectors.groupingBy(Bonus::getEmpName));
@@ -60,7 +60,7 @@ public class MonthSalaryService {
             Map<String, List<Deduction>> deductionMap = deductions.stream()
                     .collect(Collectors.groupingBy(Deduction::getEmpName));
 
-            // Calculate monthly salary for each employee
+            // Calcular el salario mensual de cada empleado
             for (Map.Entry<String, List<DailySalary>> entry : dailySalariesByEmp.entrySet()) {
                 String empName = entry.getKey();
                 List<DailySalary> empDailySalaries = entry.getValue();
@@ -72,14 +72,14 @@ public class MonthSalaryService {
                 Float payPerHours = null;
                 Float payPerOvertimeHour = null;
 
-                // Calculate total worked hours, overtime hours, and payments
+                // Calcular el total de horas trabajadas, horas extras y pagos
                 for (DailySalary dailySalary : empDailySalaries) {
                     totalWorkedHours += dailySalary.getWorkedHours();
                     totalOTHours += dailySalary.getOTHours();
                     totalHourPayment += dailySalary.getTotalHourPayment();
                     totalOvertimePayment += dailySalary.getTotalOvertimePayment();
 
-                    // Set payPerHours and payPerOvertimeHour from the first record that is not null
+                    // Establezca payPerHours y payPerOvertimeHour desde el primer registro que no sea nulo
                     if (payPerHours == null && dailySalary.getPayPerHours() != null) {
                         payPerHours = dailySalary.getPayPerHours();
                     }
@@ -88,10 +88,10 @@ public class MonthSalaryService {
                     }
                 }
 
-                // Calculate payment without additional (totalHourPayment + totalOvertimePayment)
+                // Calcular pago sin adicional (totalHourPayment + totalOvertimePayment)
                 float paymentWithoutAdditional = totalHourPayment + totalOvertimePayment;
 
-                // Handle bonus type and deduction type when not present
+                // Manejar el tipo de bonificación y el tipo de deducción cuando no estén presentes
                 String bonusType = bonusMap.containsKey(empName) ? bonusMap.get(empName).get(0).getBonusType() : "No Bonus";
                 String deductionType = deductionMap.containsKey(empName) ? deductionMap.get(empName).get(0).getDeductionType() : "No Deduction";
 
@@ -113,17 +113,17 @@ public class MonthSalaryService {
 
                 float grossPayment = paymentWithoutAdditional + bonus - deduction;
 
-                // Check if MonthSalary record already exists for this employee and current month
+                // Verifique si el registro MonthSalary ya existe para este empleado y el mes actual
                 Optional<MonthSalary> existingMonthSalary = monthSalaryRepository.findByEmpNameAndMonth(empName, currentMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH));
 
                 if (existingMonthSalary.isPresent()) {
-                    // Update existing record with new values
+                    // Actualizar el registro existente con nuevos valores
                     MonthSalary monthSalary = existingMonthSalary.get();
                     monthSalary.setWorkedHours(totalWorkedHours);
-                    monthSalary.setPayPerHours(payPerHours); // Assign the retrieved payPerHours
+                    monthSalary.setPayPerHours(payPerHours); // Asignar el payPerHours recuperado
                     monthSalary.setTotalHourPayment(totalHourPayment);
                     monthSalary.setOTHours(totalOTHours);
-                    monthSalary.setPayPerOvertimeHour(payPerOvertimeHour); // Assign the retrieved payPerOvertimeHour
+                    monthSalary.setPayPerOvertimeHour(payPerOvertimeHour); // Asignar el payPerOvertimeHour recuperado
                     monthSalary.setTotalOvertimePayment(totalOvertimePayment);
                     monthSalary.setBonusType(bonusType);
                     monthSalary.setBonus(bonus);
@@ -140,10 +140,10 @@ public class MonthSalaryService {
                     monthSalary.setEmpName(empName);
                     monthSalary.setMonth(currentMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH)); // Set month as month name
                     monthSalary.setWorkedHours(totalWorkedHours);
-                    monthSalary.setPayPerHours(payPerHours); // Assign the retrieved payPerHours
+                    monthSalary.setPayPerHours(payPerHours); // Asignar el payPerHours recuperado
                     monthSalary.setTotalHourPayment(totalHourPayment);
                     monthSalary.setOTHours(totalOTHours);
-                    monthSalary.setPayPerOvertimeHour(payPerOvertimeHour); // Assign the retrieved payPerOvertimeHour
+                    monthSalary.setPayPerOvertimeHour(payPerOvertimeHour); // Asignar el payPerOvertimeHour recuperado
                     monthSalary.setTotalOvertimePayment(totalOvertimePayment);
                     monthSalary.setBonusType(bonusType);
                     monthSalary.setBonus(bonus);
@@ -198,14 +198,14 @@ public class MonthSalaryService {
 
         float totalGrossPayment = 0f;
 
-        // Iterate through each month of the current year
+        //Iterar a través de cada mes del año actual
         for (int month = 1; month <= 12; month++) {
             YearMonth yearMonth = YearMonth.of(currentYear, month);
             String monthName = yearMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
 
             List<MonthSalary> salaries = monthSalaryRepository.findByMonth(monthName);
 
-            // Sum up the gross payments for the current month
+            // Sumar los pagos brutos del mes actual
             for (MonthSalary salary : salaries) {
                 totalGrossPayment += salary.getGrossPayment();
             }

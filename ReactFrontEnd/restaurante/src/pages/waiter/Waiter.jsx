@@ -42,13 +42,9 @@ export default function Waiter() {
       {tab === 'addAttendance' && <Attendance/>}
 
       {tab === 'viewAttendance' && <ViewAttendance/>}
-        {/* Orders */}
         {tab === 'take-order' && <TakeOrder />}
-        {/* Manage Orders */}
         {tab === 'manage-orders' && <ManageOrder />}
-        {/* Update Order */}
         {tab === 'update-orders' && <UpdateOrder />}
-        {/* View Order */}
         {tab === 'order-view' && <OrderView />}
       </div>
     </div>

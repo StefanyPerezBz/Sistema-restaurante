@@ -97,7 +97,7 @@ public class DailySalaryService {
                 try {
                     calculateDailySalary(employeeId, dateString);
                 } catch (Exception e) {
-                    // Handle the exception as needed
+                    // Manejar la excepción según sea necesario
                     System.out.println("Error al calcular el salario del empleado" + employeeId + " on " + dateString + ": " + e.getMessage());
                 }
             }

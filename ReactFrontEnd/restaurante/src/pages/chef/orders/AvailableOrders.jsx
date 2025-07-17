@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 export default function AvailableOrders() {
     const [orders, setOrders] = useState([]);
     const [pending, setPending] = useState(true);
-    const [viewMode, setViewMode] = useState('table'); // 'table' or 'accordion'
+    const [viewMode, setViewMode] = useState('table'); 
     const [filteredOrders, setFilteredOrders] = useState([]);
 
     useEffect(() => {
@@ -19,7 +19,6 @@ export default function AvailableOrders() {
     }, []);
 
     useEffect(() => {
-        // Filter orders to only show Pending status
         const availableOrders = orders.filter(order => order.orderStatus === 'Pending');
         setFilteredOrders(availableOrders);
     }, [orders]);

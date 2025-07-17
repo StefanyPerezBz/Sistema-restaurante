@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 export default function PreparingOrders() {
     const [orders, setOrders] = useState([]);
     const [pending, setPending] = useState(true);
-    const [viewMode, setViewMode] = useState('table'); // 'table' or 'accordion'
+    const [viewMode, setViewMode] = useState('table'); 
     const [filteredOrders, setFilteredOrders] = useState([]);
 
     useEffect(() => {
@@ -17,7 +17,6 @@ export default function PreparingOrders() {
     }, []);
 
     useEffect(() => {
-        // Filter orders to only show Processing status
         const preparingOrders = orders.filter(order => order.orderStatus === 'Processing');
         setFilteredOrders(preparingOrders);
     }, [orders]);

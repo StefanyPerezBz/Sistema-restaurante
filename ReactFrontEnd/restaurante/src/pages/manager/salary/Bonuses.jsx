@@ -26,7 +26,6 @@ function Bonuses() {
     deductionAmount: ''
   });
 
-  // Bonus types options
   const bonusTypeOptions = [
     { value: 'Bono por puntualidad', label: 'Bono por puntualidad' },
     { value: 'Bono por asistencia perfecta', label: 'Bono por asistencia perfecta' },
@@ -40,7 +39,6 @@ function Bonuses() {
     { value: 'Bono por recomendación de cliente', label: 'Bono por recomendación de cliente' }
   ];
 
-  // Deduction types options
   const deductionTypeOptions = [
     { value: 'Tardanza reiterada', label: 'Tardanza reiterada' },
     { value: 'Falta injustificada', label: 'Falta injustificada' },
@@ -326,7 +324,6 @@ function Bonuses() {
         </div>
       </div>
 
-      {/* Add Bonus Modal */}
       <Modal show={bonusModalOpen} size="md" onClose={closeBonusModal} popup>
         <Modal.Header />
         <Modal.Body>
@@ -387,7 +384,6 @@ function Bonuses() {
         </Modal.Footer>
       </Modal>
 
-      {/* Add Deduction Modal */}
       <Modal show={deductionModalOpen} size="md" onClose={closeDeductionModal} popup>
         <Modal.Header />
         <Modal.Body>

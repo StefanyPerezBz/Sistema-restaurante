@@ -66,12 +66,6 @@ const BillPayments = () => {
 
     const fetchBillTypes = async () => {
         try {
-            // Uncomment when your API is ready
-            // const response = await axios.get('http://localhost:8080/api/payment/getAllBillTypes');
-            // const existingBillTypes = response.data.map(type => ({
-            //     value: type,
-            //     label: type
-            // }));
             setBillTypes(billTypeOptions);
         } catch (error) {
             console.error('Error al obtener los tipos de factura:', error);
@@ -303,11 +297,9 @@ const handleInputChange = (e) => {
 
     return (
         <div className="flex flex-col w-full bg-gray-200 dark:bg-gray-700 min-h-screen">
-            {/* Header and filters */}
             <div className="flex flex-col md:flex-row items-center m-4 justify-between border-b bg-white dark:bg-gray-800 p-3 shadow-md rounded-md">
                 <h1 className="text-2xl font-bold mb-2 dark:text-white">Pagos de facturas</h1>
 
-                {/* Filters */}
                 <div className='flex flex-col md:flex-row w-full md:w-auto space-y-2 md:space-y-0 md:space-x-4'>
                     <div className='w-full md:w-48'>
                         <label htmlFor="filterBillType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -360,9 +352,7 @@ const handleInputChange = (e) => {
                 </div>
             </div>
 
-            {/* Main content */}
             <div className="w-full flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4 p-3 rounded-md">
-                {/* Left Side: Payment Details Table */}
                 <div className="w-full lg:w-1/2">
                     <div className="relative overflow-x-auto shadow-md bg-white dark:bg-gray-800 rounded-md">
                         {isLoading ? (
@@ -415,7 +405,6 @@ const handleInputChange = (e) => {
                     </div>
                 </div>
 
-                {/* Right Side: Form to Add/Edit Payment */}
                 <div className="w-full lg:w-1/2">
                     <div className="p-4 bg-white dark:bg-gray-800 shadow-md rounded-md">
                         <h2 className="text-xl font-bold mb-2 dark:text-white">

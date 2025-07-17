@@ -53,12 +53,10 @@ export default function ManageOrder() {
 
     const filterOrders = () => {
         let result = orders.filter(order => {
-            // Filter by status
             if (selectedStatus !== 'All' && order.orderStatus !== selectedStatus) {
                 return false;
             }
 
-            // Filter by search query
             if (searchQuery) {
                 if (searchCriteria === 'id') {
                     return order.orderId.toString().includes(searchQuery);

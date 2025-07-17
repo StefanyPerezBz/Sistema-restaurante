@@ -318,7 +318,6 @@ export default function AllFood() {
                 </TableContainer>
             </div>
 
-            {/* Edit popup */}
             {isEditPopupOpen && (
                 <EditFoodItem
                     foodId={itemToEdit}
@@ -327,7 +326,6 @@ export default function AllFood() {
                 />
             )}
 
-            {/* Add food popup */}
             {addFoodPopup && (
                 <AddFoodItem onClose={cancelAddFood} />
             )}

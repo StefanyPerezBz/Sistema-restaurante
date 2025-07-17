@@ -58,7 +58,7 @@ public class AttendanceService {
 
         // Comprueba si resultList está vacío. Si es así, devuelve el mensaje "Aún no hay asistencia disponible para hoy"
         if (resultList.isEmpty()) {
-            return Collections.singletonList(new String[]{"Still No Attendance is Available for Today"});
+            return Collections.singletonList(new String[]{"Aún no hay asistencia disponible para hoy"});
         }
 
         // Iterar sobre la lista de resultados y manejar valores outTime nulos

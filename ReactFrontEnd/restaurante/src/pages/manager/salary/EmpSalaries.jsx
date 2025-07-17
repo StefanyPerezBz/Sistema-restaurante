@@ -240,7 +240,6 @@ function EmpSalaries() {
 
   return (
     <div className="p-4">
-      {/* Filter Controls */}
       <div className="bg-white dark:bg-gray-700 rounded-lg shadow p-4 mb-4">
         <div className="flex flex-wrap items-center gap-4">
           <Button
@@ -302,7 +301,6 @@ function EmpSalaries() {
         </div>
       </div>
 
-      {/* Loading Indicator */}
       {isLoading && (
         <div className="text-center my-4">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
@@ -310,7 +308,6 @@ function EmpSalaries() {
         </div>
       )}
 
-      {/* Data Table */}
       <div className="bg-white dark:bg-gray-700 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table id="salariesTable" ref={tableRef} className="w-full">
@@ -370,7 +367,6 @@ function EmpSalaries() {
         )}
       </div>
 
-      {/* Pagination */}
       <div className="flex justify-center mt-4">
         <Pagination
           currentPage={currentPage}

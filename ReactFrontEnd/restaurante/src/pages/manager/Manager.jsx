@@ -36,67 +36,6 @@ export default function Manager() {
         }
     }, [location.search]);
     return (
-        // <div className='min-h-screen flex flex-col md:flex-row bg-white dark:bg-gray-900'>
-        //     <div className='md:w-56'>
-        //         {/* sidebar */}
-        //         <ManagerSideBar />
-        //     </div>
-
-        //     {/* Inventory */}
-        //     {tab === 'inventory' && <AllinventoryItem />}
-
-        //     {/* profile */}
-        //     {tab === 'profile' && <ManagerProfile />}
-
-        //     {/* New Employee */}
-        //     {tab === 'new-employee' && <RegisterEmployee />}
-
-        //     {/* View All Employees */}
-        //     {tab === 'view-all-employees' && <ViewAllEmployees />}
-
-        //     {/* Add Event */}
-        //     {tab === 'add-event' && <AddEvent />}
-
-        //     {/* View All Events */}
-        //     {tab === 'view-all-events' && <ViewAllEvents />}
-
-        //     {/* Manage Orders */}
-        //     {tab === 'manage-orders' && <ManageOrders />}
-
-        //     {/* View Order */}
-        //     {tab === 'view-order' && <OrderView/>}
-
-        //     {/* Update Order */}
-        //     {tab === 'update-order' && <UpdateOrder/>}
-
-        //     {tab === 'update-order-items' && <UpdateOrderItems/>}
-
-        //     {/* Attendance */}
-        //     {tab === 'attendance' && <AttendanceFrManager />}
-
-        //     {/* salary */}
-        //     {tab === 'salary' && <EmpSalaries />}
-        //     {tab === 'earnings' && <Bonuses />}
-        //     {tab === 'hourpayments' && <PayPerHour />}
-
-
-        //     {/* Dashboard */}
-        //     {tab === 'dashboard' && <ManagerDash/>}
-
-        //     {/* income statement - monthly */}
-        //     {tab === 'monthly-profit' && <MonthlyProfit />}
-
-        //     {/* income statement - annual */}
-        //     {tab === 'annual-income' && <AnnualIncome />}
-
-        //     {/* Table Manage */}
-        //     {tab === 'table-manage' && <TableManage/>}
-
-        //     {/* Bill Payments */}
-        //     {tab === 'billPayments' && <BillPayments/>}
-
-
-        // </div>
 
         <div className='min-h-screen flex flex-col md:flex-row bg-white dark:bg-gray-900'>
             {/* Sidebar */}

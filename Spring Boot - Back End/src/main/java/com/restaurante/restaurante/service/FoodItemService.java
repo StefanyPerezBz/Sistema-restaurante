@@ -14,31 +14,31 @@ import java.util.stream.Collectors;
 public class FoodItemService {
 
     @Autowired
-    private FoodItemRepository foodItemRepository; //  get data from repository
+    private FoodItemRepository foodItemRepository; //
 
     public FoodItem saveFoodItem(FoodItem foodItem) {
         return foodItemRepository.save(foodItem);
-    }//This method saves a FoodItem object to the repository.
-    // It takes a FoodItem as an argument and returns the saved item.
+    }
+    // Toma un FoodItem como argumento y devuelve el elemento guardado.
 
     public List<String> getAllCategories() {
         return foodItemRepository.findAllCategories();
-    }  // This method retrieves a list of all food categories from the repository.
-    // It returns a list of strings representing the available categories
+    }
+    // Devuelve una lista de cadenas que representan las categorías disponibles.
 
     public List<FoodItem> getItemsByCategory(String category) {
         return foodItemRepository.findByFoodCategory(category);
-    }//Given a specific category, this method retrieves a list of FoodItem objects associated with that category.
+    }//Dada una categoría específica, este metodo recupera una lista de objetos FoodItem asociados con esa categoría.
 
     public List<FoodItem> getAllItems() {
 
         return foodItemRepository.findAll();
-    }//This method retrieves all food items from the repository.
+    }//.
 
     public List<FoodItem> getAllAvailableItems() {
         List<FoodItem> allItems = foodItemRepository.findAll();
         return allItems.stream()
-                .filter(FoodItem::isAvailable) // Filter out items where availability is false
+                .filter(FoodItem::isAvailable) // Filtrar artículos cuya disponibilidad es falsa
                 .collect(Collectors.toList());
     }
 
@@ -46,7 +46,7 @@ public class FoodItemService {
     public void deleteFoodItem(Long foodItemId) {
 
         foodItemRepository.deleteById(foodItemId);
-    }//This method deletes a FoodItem from the repository based on its unique identifier (foodItemId).
+    }//Este metodo elimina un alimento del repositorio en función de su identificador único (foodItemId).
 
 
     public Optional<FoodItem> getFoodNameById(Long foodItemId) {
@@ -58,8 +58,8 @@ public class FoodItemService {
         if(existingFoodItemOptional.isPresent()){
             FoodItem existingFoodItem = existingFoodItemOptional.get();
 
-            boolean newAvailability = !existingFoodItem.isAvailable(); // Toggle the availability
-            existingFoodItem.setAvailable(newAvailability); // Save the updated food item
+            boolean newAvailability = !existingFoodItem.isAvailable(); // Alternar la disponibilidad
+            existingFoodItem.setAvailable(newAvailability); // Guardar el alimento actualizado
             foodItemRepository.save(existingFoodItem);
             return true;
         }
@@ -72,7 +72,7 @@ public class FoodItemService {
     }
 
     public boolean editFoodItem(long foodId, FoodItem updatedFood){
-        Optional<FoodItem> existingItemOptional = foodItemRepository.findById(foodId); //find the existing Food item in repo using Id
+        Optional<FoodItem> existingItemOptional = foodItemRepository.findById(foodId); //Encuentra el artículo de comida existente en el repositorio usando Id.
 
         FoodItem existingItem = existingItemOptional.get();
 

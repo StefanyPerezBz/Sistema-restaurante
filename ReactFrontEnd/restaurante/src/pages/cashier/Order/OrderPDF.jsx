@@ -122,8 +122,6 @@ const OrderPDF = ({ order }) => {
 
     const { currentUser } = useSelector((state) => state.user);
 
-
-    // Function to format date and time
     const formatDateTime = (dateTimeString) => {
         const dateTime = new Date(dateTimeString);
         const year = dateTime.getFullYear();
@@ -132,7 +130,7 @@ const OrderPDF = ({ order }) => {
         let hours = dateTime.getHours();
         const minutes = dateTime.getMinutes().toString().padStart(2, '0');
         const amOrPm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12; // Convert hours to 12-hour format
+        hours = hours % 12 || 12; 
         const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes} ${amOrPm}`;
         return formattedDateTime;
     }; 
@@ -166,7 +164,6 @@ const OrderPDF = ({ order }) => {
                     
 
                         <View style={styles.topComponent}>
-                            {/* Order Details Section */}
                             <View style={styles.detailsSection}>
                                 <Text style={[styles.header, { fontWeight: 'bold' }]}>Detalles de la orden</Text>
                                 <View style={styles.text}>
@@ -177,7 +174,6 @@ const OrderPDF = ({ order }) => {
                                 </View>
                             </View>
 
-                            {/* Customer Details Section */}
                             {order.customer && (
                                 <View style={styles.detailsSection}>
                                     <Text style={styles.header}>Detalles del cliente</Text>
@@ -194,7 +190,6 @@ const OrderPDF = ({ order }) => {
                             <Text style={styles.WarningText}> Este pedido aún no está finalizado y los datos pueden cambiar.</Text>
                         )}
 
-                        {/* Order Items Section */}
                         <View>
                             <Text style={styles.header}>Items de la orden</Text>
                             <View style={styles.table}>
@@ -216,7 +211,6 @@ const OrderPDF = ({ order }) => {
                                     </View>
                                 ))}
 
-                                {/*Sub Total Price */}
                                 <View style={[styles.tableRowSection, styles.totalPrice]}>
                                     <Text style={styles.tableCellTotal}>Subtotal</Text>
                                     <Text style={styles.tableCellTotal}>
@@ -224,7 +218,6 @@ const OrderPDF = ({ order }) => {
                                     </Text>
                                 </View>
 
-                                 {/*Discount*/}
                                  <View style={[styles.tableRow, styles.totalPrice]}>
                                     <Text style={styles.tableCellTotal}>Descuento - {order.discountPercentage}% </Text>
                                     <Text style={styles.tableCellTotal}>
@@ -232,7 +225,6 @@ const OrderPDF = ({ order }) => {
                                     </Text>
                                 </View>
 
-                                {/* Total Price */}
                                 <View style={[styles.tableRow, styles.totalPrice]}>
                                     <Text style={styles.tableCellTotal}>Total</Text>
                                     <Text style={styles.tableCellTotal}>

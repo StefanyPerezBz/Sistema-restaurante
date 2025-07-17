@@ -24,7 +24,7 @@ public class NotificationService {
 
     public Notification getNotificationById(Long id) {
         Optional<Notification> notification = notificationRepository.findById(id);
-        return notification.orElse(null); // or throw an exception if preferred
+        return notification.orElse(null);
     }
 
     public List<Notification> getNotificationsByForWho(String forWho) {
@@ -58,7 +58,7 @@ public class NotificationService {
     }
 
 
-    @Scheduled(cron = "0 0 0 * * ?") // Runs every day at midnight  //delete the notifications after the 2 days
+    @Scheduled(cron = "0 0 0 * * ?") // Funciona todos los días a medianoche.  //eliminar las notificaciones después de los 2 días
     public void deleteOldNotifications(){
         LocalDateTime cutoffDate = LocalDateTime.now().minus(2, ChronoUnit.DAYS);
         List<Notification> oldNotifications = notificationRepository.findByCreatedAtBefore(cutoffDate);

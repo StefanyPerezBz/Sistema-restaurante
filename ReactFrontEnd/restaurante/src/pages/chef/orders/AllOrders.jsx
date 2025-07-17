@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 export default function AllOrders() {
     const [orders, setOrders] = useState([]);
     const [pending, setPending] = useState(true);
-    const [viewMode, setViewMode] = useState('table'); // 'table' or 'accordion'
+    const [viewMode, setViewMode] = useState('table'); 
 
     useEffect(() => {
         fetchOrders();

@@ -26,7 +26,6 @@ function BonusesTable({ fetchBonuses }) {
   });
   const [pending, setPending] = useState(true);
 
-  // Bonus types options
   const bonusTypeOptions = [
     { value: 'Bono por puntualidad', label: 'Bono por puntualidad' },
     { value: 'Bono por asistencia perfecta', label: 'Bono por asistencia perfecta' },
@@ -272,7 +271,6 @@ function BonusesTable({ fetchBonuses }) {
         />
       </div>
 
-      {/* Delete Confirmation Modal */}
       <Modal show={deleteModalOpen} size="md" onClose={closeDeleteModal} popup>
         <Modal.Header />
         <Modal.Body>
@@ -293,7 +291,6 @@ function BonusesTable({ fetchBonuses }) {
         </Modal.Body>
       </Modal>
 
-      {/* Edit Bonus Modal */}
       <Modal show={editModalOpen} size="md" onClose={() => setEditModalOpen(false)} popup>
         <Modal.Header />
         <Modal.Body>

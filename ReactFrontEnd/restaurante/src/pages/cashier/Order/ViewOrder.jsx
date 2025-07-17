@@ -197,7 +197,6 @@ export const ViewOrder = () => {
                             Por {OrderResponse.employeeFirstName} {OrderResponse.employeeLastName}
                         </h1>
 
-                        {/* Customer Details Section */}
                         <div className="p-4 md:p-6 rounded-lg border bg-white mb-3 shadow-md dark:bg-gray-600 dark:border-none">
                             <div>
                                 <h4 className="font-bold">Detalles del cliente</h4>
@@ -242,7 +241,6 @@ export const ViewOrder = () => {
                             </div>
                         </div>
 
-                        {/* Order Items Section */}
                         <div className="py-2 flex flex-col justify-between rounded-lg border bg-white mb-6 shadow-md dark:bg-gray-600 dark:border-none min-h-[calc(100vh-21rem)] h-auto">
                             <div className="overflow-x-auto px-2 md:px-6 py-2">
                                 <table className="w-full table-auto min-w-[600px]">
@@ -297,7 +295,6 @@ export const ViewOrder = () => {
                                 </table>
                             </div>
 
-                            {/* Order Summary */}
                             <div className="px-4 md:px-6 py-3">
                                 <hr className="mt-1 mb-3" />
                                 <div className="flex justify-between">

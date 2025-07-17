@@ -15,11 +15,11 @@ public class TableManageService {
     TableManageRepository tableManageRepository;
 
     public void addTable(TableManage table){
-        // Check if the tableNumber is already in use
+        // Comprueba si el tableNumber ya está en uso
         if (tableManageRepository.existsByTableNumber(table.getTableNumber())) {
             throw new RuntimeException("Ya existe una mesa con el mismo número de tabla");
         }else {
-            // Set the current date
+            // establecer la fecha actual
             //table.setDate(new Date());
             table.setDate(new Date());
             table.setTableAvailability(true); // Por defecto disponible al crear
@@ -27,17 +27,17 @@ public class TableManageService {
         }
     }
 
-    // Method to retrieve all tables
+    // Metodo para recuperar todas las mesas
     public List<TableManage> getAllTables() {
         return tableManageRepository.findAll();
     }
 
-    // Method to delete tables by id
+    // Metodo para eliminar mesas por id
     public void deleteTableById(Long id){
         tableManageRepository.deleteById(id);
     }
 
-    // Method to update table availability by ID
+    // Metodo para actualizar la disponibilidad de la mesa por ID
     public void updateTableAvailability(Long id, boolean availability) {
         Optional<TableManage> optionalTable = tableManageRepository.findById(id);
         if (optionalTable.isPresent()) {
@@ -45,7 +45,7 @@ public class TableManageService {
             table.setTableAvailability(availability);
             tableManageRepository.save(table);
         } else {
-            // Handle the case where the table with the given ID is not found
+            // Manejar el caso donde no se encuentra la tabla con el ID dado
             throw new RuntimeException("Mesa no encontrada con ID: " + id);
         }
     }
