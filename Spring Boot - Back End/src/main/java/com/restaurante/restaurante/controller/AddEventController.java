@@ -13,7 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
 @RequestMapping("/api")
 public class AddEventController {
 

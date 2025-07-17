@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
 public class PasswordResetController {
     @Autowired
     private PasswordResetService passwordResetService;

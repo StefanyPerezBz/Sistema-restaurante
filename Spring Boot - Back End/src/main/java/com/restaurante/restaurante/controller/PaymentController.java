@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
 @RequestMapping("/api/payment")
 public class PaymentController {
     @Autowired

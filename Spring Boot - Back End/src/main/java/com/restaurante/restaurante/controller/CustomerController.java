@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin("http://localhost:3000")
+//@CrossOrigin("http://localhost:3000")
+@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
 @RequestMapping("/api/customers")
 public class CustomerController {
 

@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@CrossOrigin("http://localhost:3000")
+//@CrossOrigin("http://localhost:3000")
+@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
 public class FeedbackController {
     @Autowired
     private FeedbackRepository feedbackRepository;

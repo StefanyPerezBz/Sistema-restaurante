@@ -19,7 +19,8 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin("http://localhost:3000")
+//@CrossOrigin("http://localhost:3000")
+@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
 @RequestMapping("/api/food")
 public class ImageController {
     private final String uploadDir = "./src/main/resources/static/images"; // Ruta a su carpeta local donde se almacenan las imágenes

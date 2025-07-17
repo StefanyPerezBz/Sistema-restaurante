@@ -17,7 +17,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin(origins = "https://sistema-restaurante-production-896d.up.railway.app/")
+//@CrossOrigin("http://localhost:3000")
 public class AttendanceController {
 
     //obtener identificaciones de empleados
