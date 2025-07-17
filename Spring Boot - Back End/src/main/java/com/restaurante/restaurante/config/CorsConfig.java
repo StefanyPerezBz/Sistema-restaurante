@@ -11,7 +11,7 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                         "http://localhost:3000",
-                        "https://sistema-restaurante-ywmk-mo0bdxhdb-stefanys-projects-7bfd6750.vercel.app/"  // ← reemplaza con tu dominio de Vercel
+                        "https://sistema-restaurante-production-896d.up.railway.app/"  // ← reemplaza con tu dominio de Vercel
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*");
