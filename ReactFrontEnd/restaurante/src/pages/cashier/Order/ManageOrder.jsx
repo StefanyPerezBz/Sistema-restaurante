@@ -195,7 +195,7 @@ export default function ManageOrder() {
                     >
                         <i className="ri-eye-line"></i>
                     </button>
-                    {/* {row.orderStatus === "Ready" && (
+                     {/* {row.orderStatus === "Ready" && (
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
