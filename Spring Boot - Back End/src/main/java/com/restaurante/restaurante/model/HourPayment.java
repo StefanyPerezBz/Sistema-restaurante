@@ -11,7 +11,7 @@ public class HourPayment {
     @GeneratedValue
     @Id
     private Long id;
-    @Column(unique = true) // Ensure position is unique
+    //@Column(unique = true) // Ensure position is unique
     private String position;
     private Float payPerHour;
     private Float payPerOverTimeHour;

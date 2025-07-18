@@ -1,5 +1,3 @@
-
-
 import { Card, Label, Button, Modal, TextInput, Alert } from 'flowbite-react'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
@@ -18,6 +16,9 @@ export default function TableManage() {
     const [errorAddingTableAlert, setErrorAddingTableAlert] = useState(false);
     const [inputError, setInputError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    // Estados para paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(8); // Número de mesas por página
    
     useEffect(() => {
         fetchData();
@@ -38,6 +39,14 @@ export default function TableManage() {
             console.error("Error al obtener datos:", error);
         } 
     }
+
+    // Lógica para paginación
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentTables = tables.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(tables.length / itemsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     const handleDeleteTablePopup = async (table) => {
         if (!table.tableAvailability) {
@@ -142,6 +151,8 @@ export default function TableManage() {
                 setAddNewTableModel(false);
                 setTableNumber('');
                 fetchData();
+                // Volver a la primera página al agregar una nueva mesa
+                setCurrentPage(1);
                 Swal.fire({
                     icon: 'success',
                     title: 'Mesa agregada',
@@ -171,7 +182,7 @@ export default function TableManage() {
             </div>
             
             <div className='flex flex-wrap'>
-                {tables.map(table => (
+                {currentTables.map(table => (
                     <div key={table.id} className='w-52 h-auto ml-5 my-4'>
                         <Card
                             className="max-w-sm"
@@ -197,6 +208,37 @@ export default function TableManage() {
                     </div>
                 ))}
             </div>
+
+            {/* Paginación */}
+            {tables.length > itemsPerPage && (
+                <div className="flex justify-center mt-4">
+                    <nav className="inline-flex rounded-md shadow">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="px-3 py-1 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Anterior
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                            <button
+                                key={number}
+                                onClick={() => paginate(number)}
+                                className={`px-3 py-1 border-t border-b border-gray-300 ${currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+                            >
+                                {number}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="px-3 py-1 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Siguiente
+                        </button>
+                    </nav>
+                </div>
+            )}
             
             <Modal show={deleteTableModel} onClose={() => setDeleteTableModel(false)} popup>
                 <Modal.Header />

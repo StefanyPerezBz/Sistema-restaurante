@@ -14,8 +14,8 @@ export default function Header() {
     const { currentUser } = useSelector((state) => state.user);
     const { theme } = useSelector((state) => state.theme);
     
-    // Imagen por defecto si no hay foto de perfil
-    const defaultProfilePic = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png';
+    // Imagen por defecto (ubicada en la carpeta public)
+    const defaultProfilePic = '/public/default-profile.jpg';
 
     // Construir la URL correcta para la imagen de perfil
     const getProfilePicture = () => {
@@ -28,6 +28,11 @@ export default function Header() {
         
         // Si es un nombre de archivo subido al servidor
         return `http://localhost:8080/api/food/image/${currentUser.profilePicture}`;
+    };
+
+    // Función para manejar errores en la carga de la imagen
+    const handleImageError = (e) => {
+        e.target.src = defaultProfilePic;
     };
 
     const handleLogOut = async () => {
@@ -47,6 +52,7 @@ export default function Header() {
                         src='../src/image/logo.jpg' 
                         alt='logo' 
                         className='w-12 h-12 rounded-full object-cover' 
+                        onError={handleImageError}
                     />
                 </div>
             </Link>
@@ -90,9 +96,7 @@ export default function Header() {
                                 className="w-10 h-10"
                                 bordered
                                 size="md"
-                                onError={(e) => {
-                                    e.currentTarget.src = defaultProfilePic;
-                                }}
+                                onError={handleImageError}
                             />
                         }
                     >

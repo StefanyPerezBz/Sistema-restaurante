@@ -53,7 +53,7 @@ export default function AllFood() {
     const [itemToEdit, setItemToEdit] = useState(null);
     const [addFoodPopup, setAddFoodPopup] = useState(false);
     const [searchFood, setSearchFood] = useState('');
-    const [selectedCat, setSelectedCat] = useState('All');
+    const [selectedCat, setSelectedCat] = useState('Todos');
     const [pending, setPending] = useState(true);
 
     useEffect(() => {
@@ -84,7 +84,7 @@ export default function AllFood() {
     const filterFoods = () => {
         const filtered = foods.filter(food =>
             food.foodName.toLowerCase().includes(searchFood.toLowerCase()) &&
-            (food.foodCategory === selectedCat || selectedCat === 'All')
+            (food.foodCategory === selectedCat || selectedCat === 'Todos')
         );
         setFilteredFoods(filtered);
     };
@@ -206,7 +206,16 @@ export default function AllFood() {
         },
         {
             name: 'Categoría',
-            selector: row => row.foodCategory,
+            selector: row => {
+                // Traducción de categorías en la tabla
+                switch(row.foodCategory) {
+                    case 'Main Dish': return 'Plato Principal';
+                    case 'Side Dish': return 'Guarnición';
+                    case 'Beverage': return 'Bebida';
+                    case 'Dessert': return 'Postre';
+                    default: return row.foodCategory;
+                }
+            },
             sortable: true,
             wrap: true
         },
@@ -281,7 +290,7 @@ export default function AllFood() {
                     </div>
                     <div className='ml-2'>
                         <Dropdown color='dark' outline dismissOnClick={true} label={selectedCat || "--Seleccionar--"}>
-                            <Dropdown.Item onClick={() => handleCategorySelect("All")}>Todos</Dropdown.Item>
+                            <Dropdown.Item onClick={() => handleCategorySelect("Todos")}>Todos</Dropdown.Item>
                             <Dropdown.Item onClick={() => handleCategorySelect("Main Dish")}>Plato Principal</Dropdown.Item>
                             <Dropdown.Item onClick={() => handleCategorySelect("Side Dish")}>Guarnición</Dropdown.Item>
                             <Dropdown.Item onClick={() => handleCategorySelect("Beverage")}>Bebida</Dropdown.Item>

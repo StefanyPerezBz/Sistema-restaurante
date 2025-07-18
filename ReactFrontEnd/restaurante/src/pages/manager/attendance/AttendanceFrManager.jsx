@@ -579,24 +579,57 @@ function AttendanceFrManager() {
   };
 
   // Función para exportar a PDF
-  const downloadPDF = () => {
-    // Crear nuevo PDF en formato vertical A4
+// Añade esta función al componente (cerca de las otras funciones de formato)
+const formatDateForPDF = (dateString) => {
+  if (!dateString) return '--';
+  
+  try {
+    const date = new Date(dateString);
+    const adjustedDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+    return adjustedDate.toLocaleDateString('es-PE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  } catch (e) {
+    console.error('Error al formatear fecha para PDF:', e);
+    return dateString;
+  }
+};
+
+// Función para exportar a PDF - Versión corregida
+const downloadPDF = () => {
+  try {
+    // Función para traducir roles
+    const translateRole = (role) => {
+      const roles = {
+        'manager': 'Gerente',
+        'supervisor': 'Supervisor',
+        'chef': 'Chef',
+        'waiter': 'Mesero',
+        'bartender': 'Bartender',
+        'cashier': 'Cajero',
+        'cleaner': 'Limpieza',
+        'other': 'Otro'
+      };
+      return roles[role?.toLowerCase()] || role || '--';
+    };
+
+    // Crear nuevo PDF
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
       format: 'a4'
     });
 
-    // Configuración de colores y estilos
-    const primaryColor = [22, 160, 133]; // Verde esmeralda
-    const darkColor = [44, 62, 80]; // Azul oscuro
-    const lightColor = [189, 195, 199]; // Gris claro
-
-    // Margenes
+    // Configuración de colores
+    const primaryColor = [22, 160, 133];
+    const darkColor = [44, 62, 80];
+    const lightColor = [189, 195, 199];
     const margin = 15;
     let yPosition = margin;
 
-    // Agregar encabezado
+    // Encabezado
     doc.setFontSize(20);
     doc.setTextColor(...primaryColor);
     doc.setFont('helvetica', 'bold');
@@ -646,61 +679,7 @@ function AttendanceFrManager() {
     })}`, 105, yPosition, { align: 'center' });
     yPosition += 15;
 
-    // Resumen estadístico
-    doc.setFontSize(12);
-    doc.setTextColor(...darkColor);
-    doc.setFont('helvetica', 'bold');
-    doc.text('RESUMEN ESTADÍSTICO', margin, yPosition);
-    yPosition += 5;
-
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-
-    // Calcular estadísticas
-    const totalRegistros = attendance.length;
-    const empleadosUnicos = [...new Set(attendance.map(item => item.empId))].length;
-    const { promedioHoras, totalHoras } = calculateHoursStats(attendance);
-    const asistenciasCompletas = attendance.filter(a => a.inTime && a.outTime).length;
-
-    doc.text(`• Total de registros: ${totalRegistros}`, margin, yPosition);
-    yPosition += 5;
-    doc.text(`• Empleados registrados: ${empleadosUnicos}`, margin, yPosition);
-    yPosition += 5;
-    doc.text(`• Asistencias completas: ${asistenciasCompletas} (${Math.round((asistenciasCompletas / totalRegistros) * 100)}%)`, margin, yPosition);
-    yPosition += 5;
-    doc.text(`• Horas trabajadas totales: ${totalHoras}`, margin, yPosition);
-    yPosition += 5;
-    doc.text(`• Promedio de horas por día: ${promedioHoras}`, margin, yPosition);
-    yPosition += 5;
-
-    // Mostrar excesos en el reporte
-    if (exceededLimits.daily.length > 0 || exceededLimits.weekly.length > 0) {
-      doc.setTextColor(231, 76, 60); // Rojo
-      doc.text('• Horas excedidas:', margin, yPosition);
-      yPosition += 5;
-
-      if (exceededLimits.daily.length > 0) {
-        doc.text(`  - Diario: ${exceededLimits.daily.length} casos`, margin, yPosition);
-        yPosition += 5;
-      }
-      if (exceededLimits.weekly.length > 0) {
-        doc.text(`  - Semanal: ${exceededLimits.weekly.length} casos`, margin, yPosition);
-        yPosition += 5;
-      }
-
-      doc.setTextColor(...darkColor); // Volver al color normal
-    }
-
-    yPosition += 10;
-
-    // Tabla de asistencias
-    doc.setFontSize(12);
-    doc.setTextColor(...darkColor);
-    doc.setFont('helvetica', 'bold');
-    doc.text('DETALLE DE ASISTENCIAS', margin, yPosition);
-    yPosition += 10;
-
-    // Configurar columnas de la tabla
+    // Preparar datos para la tabla
     const headers = [
       { title: "#", dataKey: "index" },
       { title: "ID EMPLEADO", dataKey: "empId" },
@@ -713,26 +692,20 @@ function AttendanceFrManager() {
       { title: "ESTADO", dataKey: "status" }
     ];
 
-    // Preparar datos para la tabla
     const data = attendance.map((employee, index) => {
       const hoursWorked = calculateHoursWorked(employee.inTime, employee.outTime);
       const minutesWorked = calculateHoursInMinutes(employee.inTime, employee.outTime);
 
-      let status = 'Normal';
-      if (minutesWorked > 8 * 60) {
-        status = 'Horas excedidas';
-      }
-
       return {
         index: index + 1,
-        empId: employee.empId,
-        empName: employee.empName,
-        position: employee.position,
+        empId: employee.empId || '--',
+        empName: employee.empName || '--',
+        position: translateRole(employee.position),
         date: formatDateForPDF(employee.date),
-        inTime: convertTo12HourFormat(employee.inTime),
-        outTime: convertTo12HourFormat(employee.outTime),
-        hoursWorked: hoursWorked,
-        status: status
+        inTime: employee.inTime ? convertTo12HourFormat(employee.inTime) : '--',
+        outTime: employee.outTime ? convertTo12HourFormat(employee.outTime) : '--',
+        hoursWorked: hoursWorked || '--',
+        status: minutesWorked > 8 * 60 ? 'Horas excedidas' : 'Normal'
       };
     });
 
@@ -760,63 +733,34 @@ function AttendanceFrManager() {
         overflow: 'linebreak',
         halign: 'center'
       },
-      columnStyles: {
-        0: { cellWidth: 10, halign: 'center' },
-        1: { cellWidth: 20, halign: 'center' },
-        2: { cellWidth: 30, halign: 'left' },
-        3: { cellWidth: 25, halign: 'left' },
-        4: { cellWidth: 20, halign: 'center' },
-        5: { cellWidth: 15, halign: 'center' },
-        6: { cellWidth: 15, halign: 'center' },
-        7: { cellWidth: 15, halign: 'center' },
-        8: {
-          cellWidth: 20, halign: 'center',
-          cellStyles: (cell, data) => {
-            if (data.row.raw.status === 'Horas excedidas') {
-              return { textColor: [231, 76, 60], fontStyle: 'bold' };
-            }
-            return {};
-          }
-        }
-      },
-      didDrawPage: function () {
-        // Footer en cada página
+      didDrawPage: function(data) {
+        // Footer
         doc.setFontSize(8);
         doc.setTextColor(...lightColor);
         doc.text(
           `Página ${doc.internal.getNumberOfPages()}`,
           105,
-          287,
+          doc.internal.pageSize.height - 10,
           { align: 'center' }
         );
       }
     });
 
-    // Firmas y validación
-    const lastPage = doc.internal.getNumberOfPages();
-    doc.setPage(lastPage);
-
-    const signatureY = doc.lastAutoTable.finalY + 15;
-
-    if (signatureY < 250) {
-      doc.setFontSize(10);
-      doc.setTextColor(...darkColor);
-      doc.text('_________________________', margin + 20, signatureY);
-      doc.text('Responsable de RRHH', margin + 20, signatureY + 5);
-
-      doc.text('_________________________', margin + 100, signatureY);
-      doc.text('Gerente General', margin + 100, signatureY + 5);
-
-      doc.setFontSize(8);
-      doc.setTextColor(...lightColor);
-      doc.text('Documento generado automáticamente por el Sistema de Gestión de Asistencias',
-        105, 287, { align: 'center' });
-    }
-
     // Guardar el PDF
-    const fileName = `Reporte_Asistencias_${startDate || 'inicio'}_${endDate || 'fin'}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    const fileName = `Reporte_Asistencias_${new Date().toISOString().slice(0, 10)}.pdf`;
     doc.save(fileName);
-  };
+
+  } catch (error) {
+    console.error('Error al generar PDF:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el PDF',
+      confirmButtonColor: '#3085d6',
+      background: '#f8f9fa'
+    });
+  }
+};
 
   // Función para formatear fecha en formato PDF
   // Asegurar que la fecha se maneje consistentemente
@@ -883,9 +827,6 @@ function AttendanceFrManager() {
             <span className="text-sm text-gray-600 dark:text-gray-300">
               Página {currentPage} de {Math.ceil(attendance.length / itemsPerPage)}
             </span>
-            <Button color="light" onClick={downloadPDF}>
-              <FaDownload className="mr-2" /> Exportar
-            </Button>
           </div>
         </div>
 
@@ -907,16 +848,30 @@ function AttendanceFrManager() {
               const minutesWorked = calculateHoursInMinutes(employee.inTime, employee.outTime);
               const exceedsDailyLimit = minutesWorked > 8 * 60;
 
+              // Traducción de los roles
+              const translateRole = (role) => {
+                const roles = {
+                  'manager': 'Gerente',
+                  'supervisor': 'Supervisor',
+                  'chef': 'Chef',
+                  'waiter': 'Mesero',
+                  'bartender': 'Bartender',
+                  'cashier': 'Cajero',
+                  'cleaner': 'Limpieza',
+                  'other': 'Otro'
+                };
+                return roles[role.toLowerCase()] || role;
+              };
+
               return (
                 <Table.Row
                   key={index}
-                  className={`bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 ${exceedsDailyLimit ? 'border-l-4 border-yellow-500' : ''
-                    }`}
+                  className={`bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 ${exceedsDailyLimit ? 'border-l-4 border-yellow-500' : ''}`}
                 >
                   <Table.Cell>{indexOfFirstItem + index + 1}</Table.Cell>
                   <Table.Cell>{employee.empId}</Table.Cell>
                   <Table.Cell>{employee.empName}</Table.Cell>
-                  <Table.Cell className="hidden md:table-cell">{employee.position}</Table.Cell>
+                  <Table.Cell className="hidden md:table-cell">{translateRole(employee.position)}</Table.Cell>
                   <Table.Cell>{employee.date}</Table.Cell>
                   <Table.Cell className="hidden sm:table-cell">
                     {employee.inTime === '00:00' && employee.outTime === '00:00'
@@ -936,7 +891,6 @@ function AttendanceFrManager() {
                   </Table.Cell>
                   <Table.Cell>
                     <div className="flex space-x-2">
-
                       <Button
                         size="xs"
                         color="failure"

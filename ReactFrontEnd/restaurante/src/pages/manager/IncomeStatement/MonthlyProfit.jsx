@@ -17,7 +17,7 @@ const MonthlyProfit = () => {
     insurance: 0,
     otherExpenses: 0,
   });
-  
+
   // Estados para los datos financieros
   const [billTypeAmounts, setBillTypeAmounts] = useState([]);
   const [totalExpenses, setTotalExpenses] = useState(0);
@@ -30,12 +30,12 @@ const MonthlyProfit = () => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [tax, setTax] = useState(0);
   const [netProfit, setNetProfit] = useState(0);
-  
+
   // Estados para datos del mes anterior
   const [previousMonthTotalIncome, setPreviousMonthTotalIncome] = useState(0);
   const [previousMonthTotalExpenses, setPreviousMonthTotalExpenses] = useState(0);
   const [previousMonthNetProfit, setPreviousMonthNetProfit] = useState(0);
-  
+
   // Obtener mes y año actual
   const currentMonth = new Date().toLocaleString('es-PE', { month: 'long' });
   const currentYear = new Date().getFullYear();
@@ -66,15 +66,15 @@ const MonthlyProfit = () => {
         });
       }
     };
-    
+
     loadData();
   }, []);
 
   useEffect(() => {
     // Calcular todos los valores financieros
     calculateFinancials();
-  }, [billTypeAmounts, salesRevenue, eventRevenue, totalMonthlySalary, 
-      totalEventBudgetforMonth, totalInventoryPurchasesForMonth]);
+  }, [billTypeAmounts, salesRevenue, eventRevenue, totalMonthlySalary,
+    totalEventBudgetforMonth, totalInventoryPurchasesForMonth]);
 
   // Función para calcular todos los valores financieros
   const calculateFinancials = () => {
@@ -108,7 +108,7 @@ const MonthlyProfit = () => {
     try {
       const response = await fetch(`http://localhost:8080/api/payment/current-month`);
       if (!response.ok) throw new Error('Error al obtener tipos de factura');
-      
+
       const data = await response.json();
       const translatedData = data.map(item => {
         const types = {
@@ -118,7 +118,7 @@ const MonthlyProfit = () => {
           'Internet Bill': 'Internet',
           'Insurance Bill': 'Seguro'
         };
-        
+
         return {
           ...item,
           billType: types[item.billType] || item.billType
@@ -142,7 +142,7 @@ const MonthlyProfit = () => {
     try {
       const response = await fetch(`http://localhost:8080/api/salary/getTotalGrossPaymentForCurrentMonth`);
       if (!response.ok) throw new Error('Error al obtener salarios');
-      
+
       const text = await response.text();
       const totalSalary = text ? JSON.parse(text) : 0;
       setTotalMonthlySalary(totalSalary);
@@ -163,7 +163,7 @@ const MonthlyProfit = () => {
     try {
       const response = await fetch(`http://localhost:8080/api/events/monthly-total-budget`);
       if (!response.ok) throw new Error('Error al obtener presupuesto de eventos');
-      
+
       const text = await response.text();
       const totalBudget = text ? JSON.parse(text) : 0;
       setTotalEventBudgetforMonth(totalBudget);
@@ -184,7 +184,7 @@ const MonthlyProfit = () => {
     try {
       const response = await fetch(`http://localhost:8080/api/inventory/total-price/month`);
       if (!response.ok) throw new Error('Error al obtener compras de inventario');
-      
+
       const text = await response.text();
       const totalPurchases = text ? JSON.parse(text) : 0;
       setTotalInventoryPurchasesForMonth(totalPurchases);
@@ -205,7 +205,7 @@ const MonthlyProfit = () => {
     try {
       const response = await fetch(`http://localhost:8080/api/orders/monthly-sales-revenue`);
       if (!response.ok) throw new Error('Error al obtener ingresos por ventas');
-      
+
       const salesRevenue = await response.json();
       setSalesRevenue(salesRevenue);
     } catch (error) {
@@ -225,7 +225,7 @@ const MonthlyProfit = () => {
     try {
       const response = await fetch(`http://localhost:8080/api/events/monthly-total-revenue`);
       if (!response.ok) throw new Error('Error al obtener ingresos de eventos');
-      
+
       const eventRevenue = await response.json();
       setEventRevenue(eventRevenue);
     } catch (error) {
@@ -245,7 +245,7 @@ const MonthlyProfit = () => {
     try {
       const response = await fetch(`http://localhost:8080/api/income/previous-month/${previousMonth}`);
       if (!response.ok) throw new Error('Error al obtener datos del mes anterior');
-      
+
       const data = await response.json();
       setPreviousMonthTotalIncome(data.totalIncome || 0);
       setPreviousMonthTotalExpenses(data.totalExpenses || 0);
@@ -272,10 +272,10 @@ const MonthlyProfit = () => {
 
   const calculateTotalExpenses = () => {
     const servicesTotal = billTypeAmounts.reduce((acc, item) => acc + (item.totalAmount || 0), 0);
-    const totalEx = servicesTotal + 
-                  (totalMonthlySalary || 0) + 
-                  (totalEventBudgetforMonth || 0) + 
-                  (totalInventoryPurchasesForMonth || 0);
+    const totalEx = servicesTotal +
+      (totalMonthlySalary || 0) +
+      (totalEventBudgetforMonth || 0) +
+      (totalInventoryPurchasesForMonth || 0);
     setTotalExpenses(totalEx);
   };
 
@@ -333,89 +333,28 @@ const MonthlyProfit = () => {
   };
 
   // Función para generar y descargar PDF
-  const handleDownloadPDF = async () => {
-    try {
-      Swal.fire({
-        title: 'Generando PDF',
-        html: 'Por favor espere...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
+  const handleDownloadPDF = () => {
+    // Download PDF of the annual statement
+    const inputElement = document.getElementById('monthly-report'); // Element to capture
 
-      const inputElement = document.getElementById('monthly-report');
-      const originalStyles = {
-        width: inputElement.style.width,
-        height: inputElement.style.height,
-        padding: inputElement.style.padding
-      };
+    inputElement.style.width = '800px'; // Set a fixed width
+    inputElement.style.height = 'auto'; // Set auto height to maintain aspect ratio
 
-      // Ajustar estilos para el PDF
-      inputElement.style.width = '800px';
-      inputElement.style.height = 'auto';
-      inputElement.style.padding = '20px';
+    html2canvas(inputElement, {
+      scale: 3, // Increase scale to improve quality (default is 1)
+      useCORS: true // Ensures cross-origin images are handled properly
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png'); // Convert canvas to image data
+      const pdf = new jsPDF('p', 'mm', 'a4'); // Create new PDF document (portrait mode, millimeters, A4 size)
 
-      const canvas = await html2canvas(inputElement, {
-        scale: 3,
-        useCORS: true,
-        logging: true,
-        allowTaint: true
-      });
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = canvas.height * imgWidth / canvas.width; // Calculate image height based on aspect ratio
 
-      // Restaurar estilos originales
-      inputElement.style.width = originalStyles.width;
-      inputElement.style.height = originalStyles.height;
-      inputElement.style.padding = originalStyles.padding;
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight); // Add image to PDF
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 190;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      // Encabezado del PDF
-      pdf.setFontSize(16);
-      pdf.setTextColor(40, 40, 40);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Reporte Financiero Mensual', 105, 15, null, null, 'center');
-      pdf.setFontSize(12);
-      pdf.text(`Restaurante: ${currentMonth} ${currentYear}`, 105, 22, null, null, 'center');
-
-      // Logo
-      const logoData = await fetch(CafeandEvent).then(res => res.blob());
-      const logoUrl = URL.createObjectURL(logoData);
-      pdf.addImage(logoUrl, 'JPEG', 15, 10, 30, 15);
-
-      // Contenido principal
-      pdf.addImage(imgData, 'PNG', 10, 30, imgWidth, imgHeight);
-
-      // Pie de página
-      pdf.setFontSize(10);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text('Generado el: ' + new Date().toLocaleDateString(), 15, 285);
-      pdf.text('© Los Patos - Todos los derechos reservados', 105, 285, null, null, 'center');
-
-      // Guardar PDF
-      pdf.save(`Reporte_Mensual_${currentMonth}_${currentYear}.pdf`);
-      Swal.close();
-
-      // Guardar datos en backend
-      await sendReportDataToBackend();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'PDF Generado',
-        text: 'El reporte se ha descargado correctamente',
-        timer: 2000,
-        showConfirmButton: false
-      });
-    } catch (error) {
-      console.error('Error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo generar el PDF',
-        footer: error.message
-      });
-    }
+      pdf.save('Monthly Income Statement.pdf'); // Save PDF with filename
+    });
+    sendReportDataToBackend(); // Send report data to the backend
   };
 
   // Renderizado del componente
@@ -429,7 +368,7 @@ const MonthlyProfit = () => {
         </div>
         <div className="w-full md:w-1/2 flex justify-end pr-5">
           <Button onClick={handleDownloadPDF} className="hover:bg-green-700 text-white font-bold mb-5 rounded">
-            Exportar a PDF
+            Guardar datos
           </Button>
         </div>
       </div>
@@ -583,24 +522,24 @@ const MonthlyProfit = () => {
             <p className="font-semibold">Cómo se calcula cada valor:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
               <li>
-                <strong>Ingresos Totales:</strong> Ventas (S/. {salesRevenue.toLocaleString('es-PE')}) + 
+                <strong>Ingresos Totales:</strong> Ventas (S/. {salesRevenue.toLocaleString('es-PE')}) +
                 Eventos (S/. {eventRevenue.toLocaleString('es-PE')})
               </li>
               <li>
-                <strong>Gastos Totales:</strong> Servicios (S/. {billTypeAmounts.reduce((acc, item) => acc + item.totalAmount, 0).toLocaleString('es-PE')}) + 
-                Salarios (S/. {totalMonthlySalary.toLocaleString('es-PE')}) + 
-                Presupuesto Eventos (S/. {totalEventBudgetforMonth.toLocaleString('es-PE')}) + 
+                <strong>Gastos Totales:</strong> Servicios (S/. {billTypeAmounts.reduce((acc, item) => acc + item.totalAmount, 0).toLocaleString('es-PE')}) +
+                Salarios (S/. {totalMonthlySalary.toLocaleString('es-PE')}) +
+                Presupuesto Eventos (S/. {totalEventBudgetforMonth.toLocaleString('es-PE')}) +
                 Inventario (S/. {totalInventoryPurchasesForMonth.toLocaleString('es-PE')})
               </li>
               <li>
-                <strong>Ingresos Netos:</strong> Ingresos Totales (S/. {totalRevenue.toLocaleString('es-PE')}) - 
+                <strong>Ingresos Netos:</strong> Ingresos Totales (S/. {totalRevenue.toLocaleString('es-PE')}) -
                 Gastos Totales (S/. {totalExpenses.toLocaleString('es-PE')})
               </li>
               <li>
                 <strong>Impuestos:</strong> 18% de los Ingresos Netos (S/. {tax.toLocaleString('es-PE')})
               </li>
               <li>
-                <strong>Ganancia Neta:</strong> Ingresos Netos (S/. {totalIncome.toLocaleString('es-PE')}) - 
+                <strong>Ganancia Neta:</strong> Ingresos Netos (S/. {totalIncome.toLocaleString('es-PE')}) -
                 Impuestos (S/. {tax.toLocaleString('es-PE')})
               </li>
             </ul>

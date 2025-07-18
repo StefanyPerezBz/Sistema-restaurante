@@ -306,111 +306,6 @@ export default function CashierDashboard() {
     }]
   };
 
-  // Exportar a PDF
-  const exportToPDF = async () => {
-    const { value: option } = await Swal.fire({
-      title: 'Exportar Dashboard',
-      text: 'Seleccione qué desea exportar:',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Todo el dashboard',
-      cancelButtonText: 'Cancelar',
-      showDenyButton: true,
-      denyButtonText: 'Solo los gráficos',
-      customClass: {
-        popup: 'dark:bg-gray-800 dark:text-white',
-        confirmButton: 'bg-blue-500 hover:bg-blue-600',
-        cancelButton: 'bg-green-500 hover:bg-green-600'
-      }
-    });
-
-    if (option === undefined) return; // Cancelado
-
-    const loadingAlert = Swal.fire({
-      title: 'Generando PDF...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-      background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-      color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#111827'
-    });
-
-    try {
-      const pdf = new jsPDF('l', 'mm', 'a4');
-      let positionY = 20;
-
-      // Encabezado
-      pdf.setFontSize(20);
-      pdf.setTextColor(colors.primary);
-      pdf.text('Reporte del Dashboard', 105, positionY, { align: 'center' });
-      positionY += 10;
-
-      pdf.setFontSize(12);
-      pdf.setTextColor(colors.text);
-      pdf.text(`Generado el: ${formattedDate} a las ${formattedTime}`, 105, positionY, { align: 'center' });
-      positionY += 15;
-
-      if (option === true) { // Exportar todo
-        // Estadísticas
-        pdf.setFontSize(14);
-        pdf.setTextColor(colors.primary);
-        pdf.text('Resumen de Estadísticas', 20, positionY);
-        positionY += 10;
-
-        pdf.setFontSize(10);
-        pdf.setTextColor(colors.text);
-        pdf.text(`• Empleados: ${employeeCount ?? 'N/A'}`, 20, positionY);
-        pdf.text(`• Platos en menú: ${menuItemsCount ?? 'N/A'}`, 70, positionY);
-        pdf.text(`• Ingresos diarios: ${dailyRevenue !== null ? `S/. ${dailyRevenue.toLocaleString('es-PE')}` : 'N/A'}`, 120, positionY);
-        pdf.text(`• Mesas disponibles: ${availableTables ?? 'N/A'}`, 180, positionY);
-        positionY += 20;
-      }
-
-      // Gráficos
-      const chartsToExport = option === true ? 
-        [0, 1, 2, 3] : // Todos los gráficos
-        [0, 1, 2, 3];   // Solo gráficos
-
-      for (const index of chartsToExport) {
-        if (index > 0 && (index % 2 === 0 || option !== true)) {
-          pdf.addPage();
-          positionY = 20;
-        }
-
-        const canvas = await html2canvas(chartsRef.current[index]);
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 
-          index % 2 === 0 ? 20 : 110, 
-          positionY, 
-          80, 
-          60
-        );
-
-        if (index % 2 !== 0) positionY += 70;
-      }
-
-      pdf.save(`dashboard-reporte-${new Date().toISOString().slice(0, 10)}.pdf`);
-      
-      loadingAlert.close();
-      Swal.fire({
-        title: '¡PDF generado!',
-        text: 'El reporte se ha descargado correctamente',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
-        background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-        color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#111827'
-      });
-    } catch (error) {
-      console.error('Error al generar PDF:', error);
-      loadingAlert.close();
-      Swal.fire({
-        title: 'Error',
-        text: 'No se pudo generar el documento PDF',
-        icon: 'error',
-        background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-        color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#111827'
-      });
-    }
-  };
 
   // Componente para mostrar cuando no hay datos
   const NoDataMessage = () => (
@@ -444,13 +339,6 @@ export default function CashierDashboard() {
             </div>
           </div>
 
-          <Button
-            onClick={exportToPDF}
-            color="light"
-            className="px-4 py-2 bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600"
-          >
-            <FaFilePdf className="mr-2" /> Exportar PDF
-          </Button>
         </div>
       </motion.div>
 

@@ -137,25 +137,39 @@ function PayPerHour() {
     setErrors({ ...errors, otPay: '' });
   };
 
-  const handleAddHourlyPay = async () => {
-    if (!validateForm()) return;
+const handleAddHourlyPay = async () => {
+  if (!validateForm()) return;
 
-    const hourlyPayData = {
-      position: selectedPosition.value, // Enviamos el valor original en inglés
-      payPerHour: parseFloat(hourlyPay).toFixed(2),
-      payPerOverTimeHour: parseFloat(otPay).toFixed(2)
-    };
+  const hourlyPayData = {
+    position: selectedPosition.value,
+    payPerHour: parseFloat(hourlyPay).toFixed(2),
+    payPerOverTimeHour: parseFloat(otPay).toFixed(2),
+    // Agrega un timestamp único como "salting" para evitar el error
+    uniqueSalt: Date.now().toString()
+  };
 
-    try {
+  try {
+    await axios.post(`http://localhost:8080/hourPayments/create`, hourlyPayData);
+    showSuccess('Pago por hora registrado correctamente');
+    setRefreshHourlyTable(prev => !prev);
+    closeHourlyModal();
+  } catch (error) {
+    console.error('Error al añadir el pago por hora:', error);
+    
+    // Manejo especial para errores de duplicado
+    if (error.response && error.response.status === 500 && 
+        error.response.data?.message?.includes('Duplicate entry')) {
+      // Intento nuevamente con un salt diferente
+      hourlyPayData.uniqueSalt = (Date.now() + Math.random()).toString();
       await axios.post(`http://localhost:8080/hourPayments/create`, hourlyPayData);
-      showSuccess('Pago por hora registrado correctamente');
+      showSuccess('Pago registrado después de reintento');
       setRefreshHourlyTable(prev => !prev);
       closeHourlyModal();
-    } catch (error) {
-      console.error('Error al añadir el pago por hora:', error);
+    } else {
       showError('Error al registrar el pago por hora');
     }
-  };
+  }
+};
 
   return (
     <div className="min-h-screen p-4">

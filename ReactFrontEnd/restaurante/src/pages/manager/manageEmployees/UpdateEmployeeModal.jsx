@@ -80,8 +80,8 @@ const UpdateEmployeeModal = ({ employee, handleClose, onUpdate }) => {
             case 'email':
                 if (value && !/\S+@\S+\.\S+/.test(value)) {
                     error = 'Correo electrónico inválido';
-                } else if (value && value.length > 100) {
-                    error = 'Máximo 100 caracteres';
+                } else if (value && value.length > 50) {
+                    error = 'Máximo 50 caracteres';
                 }
                 break;
             case 'contact_number':
@@ -380,10 +380,10 @@ const UpdateEmployeeModal = ({ employee, handleClose, onUpdate }) => {
                                 name="email"
                                 color={errors.email ? 'failure' : ''}
                                 helperText={errors.email && <span className="text-red-500">{errors.email}</span>}
-                                maxLength={100}
+                                maxLength={50}
                             />
                             <div className="absolute right-2 bottom-2 text-xs text-gray-500">
-                                {formData.email.length}/100
+                                {formData.email.length}/50
                             </div>
                         </div>
                     </div>
@@ -410,10 +410,10 @@ const UpdateEmployeeModal = ({ employee, handleClose, onUpdate }) => {
                                 value={formData.address}
                                 onChange={handleChange}
                                 name="address"
-                                maxLength={200}
+                                maxLength={50}
                             />
                             <div className="absolute right-2 bottom-2 text-xs text-gray-500">
-                                {formData.address.length}/200
+                                {formData.address.length}/50
                             </div>
                         </div>
                     </div>

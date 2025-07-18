@@ -152,8 +152,8 @@ export default function RegisterEmployee() {
             if (value) {
                 if (/^\d+$/.test(value)) {
                     error = 'No puede ser solo números';
-                } else if (value.length > 200) {
-                    error = 'Máximo 200 caracteres';
+                } else if (value.length > 50) {
+                    error = 'Máximo 50 caracteres';
                 } else if (!/^[a-zA-Z0-9\s,.-]+$/.test(value)) {
                     error = 'Caracteres inválidos en la dirección';
                 }
@@ -351,7 +351,7 @@ export default function RegisterEmployee() {
                                     maxLength="50"
                                 />
                                 <div className="absolute right-2 bottom-2 text-xs text-gray-500">
-                                    {formData.email.length}/100
+                                    {formData.email.length}/50
                                 </div>
                             </div>
                         </div>
@@ -381,10 +381,10 @@ export default function RegisterEmployee() {
                                     name="address"
                                     color={errors.address ? 'failure' : ''}
                                     helperText={errors.address && <span className="text-red-500">{errors.address}</span>}
-                                    maxLength="200"
+                                    maxLength="50"
                                 />
                                 <div className="absolute right-2 bottom-2 text-xs text-gray-500">
-                                    {formData.address.length}/200
+                                    {formData.address.length}/50
                                 </div>
                             </div>
                         </div>

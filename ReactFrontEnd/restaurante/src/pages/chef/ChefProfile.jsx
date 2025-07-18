@@ -257,7 +257,7 @@ export default function ChefProfile() {
       : '/public/avatar.png');
 
   return (
-    <div className='max-w-lg mx-auto p-3 w-full'>
+     <div className='max-w-lg mx-auto p-3 w-full'>
       <h1 className='my-7 text-center font-semibold text-3xl'>Perfil del Chef</h1>
       <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
         <input 
@@ -277,9 +277,15 @@ export default function ChefProfile() {
             alt='Foto de perfil' 
             className='rounded-full w-full h-full object-cover border-8 border-[lightgray]'
             onError={(e) => {
-              e.target.src = '/default-profile.png';
+              e.target.onerror = null; // Prevenir bucles de error
+              e.target.src = '/default-profile.jpg';
             }}
           />
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300">
+            <span className="text-white text-sm font-medium opacity-0 hover:opacity-100 transition-opacity">
+              Cambiar foto
+            </span>
+          </div>
         </div>
 
         {/* Nombre con contador de caracteres */}

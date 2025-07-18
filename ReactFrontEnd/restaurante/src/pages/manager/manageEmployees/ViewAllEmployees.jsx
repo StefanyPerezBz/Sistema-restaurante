@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
@@ -16,7 +14,7 @@ const ViewAllEmployees = () => {
     const [employeeUpdate, setEmployeeUpdate] = useState(null);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [clickedImageURL, setClickedImageURL] = useState("");
-    const defaultPropic = 'https://upload.wikimedia.org/wikipedia/commons/6/67/User_Avatar.png';
+    const defaultProfilePic = '/public/default-profile.jpg'; // Ruta a tu imagen por defecto
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedJobRole, setSelectedJobRole] = useState('');
     const [jobRoles, setJobRoles] = useState([]);
@@ -47,8 +45,18 @@ const ViewAllEmployees = () => {
                     axios.get(`http://localhost:8080/api/user/manage-employees`),
                     axios.get(`http://localhost:8080/api/user/job-roles`)
                 ]);
-                setEmployees(employeesResponse.data);
-                setFilteredEmployees(employeesResponse.data);
+                
+                // Procesar empleados para asegurar que tengan una imagen válida
+                const processedEmployees = employeesResponse.data.map(employee => ({
+                    ...employee,
+                    profilePicture: employee.profilePicture 
+                        ? `http://localhost:8080/api/food/image/${employee.profilePicture}`
+                        : defaultProfilePic
+                }));
+                
+                setEmployees(processedEmployees);
+                setFilteredEmployees(processedEmployees);
+                
                 // Mapeamos los roles para react-select
                 const rolesOptions = jobRolesResponse.data.map(role => ({
                     value: role,
@@ -132,7 +140,7 @@ const ViewAllEmployees = () => {
     };
 
     const handleImageClick = (imageUrl) => {
-        if (imageUrl && imageUrl !== defaultPropic) {
+        if (imageUrl && imageUrl !== defaultProfilePic) {
             setClickedImageURL(imageUrl);
             setIsImageModalOpen(true);
         }
@@ -146,12 +154,25 @@ const ViewAllEmployees = () => {
         {
             name: 'Foto',
             cell: row => (
-                <div onClick={() => handleImageClick(row.profilePicture)} style={{ cursor: 'pointer' }}>
+                <div 
+                    onClick={() => handleImageClick(row.profilePicture)} 
+                    style={{ cursor: row.profilePicture !== defaultProfilePic ? 'pointer' : 'default' }}
+                >
                     <img
-                        src={row.profilePicture || defaultPropic}
+                        src={row.profilePicture}
                         className="rounded-full"
-                        style={{ width: '40px', height: '40px', opacity: row.profilePicture ? 1 : 0.5 }}
+                        style={{ 
+                            width: '40px', 
+                            height: '40px', 
+                            objectFit: 'cover',
+                            border: '2px solid #e2e8f0',
+                            opacity: row.profilePicture !== defaultProfilePic ? 1 : 0.7
+                        }}
                         alt="Profile"
+                        onError={(e) => {
+                            e.target.src = defaultProfilePic;
+                            e.target.style.opacity = 0.7;
+                        }}
                     />
                 </div>
             ),
@@ -198,7 +219,6 @@ const ViewAllEmployees = () => {
                     'Otro',
             wrap: true
         },
-
         {
             name: 'Fecha Ingreso',
             selector: row => new Date(row.joined_date).toLocaleDateString('es-PE'),
@@ -240,7 +260,6 @@ const ViewAllEmployees = () => {
             button: true,
             width: '150px'
         }
-
     ];
 
     const customStyles = {
@@ -372,6 +391,16 @@ const ViewAllEmployees = () => {
                             src={clickedImageURL}
                             alt="Profile"
                             className="max-w-full max-h-[70vh] object-contain"
+                            onError={(e) => {
+                                e.target.src = defaultProfilePic;
+                                setIsImageModalOpen(false);
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'No se pudo cargar la imagen del perfil',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar'
+                                });
+                            }}
                         />
                     </div>
                 </div>

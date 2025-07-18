@@ -92,63 +92,6 @@ const ViewAllEvents = () => {
     }
   };
 
-  const handleShare = async (eventID) => {
-    try {
-      const { value: emailCount } = await Swal.fire({
-        title: 'Compartir evento',
-        text: '¿Cuántos correos deseas enviar?',
-        input: 'number',
-        inputValue: 1,
-        inputAttributes: {
-          min: 1,
-          max: 100
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Enviar',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        inputValidator: (value) => {
-          if (!value || value < 1) {
-            return 'Debes ingresar un número válido';
-          }
-        }
-      });
-
-      if (emailCount) {
-        Swal.fire({
-          title: 'Enviando correos...',
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          }
-        });
-
-        const eventDetails = await fetchEventDetails(eventID);
-        const response = await axios.post(`http://localhost:8080/api/inform/share-event-details`, {
-          eventID: eventID,
-          emailCount: emailCount
-        });
-
-        if (response.status === 200) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Éxito',
-            text: `Se enviaron ${emailCount} correos electrónicos`,
-            confirmButtonColor: '#3085d6',
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error al enviar correos electrónicos:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudieron enviar los correos. Inténtelo de nuevo más tarde.',
-        confirmButtonColor: '#3085d6',
-      });
-    }
-  };
 
   const handleUpdateClick = (event) => {
     setEventUpdate(event);
@@ -292,14 +235,6 @@ const ViewAllEvents = () => {
             className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:scale-110"
           >
             <FaTrash />
-          </button>
-          <button
-            data-tooltip-id="actions-tooltip"
-            data-tooltip-content="Compartir"
-            onClick={() => handleShare(row.eventID)}
-            className="p-2 text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 hover:scale-110"
-          >
-            <FaShare />
           </button>
         </div>
       ),

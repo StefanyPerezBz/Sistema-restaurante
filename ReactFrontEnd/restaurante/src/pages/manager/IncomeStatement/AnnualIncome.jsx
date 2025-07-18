@@ -68,7 +68,6 @@ const AnnualIncome = () => {
         icon: 'error',
         title: 'Error',
         text: 'No se pudieron cargar los gastos anuales',
-        footer: error.message
       });
     }
   };
@@ -296,96 +295,29 @@ const AnnualIncome = () => {
     setNetProfit(net);
   };
 
-  const handleDownloadPDF = async () => {
-    try {
-      // Mostrar carga mientras se genera el PDF
-      Swal.fire({
-        title: 'Generando PDF',
-        html: 'Por favor espere...',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
+  const handleDownloadPDF = () => {
+    // Download PDF of the annual statement
+    const inputElement = document.getElementById('annual-report'); // Element to capture
 
-      const inputElement = document.getElementById('annual-report');
+    inputElement.style.width = '800px'; // Set a fixed width
+    inputElement.style.height = 'auto'; // Set auto height to maintain aspect ratio
 
-      // Estilos temporales para el PDF
-      const originalStyles = {
-        width: inputElement.style.width,
-        height: inputElement.style.height,
-        padding: inputElement.style.padding
-      };
+    html2canvas(inputElement, {
+      scale: 3, // Increase scale to improve quality (default is 1)
+      useCORS: true // Ensures cross-origin images are handled properly
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png'); // Convert canvas to image data
+      const pdf = new jsPDF('p', 'mm', 'a4'); // Create new PDF document (portrait mode, millimeters, A4 size)
 
-      inputElement.style.width = '800px';
-      inputElement.style.height = 'auto';
-      inputElement.style.padding = '20px';
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = canvas.height * imgWidth / canvas.width; // Calculate image height based on aspect ratio
 
-      const canvas = await html2canvas(inputElement, {
-        scale: 3,
-        useCORS: true,
-        logging: true,
-        allowTaint: true
-      });
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight); // Add image to PDF
 
-      // Restaurar estilos originales
-      inputElement.style.width = originalStyles.width;
-      inputElement.style.height = originalStyles.height;
-      inputElement.style.padding = originalStyles.padding;
+      pdf.save('Annual Income Statement.pdf'); // Save PDF with filename
+    });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 190; // Ancho reducido para márgenes
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      // Agregar encabezado profesional
-      pdf.setFontSize(16);
-      pdf.setTextColor(40, 40, 40);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Reporte Financiero Anual', 105, 15, null, null, 'center');
-
-      pdf.setFontSize(12);
-      pdf.text(`Restaurante - Año Fiscal: ${currentYear}`, 105, 22, null, null, 'center');
-
-      // Agregar logo
-      const logoData = await fetch(CafeandEvent).then(res => res.blob());
-      const logoUrl = URL.createObjectURL(logoData);
-      pdf.addImage(logoUrl, 'JPEG', 15, 10, 30, 15);
-
-      // Agregar contenido principal
-      pdf.addImage(imgData, 'PNG', 10, 30, imgWidth, imgHeight);
-
-      // Agregar pie de página profesional
-      pdf.setFontSize(10);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text('Generado el: ' + new Date().toLocaleDateString(), 15, 285);
-      pdf.text('© Restaurante Los Patos - Todos los derechos reservados', 105, 285, null, null, 'center');
-
-      // Guardar PDF
-      pdf.save(`Reporte_Anual_${currentYear}.pdf`);
-
-      // Cerrar alerta de carga
-      Swal.close();
-
-      // Enviar datos al backend
-      await sendReportDataToBackend();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'PDF Generado',
-        text: 'El reporte anual se ha descargado correctamente',
-        timer: 2000,
-        showConfirmButton: false
-      });
-    } catch (error) {
-      console.error('Error al generar PDF:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo generar el PDF anual',
-        footer: error.message
-      });
-    }
+    sendReportDataToBackend(); // Send report data to backend
   };
 
   const formatCurrency = (value) => {
@@ -401,10 +333,8 @@ const AnnualIncome = () => {
         <div className="w-full md:w-1/2 pl-5">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Estado Anual de Pérdidas y Ganancias</h1> <br />
         </div>
-        <div className="w-full md:w-1/2 flex justify-end pr-5">
-          <Button onClick={handleDownloadPDF} className="hover:bg-green-700 text-white font-bold mb-5 rounded">
-            Exportar a PDF
-          </Button>
+        <div className=" w-1/2 flex justify-end pr-5">
+          <Button onClick={handleDownloadPDF} className=" hover:bg-green-700 text-white font-bold mb-5 rounded">Guardar datos</Button>
         </div>
       </div>
       <hr />

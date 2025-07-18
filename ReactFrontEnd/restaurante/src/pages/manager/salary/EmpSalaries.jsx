@@ -1,22 +1,39 @@
-
-
-import React, { useEffect, useState, useRef } from 'react';
-import { Table, Button, Pagination, Alert } from "flowbite-react";
+import React, { useEffect, useState } from 'react';
+import { Button, Alert } from "flowbite-react";
 import { FaCloudDownloadAlt } from "react-icons/fa";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import Swal from 'sweetalert2';
 import Select from 'react-select';
-import DataTable from 'datatables.net-dt';
+import DataTable from 'react-data-table-component';
 
 function EmpSalaries() {
   const [salaries, setSalaries] = useState([]);
   const [showExtraColumns, setShowExtraColumns] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const itemsPerPage = 5;
-  const tableRef = useRef(null);
+  const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
+
+  // Diccionario para traducción de meses
+  const monthTranslations = {
+    'January': 'Enero',
+    'February': 'Febrero',
+    'March': 'Marzo',
+    'April': 'Abril',
+    'May': 'Mayo',
+    'June': 'Junio',
+    'July': 'Julio',
+    'August': 'Agosto',
+    'September': 'Setiembre',
+    'October': 'Octubre',
+    'November': 'Noviembre',
+    'December': 'Diciembre'
+  };
+
+  // Función para traducir el mes
+  const translateMonth = (month) => {
+    return monthTranslations[month] || month;
+  };
 
   // Opciones para el Select
   const monthOptions = [
@@ -34,135 +51,239 @@ function EmpSalaries() {
     { value: 'December', label: 'Diciembre' }
   ];
 
+  // Columnas básicas
+  const baseColumns = [
+    {
+      name: 'Nombre del empleado',
+      selector: row => row.empName,
+      sortable: true,
+      wrap: true
+    },
+    {
+      name: 'Pago por hora (S/.)',
+      selector: row => row.payPerHours,
+      sortable: true,
+      format: row => parseFloat(row.payPerHours).toFixed(2)
+    },
+    {
+      name: 'Horas normales',
+      selector: row => row.workedHours,
+      sortable: true
+    },
+    {
+      name: 'Total horas normales (S/.)',
+      selector: row => row.totalHourPayment,
+      sortable: true,
+      format: row => parseFloat(row.totalHourPayment).toFixed(2),
+      conditionalCellStyles: [
+        {
+          when: row => true,
+          style: {
+            color: 'red'
+          }
+        }
+      ]
+    },
+    {
+      name: 'Pago hora extra (S/.)',
+      selector: row => row.payPerOvertimeHour,
+      sortable: true,
+      format: row => parseFloat(row.payPerOvertimeHour).toFixed(2)
+    },
+    {
+      name: 'Horas extra',
+      selector: row => row.othours,
+      sortable: true
+    },
+    {
+      name: 'Total horas extra (S/.)',
+      selector: row => row.totalOvertimePayment,
+      sortable: true,
+      format: row => parseFloat(row.totalOvertimePayment).toFixed(2),
+      conditionalCellStyles: [
+        {
+          when: row => true,
+          style: {
+            color: 'red'
+          }
+        }
+      ]
+    }
+  ];
+
+  // Columnas adicionales
+  const extraColumns = [
+    {
+      name: 'Total sin bonos (S/.)',
+      selector: row => row.paymentWithoutAdditional,
+      sortable: true,
+      format: row => parseFloat(row.paymentWithoutAdditional).toFixed(2)
+    },
+    {
+      name: 'Tipo bonificación',
+      selector: row => row.bonusType,
+      sortable: true
+    },
+    {
+      name: 'Bonos (S/.)',
+      selector: row => row.bonus,
+      sortable: true,
+      format: row => parseFloat(row.bonus).toFixed(2),
+      conditionalCellStyles: [
+        {
+          when: row => true,
+          style: {
+            color: 'green'
+          }
+        }
+      ]
+    },
+    {
+      name: 'Tipo deducción',
+      selector: row => row.deductionType,
+      sortable: true
+    },
+    {
+      name: 'Deducciones (S/.)',
+      selector: row => row.deduction,
+      sortable: true,
+      format: row => parseFloat(row.deduction).toFixed(2),
+      conditionalCellStyles: [
+        {
+          when: row => true,
+          style: {
+            color: 'blue'
+          }
+        }
+      ]
+    },
+    {
+      name: 'Mes',
+      selector: row => translateMonth(row.month),
+      sortable: true
+    }
+  ];
+
+  // Columna final
+  const finalColumn = [
+    {
+      name: 'Pago bruto (S/.)',
+      selector: row => row.grossPayment,
+      sortable: true,
+      format: row => parseFloat(row.grossPayment).toFixed(2),
+      conditionalCellStyles: [
+        {
+          when: row => true,
+          style: {
+            color: 'red'
+          }
+        }
+      ]
+    }
+  ];
+
+  // Columnas combinadas según showExtraColumns
+  const columns = showExtraColumns 
+    ? [...baseColumns, ...extraColumns, ...finalColumn]
+    : [...baseColumns, ...finalColumn];
+
   useEffect(() => {
     fetchAllMonthSalaries();
-    return () => {
-      // Clean up DataTable when component unmounts
-      if ($.fn.dataTable.isDataTable('#salariesTable')) {
-        $('#salariesTable').DataTable().destroy();
-      }
-    };
   }, []);
 
-  useEffect(() => {
-    if (tableRef.current && salaries.length > 0) {
-      initializeDataTable();
+  const fetchAllMonthSalaries = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:8080/api/salary/getAllMonthSalaries');
+      const data = await response.json();
+      setSalaries(data);
+    } catch (error) {
+      console.error('Error al recuperar los salarios:', error);
+      Swal.fire('Error', 'No se pudieron cargar los salarios', 'error');
+    } finally {
+      setIsLoading(false);
     }
-  }, [salaries, showExtraColumns]);
+  };
 
-  const initializeDataTable = () => {
-    if ($.fn.dataTable.isDataTable('#salariesTable')) {
-      $('#salariesTable').DataTable().destroy();
+  const fetchTodaySalaries = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:8080/salary/currentDateSalaries');
+      const data = await response.json();
+      setSalaries(data);
+      setShowExtraColumns(false);
+      setResetPaginationToggle(!resetPaginationToggle);
+      await calculateAllEmployeesDailySalary();
+    } catch (error) {
+      console.error('Error al obtener los salarios:', error);
+      Swal.fire('Error', 'No se pudieron cargar los salarios de hoy', 'error');
+    } finally {
+      setIsLoading(false);
     }
-    
-    $(tableRef.current).DataTable({
-      responsive: true,
-      paging: false,
-      searching: true,
-      ordering: true,
-      info: false,
-      language: {
-        url: '//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json'
-      }
-    });
   };
 
-  const fetchAllMonthSalaries = () => {
+  const fetchThisMonthSalaries = async () => {
     setIsLoading(true);
-    fetch('http://localhost:8080/api/salary/getAllMonthSalaries')
-      .then(response => response.json())
-      .then(data => {
-        setSalaries(data);
-        setIsLoading(false);
-      })
-      .catch(error => {
-        console.error('Error al recuperar los salarios:', error);
-        setIsLoading(false);
-        Swal.fire('Error', 'No se pudieron cargar los salarios', 'error');
-      });
+    try {
+      const response = await fetch('http://localhost:8080/api/salary/getThisMonthSalaries');
+      const data = await response.json();
+      setSalaries(data);
+      setShowExtraColumns(true);
+      setResetPaginationToggle(!resetPaginationToggle);
+      await calculateMonthlySalaries();
+    } catch (error) {
+      console.error('Error al obtener los salarios:', error);
+      Swal.fire('Error', 'No se pudieron cargar los salarios del mes', 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const fetchTodaySalaries = () => {
-    setIsLoading(true);
-    fetch('http://localhost:8080/salary/currentDateSalaries')
-      .then(response => response.json())
-      .then(data => {
-        setSalaries(data);
-        setShowExtraColumns(false);
-        setIsLoading(false);
-        calculateAllEmployeesDailySalary();
-      })
-      .catch(error => {
-        console.error('Error al obtener los salarios:', error);
-        setIsLoading(false);
-        Swal.fire('Error', 'No se pudieron cargar los salarios de hoy', 'error');
-      });
-  };
-
-  const fetchThisMonthSalaries = () => {
-    setIsLoading(true);
-    fetch('http://localhost:8080/api/salary/getThisMonthSalaries')
-      .then(response => response.json())
-      .then(data => {
-        setSalaries(data);
-        setShowExtraColumns(true);
-        setIsLoading(false);
-        calculateMonthlySalaries();
-      })
-      .catch(error => {
-        console.error('Error al obtener los salarios:', error);
-        setIsLoading(false);
-        Swal.fire('Error', 'No se pudieron cargar los salarios del mes', 'error');
-      });
-  };
-
-  const fetchMonthSalaries = () => {
+  const fetchMonthSalaries = async () => {
     if (!selectedMonth) {
       Swal.fire('Advertencia', 'Por favor seleccione un mes', 'warning');
       return;
     }
 
     setIsLoading(true);
-    fetch(`http://localhost:8080/api/salary/getMonthSalaries/${selectedMonth.value}`)
-      .then(response => response.json())
-      .then(data => {
-        setSalaries(data);
-        setIsLoading(false);
-      })
-      .catch(error => {
-        console.error('Error al obtener los salarios:', error);
-        setIsLoading(false);
-        Swal.fire('Error', `No se pudieron cargar los salarios de ${selectedMonth.label}`, 'error');
-      });
+    try {
+      const response = await fetch(`http://localhost:8080/api/salary/getMonthSalaries/${selectedMonth.value}`);
+      const data = await response.json();
+      setSalaries(data);
+      setResetPaginationToggle(!resetPaginationToggle);
+    } catch (error) {
+      console.error('Error al obtener los salarios:', error);
+      Swal.fire('Error', `No se pudieron cargar los salarios de ${selectedMonth.label}`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const calculateAllEmployeesDailySalary = () => {
-    fetch('http://localhost:8080/salary/calculateAll')
-      .then(response => {
-        if (response.ok) {
-          Swal.fire('Éxito', 'Salarios diarios calculados correctamente', 'success');
-        } else {
-          throw new Error('Error en el cálculo');
-        }
-      })
-      .catch(error => {
-        console.error('Error al calcular salarios:', error);
-        Swal.fire('Error', 'No se pudieron calcular los salarios diarios', 'error');
-      });
+  const calculateAllEmployeesDailySalary = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/salary/calculateAll');
+      if (response.ok) {
+        Swal.fire('Éxito', 'Salarios diarios calculados correctamente', 'success');
+      } else {
+        throw new Error('Error en el cálculo');
+      }
+    } catch (error) {
+      console.error('Error al calcular salarios:', error);
+      Swal.fire('Error', 'No se pudieron calcular los salarios diarios', 'error');
+    }
   };
 
-  const calculateMonthlySalaries = () => {
-    fetch('http://localhost:8080/api/salary/calculateMonthlySalaries', {
-      method: 'POST'
-    })
-      .then(response => response.text())
-      .then(data => {
-        Swal.fire('Éxito', 'Salarios mensuales calculados correctamente', 'success');
-      })
-      .catch(error => {
-        console.error('Error al calcular salarios:', error);
-        Swal.fire('Error', 'No se pudieron calcular los salarios mensuales', 'error');
+  const calculateMonthlySalaries = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/salary/calculateMonthlySalaries', {
+        method: 'POST'
       });
+      const data = await response.text();
+      Swal.fire('Éxito', 'Salarios mensuales calculados correctamente', 'success');
+    } catch (error) {
+      console.error('Error al calcular salarios:', error);
+      Swal.fire('Error', 'No se pudieron calcular los salarios mensuales', 'error');
+    }
   };
 
   const handleSearch = () => {
@@ -181,19 +302,37 @@ function EmpSalaries() {
     doc.text(title, 14, 10);
     
     const headers = showExtraColumns ? [
-       'Nombre del Empleado', 'PPH (S/.)', 'HNT', 'PTPHN (S/.)', 'PPOE (S/.)', 'HE',
-      'PTPHE (S/.)', 'Pago Total sin Bonos ni Deducciones (S/.)', '	Bonificaciones (S/.)', 'Deducciones (S/.)', 'Mes', 'Pago Bruto (S/.)'
+      'Nombre del Empleado', 'PPH (S/.)', 'HNT', 'PTPHN (S/.)', 'PPOE (S/.)', 'HE',
+      'PTPHE (S/.)', 'Pago Total sin Bonos ni Deducciones (S/.)', 'Bonificaciones (S/.)', 
+      'Deducciones (S/.)', 'Mes', 'Pago Bruto (S/.)'
     ] : [
-      'Nombre del Empleado', 'Pago por Hora (S/.)', '	Horas Normales Trabajadas', 'Pago Total por Horas Normales (S/.)', 'Pago por Hora Extra (S/.)', 'Horas Extra',
+      'Nombre del Empleado', 'Pago por Hora (S/.)', 'Horas Normales Trabajadas', 
+      'Pago Total por Horas Normales (S/.)', 'Pago por Hora Extra (S/.)', 'Horas Extra',
       'Pago Total por Horas Extra (S/.)', 'Pago Bruto (S/.)'
     ];
   
     const data = salaries.map(row => showExtraColumns ? [
-      row.empName, row.payPerHours, row.workedHours, row.totalHourPayment, row.payPerOvertimeHour, row.othours,
-      row.totalOvertimePayment, row.paymentWithoutAdditional, row.bonus, row.deduction, row.month, row.grossPayment
+      row.empName, 
+      parseFloat(row.payPerHours).toFixed(2), 
+      row.workedHours, 
+      parseFloat(row.totalHourPayment).toFixed(2), 
+      parseFloat(row.payPerOvertimeHour).toFixed(2), 
+      row.othours, 
+      parseFloat(row.totalOvertimePayment).toFixed(2), 
+      parseFloat(row.paymentWithoutAdditional).toFixed(2), 
+      parseFloat(row.bonus).toFixed(2), 
+      parseFloat(row.deduction).toFixed(2), 
+      translateMonth(row.month), // Traducimos el mes para el PDF
+      parseFloat(row.grossPayment).toFixed(2)
     ] : [
-      row.empName, row.payPerHours, row.workedHours, row.totalHourPayment, row.payPerOvertimeHour, row.othours,
-      row.totalOvertimePayment, row.grossPayment
+      row.empName, 
+      parseFloat(row.payPerHours).toFixed(2), 
+      row.workedHours, 
+      parseFloat(row.totalHourPayment).toFixed(2), 
+      parseFloat(row.payPerOvertimeHour).toFixed(2), 
+      row.othours, 
+      parseFloat(row.totalOvertimePayment).toFixed(2), 
+      parseFloat(row.grossPayment).toFixed(2)
     ]);
   
     doc.autoTable({
@@ -231,12 +370,6 @@ function EmpSalaries() {
       }
     })
   };
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = salaries.slice(indexOfFirstItem, indexOfLastItem);
-
-  const onPageChange = (page) => setCurrentPage(page);
 
   return (
     <div className="p-4">
@@ -309,70 +442,31 @@ function EmpSalaries() {
       )}
 
       <div className="bg-white dark:bg-gray-700 rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table id="salariesTable" ref={tableRef} className="w-full">
-            <thead className="bg-gray-100 dark:bg-gray-600">
-              <tr>
-                <th>Nombre del empleado</th>
-                <th>Pago por hora (S/.)</th>
-                <th>Horas normales</th>
-                <th className="text-red-600">Total horas normales (S/.)</th>
-                <th>Pago hora extra (S/.)</th>
-                <th>Horas extra</th>
-                <th className="text-red-600">Total horas extra (S/.)</th>
-                {showExtraColumns && (
-                  <>
-                    <th>Total sin bonos (S/.)</th>
-                    <th>Tipo bonificación</th>
-                    <th className="text-green-600">Bonos (S/.)</th>
-                    <th>Tipo deducción</th>
-                    <th className="text-blue-800">Deducciones (S/.)</th>
-                    <th>Mes</th>
-                  </>
-                )}
-                <th className="text-red-600">Pago bruto (S/.)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {salaries.map((salary, index) => (
-                <tr key={index} className="border-t hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <td>{salary.empName}</td>
-                  <td>{salary.payPerHours}</td>
-                  <td>{salary.workedHours}</td>
-                  <td>{salary.totalHourPayment}</td>
-                  <td>{salary.payPerOvertimeHour}</td>
-                  <td>{salary.othours}</td>
-                  <td>{salary.totalOvertimePayment}</td>
-                  {showExtraColumns && (
-                    <>
-                      <td>{salary.paymentWithoutAdditional}</td>
-                      <td>{salary.bonusType}</td>
-                      <td>{salary.bonus}</td>
-                      <td>{salary.deductionType}</td>
-                      <td>{salary.deduction}</td>
-                      <td>{salary.month}</td>
-                    </>
-                  )}
-                  <td>{salary.grossPayment}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {salaries.length === 0 && !isLoading && (
-          <div className="text-center p-4 text-gray-500">
-            No se encontraron registros de salarios
-          </div>
-        )}
-      </div>
-
-      <div className="flex justify-center mt-4">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={Math.ceil(salaries.length / itemsPerPage)}
-          onPageChange={onPageChange}
-          showIcons
+        <DataTable
+          columns={columns}
+          data={salaries}
+          progressPending={isLoading}
+          pagination
+          paginationResetDefaultPage={resetPaginationToggle}
+          persistTableHead
+          noDataComponent={
+            <div className="text-center p-4 text-gray-500">
+              No se encontraron registros de salarios
+            </div>
+          }
+          customStyles={{
+            headCells: {
+              style: {
+                backgroundColor: '#f3f4f6',
+                fontWeight: 'bold',
+              },
+            },
+            cells: {
+              style: {
+                padding: '8px',
+              },
+            },
+          }}
         />
       </div>
     </div>
