@@ -14,10 +14,15 @@ export default function Bill() {
     const [subtotal, setSubtotal] = useState(0);
     const [totalAfterDiscount, setTotalAfterDiscount] = useState(0);
     const [discountPercentage, setDiscountPercentage] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [paymentMethod, setPaymentMethod] = useState(null);
+    const [paymentMethod, setPaymentMethod] = useState('');
     const [cashAmount, setCashAmount] = useState('');
     const [changeAmount, setChangeAmount] = useState(0);
+    const [validationErrors, setValidationErrors] = useState({
+        payment: false,
+        cash: false
+    });
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -42,9 +47,13 @@ export default function Bill() {
                     setSubtotal(subTotal);
                     setDiscountPercentage(discountPercentage || 0);
                     setTotalAfterDiscount(totalAfterDiscount);
+                    setCashAmount(totalAfterDiscount.toFixed(1));
+                    
                     if (customer) {
                         setCustomerData(customer);
-                        setDiscountPercentage(5);
+                        if (!discountPercentage) {
+                            setDiscountPercentage(5);
+                        }
                     }
                 } else {
                     window.location.href = "/cashier?tab=orders&error=order-not-found";
@@ -64,24 +73,28 @@ export default function Bill() {
         const newTotalAfterDiscount = newSubtotal - discountAmount;
         setTotalAfterDiscount(newTotalAfterDiscount);
 
-        if (paymentMethod?.value === 'cash' && cashAmount !== '') {
-            const numericCashAmount = parseFloat(cashAmount);
-            if (!isNaN(numericCashAmount)) {
-                const change = numericCashAmount - newTotalAfterDiscount;
-                setChangeAmount(change > 0 ? change : 0);
-            }
+        if (paymentMethod === 'cash') {
+            setCashAmount(newTotalAfterDiscount.toFixed(1));
+            setChangeAmount(0);
         } else {
+            setCashAmount('');
             setChangeAmount(0);
         }
-    }, [orderItems, discountPercentage, cashAmount, paymentMethod]);
+    }, [orderItems, discountPercentage, paymentMethod]);
 
-    const handleClearFields = () => {
-        setCustomerData({
-            cusName: '',
-            cusMobile: '',
-            cusEmail: ''
-        });
-    };
+    useEffect(() => {
+        if (paymentMethod === 'cash' && cashAmount !== '') {
+            const numericCashAmount = parseFloat(cashAmount);
+            if (!isNaN(numericCashAmount)) {
+                const change = numericCashAmount - totalAfterDiscount;
+                setChangeAmount(change >= 0 ? change : 0);
+                setValidationErrors({
+                    ...validationErrors,
+                    cash: numericCashAmount < totalAfterDiscount
+                });
+            }
+        }
+    }, [cashAmount, totalAfterDiscount, paymentMethod]);
 
     const paymentMethodOptions = [
         { value: 'cash', label: 'Efectivo' },
@@ -100,19 +113,50 @@ export default function Bill() {
 
     const handleCashInput = (e) => {
         const value = e.target.value;
-        // Permitir números con un solo decimal o números enteros
         if (/^\d*\.?\d{0,1}$/.test(value) || value === '') {
             setCashAmount(value);
         }
     };
 
     const formatNumber = (num) => {
-        // Mostrar como entero si no tiene decimales, de lo contrario mostrar un decimal
         return num % 1 === 0 ? num.toString() : num.toFixed(1);
     };
 
+    const validateOrder = () => {
+        const errors = {
+            payment: paymentMethod === '',
+            cash: paymentMethod === 'cash' && (
+                cashAmount === '' ||
+                parseFloat(cashAmount) < parseFloat(totalAfterDiscount.toFixed(1))
+            )
+        };
+
+        setValidationErrors(errors);
+
+        if (errors.payment) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor seleccione un método de pago',
+                confirmButtonColor: '#3085d6',
+            });
+            return false;
+        }
+
+        if (errors.cash) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `El monto en efectivo debe ser igual o mayor a S/. ${formatNumber(totalAfterDiscount)}`,
+                confirmButtonColor: '#3085d6',
+            });
+            return false;
+        }
+
+        return true;
+    };
+
     const confirmOrderCompletion = async () => {
-        // Validación básica
         if (orderItems.length < 1) {
             Swal.fire({
                 icon: 'error',
@@ -123,45 +167,17 @@ export default function Bill() {
             return;
         }
 
-        if (!paymentMethod) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Por favor seleccione un método de pago',
-                confirmButtonColor: '#3085d6',
-            });
+        if (!validateOrder()) {
             return;
-        }
-
-        if (paymentMethod.value === 'cash') {
-            const numericCashAmount = parseFloat(cashAmount);
-            if (isNaN(numericCashAmount)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Por favor ingrese un monto válido',
-                    confirmButtonColor: '#3085d6',
-                });
-                return;
-            }
-
-            if (numericCashAmount < totalAfterDiscount) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: `El monto en efectivo debe ser igual o mayor a S/. ${formatNumber(totalAfterDiscount)}`,
-                    confirmButtonColor: '#3085d6',
-                });
-                return;
-            }
         }
 
         const { isConfirmed } = await Swal.fire({
             title: '¿Confirmar pago?',
             html: `
                 <div class="text-left">
-                    <p><strong>Método de pago:</strong> ${paymentMethod.label}</p>
-                    ${paymentMethod.value === 'cash' ? `
+                    <p><strong>Método de pago:</strong> ${paymentMethod === 'cash' ? 'Efectivo' : 
+                      paymentMethod === 'card' ? 'Tarjeta' : 'Transferencia'}</p>
+                    ${paymentMethod === 'cash' ? `
                         <p><strong>Total a pagar:</strong> S/. ${formatNumber(totalAfterDiscount)}</p>
                         <p><strong>Monto recibido:</strong> S/. ${formatNumber(parseFloat(cashAmount))}</p>
                         <p><strong>Cambio:</strong> S/. ${formatNumber(changeAmount)}</p>
@@ -177,11 +193,12 @@ export default function Bill() {
         });
 
         if (isConfirmed) {
-            updateOrder();
+            await updateOrder();
         }
     };
 
     const updateOrder = async () => {
+        setIsSubmitting(true);
         try {
             const convertedOrderItems = orderItems.map(item => {
                 const { foodId, ...rest } = item;
@@ -198,7 +215,7 @@ export default function Bill() {
                 discountValue: subtotal * (discountPercentage / 100),
                 discountPercentage: discountPercentage,
                 totalAfterDiscount: totalAfterDiscount,
-                paymentMethod: paymentMethod.value,
+                paymentMethod: paymentMethod,
                 paymentStatus: true,
                 employeeId: currentUser.id,
                 orderItems: convertedOrderItems,
@@ -216,14 +233,14 @@ export default function Bill() {
                     await axios.put(`http://localhost:8080/api/table/${tableNumber}/availability?availability=true`);
                 }
 
-                Swal.fire({
+                await Swal.fire({
                     icon: 'success',
                     title: '¡Pedido completado!',
                     text: 'El pedido ha sido marcado como completado exitosamente',
                     confirmButtonColor: '#3085d6',
-                }).then(() => {
-                    window.location.href = "/cashier?tab=orders";
                 });
+                
+                window.location.href = "/cashier?tab=orders";
             }
         } catch (error) {
             console.error("Error:", error);
@@ -233,6 +250,8 @@ export default function Bill() {
                 text: 'Ocurrió un error al procesar el pedido. Por favor intente nuevamente.',
                 confirmButtonColor: '#3085d6',
             });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -247,12 +266,21 @@ export default function Bill() {
         return `${year}-${month}-${day} ${hours}:${minutes} ${period}`;
     };
 
+    const translateStatus = (status) => {
+        const statusMap = {
+            'Pending': 'Pendiente',
+            'Processing': 'En proceso',
+            'Ready': 'Listo',
+            'Completed': 'Completado'
+        };
+        return statusMap[status] || status;
+    };
+
     return (
         <div className="w-full bg-slate-200 dark:bg-slate-500 py-5">
             <div className="w-full">
                 <div className="max-w-full px-6">
                     <div className="mx-auto justify-center md:flex md:space-x-6 xl:px-0">
-                        {/* Side Bar*/}
                         <div className="h-full w-full">
                             <div className="flex justify-between">
                                 <div className={`p-6 mr-1 rounded-lg border bg-white mb-3 shadow-md md:mt-0 text-sm dark:bg-gray-600 ${customerData && Object.keys(customerData).length > 0 ? 'w-1/2' : 'w-full'}`}>
@@ -313,7 +341,7 @@ export default function Bill() {
                                                                     }`}
                                                                 >
                                                                     &nbsp;
-                                                                    {OrderResponse.orderStatus}
+                                                                    {translateStatus(OrderResponse.orderStatus)}
                                                                     &nbsp;
                                                                 </span>
                                                             </div>
@@ -546,14 +574,19 @@ export default function Bill() {
                                                 <div className="w-1/2">
                                                     <Select
                                                         options={paymentMethodOptions}
-                                                        value={paymentMethod}
+                                                        value={paymentMethodOptions.find(opt => opt.value === paymentMethod)}
                                                         onChange={(selected) => {
-                                                            setPaymentMethod(selected);
+                                                            setPaymentMethod(selected.value);
                                                             if (selected.value === 'cash') {
                                                                 setCashAmount(totalAfterDiscount.toFixed(1));
                                                             } else {
                                                                 setCashAmount('');
                                                             }
+                                                            setValidationErrors({
+                                                                ...validationErrors,
+                                                                payment: false,
+                                                                cash: false
+                                                            });
                                                         }}
                                                         placeholder="Seleccionar método"
                                                         className="basic-single"
@@ -563,21 +596,24 @@ export default function Bill() {
                                                                 ...provided,
                                                                 minHeight: '38px',
                                                                 borderRadius: '6px',
-                                                                borderColor: !paymentMethod && state.isFocused ? '#f87171' : '#d1d5db',
+                                                                borderColor: validationErrors.payment ? '#f87171' : '#d1d5db',
                                                                 '&:hover': {
                                                                     borderColor: '#9ca3af'
                                                                 }
                                                             })
                                                         }}
                                                     />
+                                                    {validationErrors.payment && (
+                                                        <p className="mt-1 text-xs text-red-500">Se requiere un método de pago</p>
+                                                    )}
                                                 </div>
                                             </div>
-                                            {paymentMethod?.value === 'cash' && (
+                                            {paymentMethod === 'cash' && (
                                                 <div>
                                                     <div className="flex items-center justify-between mb-2">
                                                         <p className="text-md font-bold">Monto en efectivo</p>
                                                         <input
-                                                            className="w-1/2 p-2 text-sm bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                            className={`w-1/2 p-2 text-sm bg-gray-50 rounded-lg border ${validationErrors.cash ? 'border-red-500' : 'border-gray-300'} focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                                                             type="text"
                                                             inputMode="decimal"
                                                             placeholder="Ingresa el monto"
@@ -601,14 +637,30 @@ export default function Bill() {
                                                             <p className="mb-1 text-lg font-bold">S/. {formatNumber(changeAmount)}</p>
                                                         </div>
                                                     </div>
+                                                    {validationErrors.cash && (
+                                                        <p className="mt-1 text-xs text-red-500">El monto debe ser igual o mayor al total</p>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
                                         <button
                                             onClick={confirmOrderCompletion}
-                                            className="mt-6 w-full rounded-md bg-green-500 py-1.5 font-medium text-white hover:bg-green-600"
+                                            disabled={isSubmitting}
+                                            className={`mt-6 w-full rounded-md py-1.5 font-medium text-white ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
                                         >
-                                            <i className="ri-restaurant-2-fill"></i> Completar orden
+                                            {isSubmitting ? (
+                                                <span className="flex items-center justify-center">
+                                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Procesando...
+                                                </span>
+                                            ) : (
+                                                <>
+                                                    <i className="ri-restaurant-2-fill"></i> Completar orden
+                                                </>
+                                            )}
                                         </button>
                                         <button
                                             onClick={() => { window.location.href = "/cashier?tab=orders" }}
