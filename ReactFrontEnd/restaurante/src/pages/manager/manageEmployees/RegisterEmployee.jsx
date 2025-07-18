@@ -128,8 +128,8 @@ export default function RegisterEmployee() {
         } else if (name === 'email') {
             if (value && !/\S+@\S+\.\S+/.test(value)) {
                 error = 'Correo electrónico inválido';
-            } else if (value.length > 100) {
-                error = 'Máximo 100 caracteres';
+            } else if (value.length > 50) {
+                error = 'Máximo 50 caracteres';
             } else if (value && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
                 error = 'Formato de correo electrónico inválido';
             }
@@ -348,7 +348,7 @@ export default function RegisterEmployee() {
                                     name="email"
                                     color={errors.email ? 'failure' : ''}
                                     helperText={errors.email && <span className="text-red-500">{errors.email}</span>}
-                                    maxLength="100"
+                                    maxLength="50"
                                 />
                                 <div className="absolute right-2 bottom-2 text-xs text-gray-500">
                                     {formData.email.length}/100

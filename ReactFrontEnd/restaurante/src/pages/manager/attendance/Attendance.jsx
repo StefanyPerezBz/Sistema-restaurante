@@ -51,8 +51,10 @@ function Attendance() {
 
   // Formateo de hora a formato 12 horas AM/PM
   const formatTime = (timeString) => {
+    // Caso especial para no asistencia
+    if (timeString === '00:00') return 'No asistió';
     if (!timeString) return "No registrado";
-    
+
     // Si ya está en formato AM/PM, devolver tal cual
     if (timeString.includes("AM") || timeString.includes("PM")) {
       return timeString;
@@ -77,46 +79,53 @@ function Attendance() {
     let hours = now.getHours();
     let minutes = now.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    
+
     hours = hours % 12;
     hours = hours ? hours : 12; // La hora 0 se convierte en 12
-    
+
     // Asegurar formato de 2 dígitos
     minutes = minutes < 10 ? '0' + minutes : minutes;
-    
+
     return `${hours}:${minutes} ${ampm}`;
   };
 
   // Convertir hora AM/PM a minutos para validación
   const timeToMinutes = (timeStr) => {
     if (!timeStr) return 0;
-    
+    console.log("Convirtiendo tiempo:", timeStr); // Para diagnóstico
+
     // Extraer partes del tiempo
     const [time, period] = timeStr.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
-    
-    // Ajustar horas para PM
-    if (period === 'PM' && hours !== 12) {
-      hours += 12;
-    }
-    if (period === 'AM' && hours === 12) {
+
+    console.log("Hora cruda:", hours, minutes, period); // Para diagnóstico
+
+    // Ajustar horas para PM (manejo especial para 12 PM/AM)
+    if (period === 'PM') {
+      hours = hours !== 12 ? hours + 12 : 12;
+    } else if (period === 'AM' && hours === 12) {
       hours = 0;
     }
-    
-    return hours * 60 + minutes;
+
+    const totalMinutes = hours * 60 + minutes;
+    console.log("Total minutos:", totalMinutes); // Para diagnóstico
+    return totalMinutes;
   };
 
   // Validar si la hora actual está dentro del rango permitido
   const isTimeAllowed = (isEntry) => {
     const currentTime = getCurrentTime();
+    console.log("Validando hora:", currentTime); // Para diagnóstico
     const currentMinutes = timeToMinutes(currentTime);
-    
+    console.log("Minutos actuales:", currentMinutes); // Para diagnóstico
+
     if (isEntry) {
-      // Entrada permitida: desde las 7:00 AM (420) hasta antes de las 7:00 PM (1140)
-      return currentMinutes >= 420 && currentMinutes < 1140;
+      // Entrada permitida: 7:00 AM (420) a 9:00 AM (540)
+      return currentMinutes >= 420 && currentMinutes < 540;
     } else {
-      // Salida permitida de 7:00 PM a 10:00 PM (1140 a 1320 minutos)
-      return currentMinutes >= 1140 && currentMinutes < 1320;
+      // Salida permitida: 7:00 PM (1140) a 10:00 PM (1320)
+      // Asegurémonos de incluir todo el rango
+      return currentMinutes >= 1140 && currentMinutes <= 1320;
     }
   };
 
@@ -144,7 +153,7 @@ function Attendance() {
               const existingRecord = attendanceResponse.data.find(
                 record => record.empId === emp.empId
               );
-              
+
               if (existingRecord) {
                 return {
                   ...emp,
@@ -156,7 +165,7 @@ function Attendance() {
               }
               return emp;
             });
-            
+
             setAttendance(updatedAttendance);
             setLoading(false);
           })
@@ -190,16 +199,16 @@ function Attendance() {
 
     setTimeout(() => {
       const doc = new jsPDF();
-      
+
       // Título
       doc.setFontSize(18);
       doc.setTextColor(40, 40, 40);
       doc.text(`Reporte de Asistencia - ${todayDate}`, 15, 15);
-      
+
       // Información de la empresa
       doc.setFontSize(12);
       doc.text('Sistema de Control de Asistencia', 15, 25);
-      
+
       // Preparar datos para la tabla
       const pdfData = attendance.map((emp, index) => [
         index + 1,
@@ -248,7 +257,7 @@ function Attendance() {
       });
 
       doc.save(`asistencia_${todayDate.replace(/\//g, '-')}.pdf`);
-      
+
       Swal.fire({
         title: 'Reporte generado',
         text: 'El PDF se ha descargado correctamente',
@@ -330,18 +339,25 @@ function Attendance() {
       },
       {
         name: windowWidth < 640 ? 'Salida' : 'Marcar salida',
-        cell: row => (
-          <Button
-            color="success"
-            size="xs"
-            pill
-            onClick={() => handleTakeTime(row.empId, row.empName, row.position, false)}
-            disabled={!row.hasRegisteredIn || row.hasRegisteredOut || !isTimeAllowed(false)}
-            className="text-xs sm:text-sm"
-          >
-            {windowWidth < 640 ? 'Salida' : 'Registrar salida'}
-          </Button>
-        ),
+        cell: row => {
+          console.log("Estado fila:", row); // Para diagnóstico
+          return (
+            <Button
+              color="success"
+              size="xs"
+              pill
+              onClick={() => handleTakeTime(row.empId, row.empName, row.position, false)}
+              disabled={
+                !row.hasRegisteredIn ||
+                row.hasRegisteredOut ||
+                !isTimeAllowed(false)
+              }
+              className="text-xs sm:text-sm"
+            >
+              {windowWidth < 640 ? 'Salida' : 'Registrar salida'}
+            </Button>
+          )
+        },
         width: windowWidth < 640 ? '100px' : '150px'
       }
     ];
@@ -374,7 +390,7 @@ function Attendance() {
     setSelectedEmployee({ empId, empName, position });
     setIsInTime(isInTime);
 
-    const confirmationText = isInTime 
+    const confirmationText = isInTime
       ? `¿Estás seguro de registrar tu hora de entrada ahora? (${getCurrentTime()})`
       : `¿Estás seguro de registrar tu hora de salida ahora? (${getCurrentTime()})`;
 
@@ -447,8 +463,8 @@ function Attendance() {
         <h1 className="text-xl sm:text-2xl font-bold">
           Asistencia (Hoy: {todayDate})
         </h1>
-        <Button 
-          color="gray" 
+        <Button
+          color="gray"
           onClick={exportToPDF}
           className="flex items-center gap-2"
         >

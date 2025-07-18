@@ -203,7 +203,7 @@ export default function ManageInventory() {
 
   return (
     <Fragment>
-      <div className='min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 bg-gray-100'>
+      <div className='min-h-screen w-full grid grid-cols-1 lg:grid-cols-1 bg-gray-100'>
         <div className='p-4 border-r border-gray-200'>
           <div className='bg-white p-4 rounded-lg shadow mb-4'>
             <h2 className="text-xl font-bold text-gray-800">Inventario disponible</h2>
@@ -236,7 +236,7 @@ export default function ManageInventory() {
           </div>
         </div>
 
-        <div className='p-4'>
+        {/* <div className='p-4'>
           <div className='bg-white p-4 rounded-lg shadow mb-4'>
             <h2 className="text-xl font-bold text-gray-800">Uso del artículo hoy</h2>
           </div>
@@ -266,7 +266,7 @@ export default function ManageInventory() {
               />
             )}
           </div>
-        </div>
+        </div> */}
       </div>
 
       {showPopup && selectedItem && (

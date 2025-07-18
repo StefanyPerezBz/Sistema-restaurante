@@ -1,4 +1,4 @@
-import { Button, TextInput, Label } from 'flowbite-react';
+import { Button, TextInput, Label, Alert } from 'flowbite-react';
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateStart, updateSuccess, updateFailure } from '../../redux/user/userSlice';
@@ -12,9 +12,27 @@ export default function ChefProfile() {
   const [isUploading, setIsUploading] = useState(false);
   const [nameCharCount, setNameCharCount] = useState(currentUser.first_name?.length || 0);
   const [lastNameCharCount, setLastNameCharCount] = useState(currentUser.last_name?.length || 0);
+  const [addressCharCount, setAddressCharCount] = useState(currentUser.address?.length || 0);
   const [emailValid, setEmailValid] = useState(true);
+  const [phoneError, setPhoneError] = useState(false);
+  const [emergencyContactError, setEmergencyContactError] = useState(false);
   const filePickerRef = useRef();
   const dispatch = useDispatch();
+
+  // Traducción de campos
+  const translateField = (field) => {
+    const translations = {
+      'first_name': 'Nombres',
+      'last_name': 'Apellidos',
+      'email': 'Correo electrónico',
+      'contact_number': 'Teléfono (9 dígitos)',
+      'address': 'Dirección',
+      'uniform_size': 'Talla de uniforme',
+      'emergency_contact': 'Contacto de emergencia (9 dígitos)',
+      'position': 'Cargo'
+    };
+    return translations[field] || field;
+  };
 
   // Traducción de cargos y géneros (solo visual)
   const translatePosition = (position) => {
@@ -78,7 +96,7 @@ export default function ChefProfile() {
 
     try {
       const response = await axios.post(
-        'http://localhost:8080/api/food/upload',
+        `http://localhost:8080/api/food/upload`,
         formData,
         {
           headers: {
@@ -119,10 +137,25 @@ export default function ChefProfile() {
     }
   };
 
+  const handleAddressChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= 100) {
+      setAddressCharCount(value.length);
+    } else {
+      e.target.value = value.substring(0, 100);
+    }
+  };
+
   const handlePhoneChange = (e) => {
-    // Solo permite números y máximo 9 dígitos
     const value = e.target.value.replace(/\D/g, '').substring(0, 9);
     e.target.value = value;
+    setPhoneError(value.length !== 9 && value.length > 0);
+  };
+
+  const handleEmergencyContactChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '').substring(0, 9);
+    e.target.value = value;
+    setEmergencyContactError(value.length !== 9 && value.length > 0);
   };
 
   const handleSubmit = async (e) => {
@@ -133,6 +166,31 @@ export default function ChefProfile() {
         icon: 'error',
         title: 'Error',
         text: 'Por favor ingrese un correo electrónico válido',
+        confirmButtonText: 'Entendido'
+      });
+      return;
+    }
+
+    const phoneValue = e.target.contact_number.value;
+    const emergencyValue = e.target.emergency_contact.value;
+
+    if (phoneValue && phoneValue.length !== 9) {
+      setPhoneError(true);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'El teléfono debe tener 9 dígitos',
+        confirmButtonText: 'Entendido'
+      });
+      return;
+    }
+
+    if (emergencyValue && emergencyValue.length !== 9) {
+      setEmergencyContactError(true);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'El contacto de emergencia debe tener 9 dígitos',
         confirmButtonText: 'Entendido'
       });
       return;
@@ -154,11 +212,11 @@ export default function ChefProfile() {
         email: e.target.email.value,
         first_name: e.target.first_name.value,
         last_name: e.target.last_name.value,
-        contact_number: e.target.contact_number?.value || currentUser.contact_number,
-        address: e.target.address?.value || currentUser.address,
+        contact_number: phoneValue || null,
+        address: e.target.address.value,
         gender: currentUser.gender,
         uniform_size: currentUser.uniform_size,
-        emergency_contact: e.target.emergency_contact?.value || currentUser.emergency_contact,
+        emergency_contact: emergencyValue || null,
         position: currentUser.position
       };
 
@@ -226,7 +284,7 @@ export default function ChefProfile() {
 
         {/* Nombre con contador de caracteres */}
         <div>
-          <Label htmlFor="first_name" value="Nombres" />
+          <Label htmlFor="first_name" value={translateField('first_name')} />
           <TextInput 
             type='text' 
             id='first_name' 
@@ -241,7 +299,7 @@ export default function ChefProfile() {
 
         {/* Apellido con contador de caracteres */}
         <div>
-          <Label htmlFor="last_name" value="Apellidos" />
+          <Label htmlFor="last_name" value={translateField('last_name')} />
           <TextInput 
             type='text' 
             id='last_name' 
@@ -256,7 +314,7 @@ export default function ChefProfile() {
 
         {/* Correo electrónico con validación */}
         <div>
-          <Label htmlFor="email" value="Correo electrónico" />
+          <Label htmlFor="email" value={translateField('email')} />
           <TextInput 
             type='email' 
             id='email' 
@@ -271,7 +329,7 @@ export default function ChefProfile() {
 
         {/* Teléfono (9 dígitos) */}
         <div>
-          <Label htmlFor="contact_number" value="Teléfono (9 dígitos)" />
+          <Label htmlFor="contact_number" value={translateField('contact_number')} />
           <TextInput 
             type='text' 
             id='contact_number' 
@@ -279,18 +337,23 @@ export default function ChefProfile() {
             defaultValue={currentUser.contact_number}
             onChange={handlePhoneChange}
             maxLength={9}
+            color={phoneError ? 'failure' : 'gray'}
+            helperText={phoneError && 'El teléfono debe tener 9 dígitos'}
           />
         </div>
 
-        {/* Dirección */}
+        {/* Dirección con contador de caracteres */}
         <div>
-          <Label htmlFor="address" value="Dirección" />
+          <Label htmlFor="address" value={translateField('address')} />
           <TextInput 
             type='text' 
             id='address' 
             placeholder='Ingrese su dirección completa' 
             defaultValue={currentUser.address}
+            onChange={handleAddressChange}
+            maxLength={100}
           />
+          <p className="text-xs text-gray-500 mt-1">{addressCharCount}/100 caracteres</p>
         </div>
 
         {/* Género (no editable) con traducción */}
@@ -307,7 +370,7 @@ export default function ChefProfile() {
 
         {/* Talla de uniforme (no editable) */}
         <div>
-          <Label htmlFor="uniform_size" value="Talla de uniforme" />
+          <Label htmlFor="uniform_size" value={translateField('uniform_size')} />
           <TextInput 
             type='text' 
             id='uniform_size' 
@@ -319,18 +382,22 @@ export default function ChefProfile() {
 
         {/* Contacto de emergencia */}
         <div>
-          <Label htmlFor="emergency_contact" value="Contacto de emergencia" />
+          <Label htmlFor="emergency_contact" value={translateField('emergency_contact')} />
           <TextInput 
             type='text' 
             id='emergency_contact' 
-            placeholder='Nombre y teléfono de contacto' 
-            defaultValue={currentUser.emergency_contact} 
+            placeholder='Ej: 987654321' 
+            defaultValue={currentUser.emergency_contact}
+            onChange={handleEmergencyContactChange}
+            maxLength={9}
+            color={emergencyContactError ? 'failure' : 'gray'}
+            helperText={emergencyContactError && 'El contacto debe tener 9 dígitos'}
           />
         </div>
 
         {/* Cargo (no editable) con traducción */}
         <div>
-          <Label htmlFor="position" value="Cargo" />
+          <Label htmlFor="position" value={translateField('position')} />
           <TextInput 
             type='text' 
             id='position' 
@@ -344,7 +411,7 @@ export default function ChefProfile() {
           type='submit' 
           gradientDuoTone='greenToBlue' 
           outline
-          disabled={isUploading || !emailValid}
+          disabled={isUploading || !emailValid || phoneError || emergencyContactError}
           className="mt-4"
         >
           {isUploading ? (

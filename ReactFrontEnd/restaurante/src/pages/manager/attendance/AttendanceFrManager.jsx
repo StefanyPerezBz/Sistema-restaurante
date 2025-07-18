@@ -76,7 +76,7 @@ function AttendanceFrManager() {
         // Calcular horas trabajadas
         const hoursWorked = calculateHoursInMinutes(employee.inTime, employee.outTime);
         const hoursDecimal = (hoursWorked / 60).toFixed(2);
-        
+
         // Verificar si excede el límite diario (8 horas)
         if (hoursWorked > 8 * 60) {
           dailyExceeded.push({
@@ -91,7 +91,7 @@ function AttendanceFrManager() {
         const date = new Date(employee.date);
         const weekNumber = getWeekNumber(date);
         const weekKey = `${employee.empId}-${date.getFullYear()}-${weekNumber}`;
-        
+
         if (!weeklyHoursByEmployee[weekKey]) {
           weeklyHoursByEmployee[weekKey] = {
             empId: employee.empId,
@@ -133,17 +133,17 @@ function AttendanceFrManager() {
             ${dailyExceeded.length > 0 ? `
               <p class="font-bold">Horas diarias excedidas:</p>
               <ul class="list-disc pl-5">
-                ${dailyExceeded.map(e => 
-                  `<li>${e.empName} (${e.empId}): ${e.hours} hrs el ${new Date(e.date).toLocaleDateString('es-PE')}</li>`
-                ).join('')}
+                ${dailyExceeded.map(e =>
+          `<li>${e.empName} (${e.empId}): ${e.hours} hrs el ${new Date(e.date).toLocaleDateString('es-PE')}</li>`
+        ).join('')}
               </ul>
             ` : ''}
             ${weeklyExceeded.length > 0 ? `
               <p class="font-bold mt-3">Horas semanales excedidas:</p>
               <ul class="list-disc pl-5">
-                ${weeklyExceeded.map(e => 
-                  `<li>${e.empName} (${e.empId}): ${e.hours} hrs en semana ${e.week} del ${e.year}</li>`
-                ).join('')}
+                ${weeklyExceeded.map(e =>
+          `<li>${e.empName} (${e.empId}): ${e.hours} hrs en semana ${e.week} del ${e.year}</li>`
+        ).join('')}
               </ul>
             ` : ''}
           </div>
@@ -158,39 +158,43 @@ function AttendanceFrManager() {
 
   // Función auxiliar para calcular horas en minutos
   const calculateHoursInMinutes = (inTime, outTime) => {
+    // Si es "No asistió" (00:00), retornar 0
+    if (outTime === '00:00' || outTime === 'No asistió') return 0;
+
     if (!inTime || !outTime) return 0;
-    
+
     const inTime24h = convertTo24HourFormat(inTime);
     const outTime24h = convertTo24HourFormat(outTime);
-    
+
     const [inHours, inMinutes] = inTime24h.split(':').map(Number);
     const [outHours, outMinutes] = outTime24h.split(':').map(Number);
-    
+
     let totalHours = outHours - inHours;
     let totalMinutes = outMinutes - inMinutes;
-    
+
     if (totalMinutes < 0) {
       totalHours--;
       totalMinutes += 60;
     }
-    
-    // Si la salida es al día siguiente (ej. 23:00 - 01:00)
+
     if (totalHours < 0) {
       totalHours += 24;
     }
-    
+
     return totalHours * 60 + totalMinutes;
   };
 
   // Función para convertir a formato 12h
   const convertTo12HourFormat = (timeString) => {
+    // Caso especial para no asistencia (ambos campos 00:00)
+    if (timeString === '00:00') return 'No asistió';
     if (!timeString || timeString === '--') return 'No registrado';
-    
-    // Si ya está en formato 12h (contiene AM/PM)
+
+    // Si ya está en formato 12h
     if (timeString.includes('AM') || timeString.includes('PM')) {
       return timeString;
     }
-    
+
     // Convertir de formato 24h a 12h
     try {
       const [hours, minutes] = timeString.split(':').map(Number);
@@ -206,22 +210,22 @@ function AttendanceFrManager() {
   // Función para convertir a formato 24h
   const convertTo24HourFormat = (timeString) => {
     if (!timeString || timeString === '--') return '';
-    
+
     // Si ya está en formato 24h (no contiene AM/PM)
     if (!timeString.includes('AM') && !timeString.includes('PM')) {
       return timeString;
     }
-    
+
     try {
       const [time, period] = timeString.split(' ');
       let [hours, minutes] = time.split(':').map(Number);
-      
+
       if (period === 'PM' && hours !== 12) {
         hours += 12;
       } else if (period === 'AM' && hours === 12) {
         hours = 0;
       }
-      
+
       return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     } catch (e) {
       console.error('Error al convertir hora:', e);
@@ -326,30 +330,33 @@ function AttendanceFrManager() {
       return;
     }
 
-    // Calcular horas trabajadas
-    const minutesWorked = calculateHoursInMinutes(formData.inTime, formData.outTime);
-    const hoursWorked = (minutesWorked / 60).toFixed(2);
+    // Solo calcular horas si no es "No asistió"
+    if (formData.outTime !== '00:00') {
+      const minutesWorked = calculateHoursInMinutes(formData.inTime, formData.outTime);
+      const hoursWorked = (minutesWorked / 60).toFixed(2);
 
-    // Mostrar confirmación si excede el límite diario
-    if (minutesWorked > 8 * 60) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Horas trabajadas',
-        html: `El empleado trabajará <strong>${hoursWorked} horas</strong> este día.<br>¿Desea continuar?`,
-        showCancelButton: true,
-        confirmButtonText: 'Sí, guardar',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        background: '#f8f9fa'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          saveAttendance(formData);
-        }
-      });
-    } else {
-      saveAttendance(formData);
+      if (minutesWorked > 8 * 60) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Horas trabajadas',
+          html: `El empleado trabajará <strong>${hoursWorked} horas</strong> este día.<br>¿Desea continuar?`,
+          showCancelButton: true,
+          confirmButtonText: 'Sí, guardar',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          background: '#f8f9fa'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            saveAttendance(formData);
+          }
+        });
+        return;
+      }
     }
+
+    saveAttendance(formData);
+
   };
 
   // Función para validar el horario laboral
@@ -358,46 +365,45 @@ function AttendanceFrManager() {
       return { isValid: false, message: 'Ambos horarios son requeridos' };
     }
 
-    // Convertir a formato 24h para validación
+    // Convertir a formato 24h
     const inTime24h = convertTo24HourFormat(inTime);
     const outTime24h = convertTo24HourFormat(outTime);
 
-    // Parsear horas
-    const [inHours, inMinutes] = inTime24h.split(':').map(Number);
-    const [outHours, outMinutes] = outTime24h.split(':').map(Number);
-
     // Validar horario de entrada (7:00 AM a 9:00 AM)
+    const [inHours, inMinutes] = inTime24h.split(':').map(Number);
     if (inHours < 7 || (inHours === 9 && inMinutes > 0) || inHours > 9) {
-      return { 
-        isValid: false, 
-        message: 'La hora de entrada debe ser entre 7:00 AM y 9:00 AM' 
+      return {
+        isValid: false,
+        message: 'La hora de entrada debe ser entre 7:00 AM y 9:00 AM'
       };
     }
 
-    // Validar horario de salida (7:00 PM a 10:00 PM)
-    if ((outHours < 19 || outHours > 22) && !(outHours === 22 && outMinutes === 0)) {
-      // Permitir medianoche (00:00) como caso especial
-      if (outHours !== 0 || outMinutes !== 0) {
-        return { 
-          isValid: false, 
-          message: 'La hora de salida debe ser entre 7:00 PM y 10:00 PM' 
-        };
-      }
+    // Validar horario de salida (6:00 PM a 10:00 PM)
+    const [outHours, outMinutes] = outTime24h.split(':').map(Number);
+
+    // Caso especial para no asistencia
+    if (outHours === 0 && outMinutes === 0) {
+      return { isValid: true, message: 'No asistió' };
     }
 
-    // Validar que la hora de salida sea después de la entrada
-    const inTotalMinutes = inHours * 60 + inMinutes;
-    let outTotalMinutes = outHours * 60 + outMinutes;
-    
-    // Si la salida es al día siguiente (ej. 23:00 - 01:00)
-    if (outTotalMinutes < inTotalMinutes) {
-      outTotalMinutes += 24 * 60;
+    // Convertir a minutos para comparación
+    const outTotal = outHours * 60 + outMinutes;
+    const minOutTime = 18 * 60; // 6:00 PM (18:00)
+    const maxOutTime = 22 * 60; // 10:00 PM (22:00)
+
+    if (outTotal < minOutTime || outTotal > maxOutTime) {
+      return {
+        isValid: false,
+        message: 'La hora de salida debe ser entre 6:00 PM y 10:00 PM'
+      };
     }
-    
-    if (outTotalMinutes <= inTotalMinutes) {
-      return { 
-        isValid: false, 
-        message: 'La hora de salida debe ser después de la hora de entrada' 
+
+    // Validar que salida sea después de entrada
+    const inTotal = inHours * 60 + inMinutes;
+    if (outTotal <= inTotal) {
+      return {
+        isValid: false,
+        message: 'La hora de salida debe ser después de la entrada'
       };
     }
 
@@ -511,14 +517,15 @@ function AttendanceFrManager() {
   // Función para formatear la hora para inputs
   const formatTimeForInput = (timeString) => {
     if (!timeString || timeString === '--') return '';
-    
+    if (timeString === '00:00') return '00:00'; // Caso especial para medianoche
+
     if (timeString.includes(':')) {
       const parts = timeString.split(':');
       if (parts.length >= 2) {
         return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
       }
     }
-    
+
     try {
       const date = new Date(timeString);
       if (!isNaN(date.getTime())) {
@@ -527,20 +534,25 @@ function AttendanceFrManager() {
     } catch (e) {
       console.error('Error al formatear hora:', e);
     }
-    
+
     return '';
   };
 
   // Función para calcular horas trabajadas
   const calculateHoursWorked = (inTime, outTime) => {
+    // Si ambos son "00:00" o "No asistió"
+    if ((inTime === '00:00' || inTime === 'No asistió') &&
+      (outTime === '00:00' || outTime === 'No asistió')) {
+      return 'No asistió';
+    }
+
     if (!inTime || !outTime) return '--';
-    
+
     const minutesWorked = calculateHoursInMinutes(inTime, outTime);
     if (minutesWorked <= 0) return '--';
-    
+
     const hours = Math.floor(minutesWorked / 60);
     const minutes = minutesWorked % 60;
-    
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
   };
 
@@ -548,18 +560,18 @@ function AttendanceFrManager() {
   const calculateHoursStats = (attendanceData) => {
     const validEntries = attendanceData.filter(a => a.inTime && a.outTime);
     let totalMinutes = 0;
-    
+
     validEntries.forEach(entry => {
       const minutes = calculateHoursInMinutes(entry.inTime, entry.outTime);
       totalMinutes += minutes;
     });
-    
+
     const totalHours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
     const avgMinutes = validEntries.length > 0 ? Math.round(totalMinutes / validEntries.length) : 0;
     const avgHours = Math.floor(avgMinutes / 60);
     const avgRemainingMinutes = avgMinutes % 60;
-    
+
     return {
       totalHoras: `${totalHours}h ${remainingMinutes}m`,
       promedioHoras: `${avgHours}h ${avgRemainingMinutes}m`
@@ -615,7 +627,7 @@ function AttendanceFrManager() {
 
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    const periodText = startDate && endDate 
+    const periodText = startDate && endDate
       ? `Desde ${formatDateForPDF(startDate)} hasta ${formatDateForPDF(endDate)}`
       : 'Todos los registros disponibles';
     doc.text(periodText, margin, yPosition);
@@ -624,10 +636,10 @@ function AttendanceFrManager() {
     // Fecha de generación
     doc.setTextColor(...lightColor);
     doc.setFontSize(10);
-    doc.text(`Generado el: ${new Date().toLocaleDateString('es-PE', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
+    doc.text(`Generado el: ${new Date().toLocaleDateString('es-PE', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -643,7 +655,7 @@ function AttendanceFrManager() {
 
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    
+
     // Calcular estadísticas
     const totalRegistros = attendance.length;
     const empleadosUnicos = [...new Set(attendance.map(item => item.empId))].length;
@@ -654,7 +666,7 @@ function AttendanceFrManager() {
     yPosition += 5;
     doc.text(`• Empleados registrados: ${empleadosUnicos}`, margin, yPosition);
     yPosition += 5;
-    doc.text(`• Asistencias completas: ${asistenciasCompletas} (${Math.round((asistenciasCompletas/totalRegistros)*100)}%)`, margin, yPosition);
+    doc.text(`• Asistencias completas: ${asistenciasCompletas} (${Math.round((asistenciasCompletas / totalRegistros) * 100)}%)`, margin, yPosition);
     yPosition += 5;
     doc.text(`• Horas trabajadas totales: ${totalHoras}`, margin, yPosition);
     yPosition += 5;
@@ -666,7 +678,7 @@ function AttendanceFrManager() {
       doc.setTextColor(231, 76, 60); // Rojo
       doc.text('• Horas excedidas:', margin, yPosition);
       yPosition += 5;
-      
+
       if (exceededLimits.daily.length > 0) {
         doc.text(`  - Diario: ${exceededLimits.daily.length} casos`, margin, yPosition);
         yPosition += 5;
@@ -675,7 +687,7 @@ function AttendanceFrManager() {
         doc.text(`  - Semanal: ${exceededLimits.weekly.length} casos`, margin, yPosition);
         yPosition += 5;
       }
-      
+
       doc.setTextColor(...darkColor); // Volver al color normal
     }
 
@@ -705,12 +717,12 @@ function AttendanceFrManager() {
     const data = attendance.map((employee, index) => {
       const hoursWorked = calculateHoursWorked(employee.inTime, employee.outTime);
       const minutesWorked = calculateHoursInMinutes(employee.inTime, employee.outTime);
-      
+
       let status = 'Normal';
       if (minutesWorked > 8 * 60) {
         status = 'Horas excedidas';
       }
-      
+
       return {
         index: index + 1,
         empId: employee.empId,
@@ -757,23 +769,24 @@ function AttendanceFrManager() {
         5: { cellWidth: 15, halign: 'center' },
         6: { cellWidth: 15, halign: 'center' },
         7: { cellWidth: 15, halign: 'center' },
-        8: { cellWidth: 20, halign: 'center', 
-             cellStyles: (cell, data) => {
-               if (data.row.raw.status === 'Horas excedidas') {
-                 return { textColor: [231, 76, 60], fontStyle: 'bold' };
-               }
-               return {};
-             }
+        8: {
+          cellWidth: 20, halign: 'center',
+          cellStyles: (cell, data) => {
+            if (data.row.raw.status === 'Horas excedidas') {
+              return { textColor: [231, 76, 60], fontStyle: 'bold' };
+            }
+            return {};
+          }
         }
       },
-      didDrawPage: function() {
+      didDrawPage: function () {
         // Footer en cada página
         doc.setFontSize(8);
         doc.setTextColor(...lightColor);
         doc.text(
-          `Página ${doc.internal.getNumberOfPages()}`, 
-          105, 
-          287, 
+          `Página ${doc.internal.getNumberOfPages()}`,
+          105,
+          287,
           { align: 'center' }
         );
       }
@@ -782,96 +795,55 @@ function AttendanceFrManager() {
     // Firmas y validación
     const lastPage = doc.internal.getNumberOfPages();
     doc.setPage(lastPage);
-    
+
     const signatureY = doc.lastAutoTable.finalY + 15;
-    
+
     if (signatureY < 250) {
       doc.setFontSize(10);
       doc.setTextColor(...darkColor);
       doc.text('_________________________', margin + 20, signatureY);
       doc.text('Responsable de RRHH', margin + 20, signatureY + 5);
-      
+
       doc.text('_________________________', margin + 100, signatureY);
       doc.text('Gerente General', margin + 100, signatureY + 5);
-      
+
       doc.setFontSize(8);
       doc.setTextColor(...lightColor);
-      doc.text('Documento generado automáticamente por el Sistema de Gestión de Asistencias', 
+      doc.text('Documento generado automáticamente por el Sistema de Gestión de Asistencias',
         105, 287, { align: 'center' });
     }
 
     // Guardar el PDF
-    const fileName = `Reporte_Asistencias_${startDate || 'inicio'}_${endDate || 'fin'}_${new Date().toISOString().slice(0,10)}.pdf`;
+    const fileName = `Reporte_Asistencias_${startDate || 'inicio'}_${endDate || 'fin'}_${new Date().toISOString().slice(0, 10)}.pdf`;
     doc.save(fileName);
   };
 
   // Función para formatear fecha en formato PDF
-  const formatDateForPDF = (dateString) => {
+  // Asegurar que la fecha se maneje consistentemente
+  const formatDate = (dateString) => {
     if (!dateString) return '--';
+
+    // Asegurarse de que la fecha se interprete correctamente
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-PE', {
+    // Ajustar a la zona horaria de Perú (UTC-5)
+    const adjustedDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+
+    return adjustedDate.toLocaleDateString('es-PE', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
     });
   };
 
+  // Usar esta función en lugar de toLocaleDateString directamente
+
   // Renderizado del componente
   return (
     <div className="flex flex-col w-full p-4">
       {/* Controles de filtro */}
       <div className="flex flex-col md:flex-row items-center mb-4 gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow">
-        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          <div className="w-full md:w-40">
-            <Label htmlFor="attendanceType" value="ID Empleado" className="mb-2 block" />
-            <Dropdown
-              id="attendanceType"
-              label={selectedEmpId === "select" ? "Seleccionar ID" : selectedEmpId}
-              value={selectedEmpId}
-              onChange={(e) => setSelectedEmpId(e.target.value)}
-              className="w-full"
-            >
-              <Dropdown.Item onClick={() => setSelectedEmpId("select")}>-- Seleccionar --</Dropdown.Item>
-              {empIds.map((empId, index) => (
-                <Dropdown.Item key={index} onClick={() => setSelectedEmpId(empId)}>
-                  {empId}
-                </Dropdown.Item>
-              ))}
-            </Dropdown>
-          </div>
-
-          <div className="w-full md:w-40">
-            <Label htmlFor="department" value="Tipo" className="mb-2 block" />
-            <Dropdown
-              id="department"
-              label={selectedType === "select" ? "Seleccionar tipo" : selectedType === "today" ? "Hoy" : "Este mes"}
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full"
-            >
-              <Dropdown.Item onClick={() => setSelectedType("select")}>-- Seleccionar --</Dropdown.Item>
-              <Dropdown.Item onClick={() => setSelectedType("today")}>Hoy</Dropdown.Item>
-              <Dropdown.Item onClick={() => setSelectedType("this")}>Este mes</Dropdown.Item>
-            </Dropdown>
-          </div>
-
-          <Button
-            color="success"
-            className="w-full md:w-auto h-10 self-end"
-            onClick={handleFilterSubmit}
-          >
-            <FaFilter className="mr-2" /> Filtrar
-          </Button>
-        </div>
 
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto mt-4 md:mt-0">
-          <Button
-            color="success"
-            className="w-full md:w-auto"
-            onClick={handleCurrentDateClick}
-          >
-            Hoy
-          </Button>
           <Button
             color="success"
             className="w-full md:w-auto"
@@ -934,21 +906,28 @@ function AttendanceFrManager() {
               const hoursWorked = calculateHoursWorked(employee.inTime, employee.outTime);
               const minutesWorked = calculateHoursInMinutes(employee.inTime, employee.outTime);
               const exceedsDailyLimit = minutesWorked > 8 * 60;
-              
+
               return (
-                <Table.Row 
-                  key={index} 
-                  className={`bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 ${
-                    exceedsDailyLimit ? 'border-l-4 border-yellow-500' : ''
-                  }`}
+                <Table.Row
+                  key={index}
+                  className={`bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600 ${exceedsDailyLimit ? 'border-l-4 border-yellow-500' : ''
+                    }`}
                 >
                   <Table.Cell>{indexOfFirstItem + index + 1}</Table.Cell>
                   <Table.Cell>{employee.empId}</Table.Cell>
                   <Table.Cell>{employee.empName}</Table.Cell>
                   <Table.Cell className="hidden md:table-cell">{employee.position}</Table.Cell>
-                  <Table.Cell>{new Date(employee.date).toLocaleDateString('es-PE')}</Table.Cell>
-                  <Table.Cell className="hidden sm:table-cell">{convertTo12HourFormat(employee.inTime)}</Table.Cell>
-                  <Table.Cell className="hidden sm:table-cell">{convertTo12HourFormat(employee.outTime)}</Table.Cell>
+                  <Table.Cell>{employee.date}</Table.Cell>
+                  <Table.Cell className="hidden sm:table-cell">
+                    {employee.inTime === '00:00' && employee.outTime === '00:00'
+                      ? 'No asistió'
+                      : convertTo12HourFormat(employee.inTime)}
+                  </Table.Cell>
+                  <Table.Cell className="hidden sm:table-cell">
+                    {employee.inTime === '00:00' && employee.outTime === '00:00'
+                      ? 'No asistió'
+                      : convertTo12HourFormat(employee.outTime)}
+                  </Table.Cell>
                   <Table.Cell className={exceedsDailyLimit ? 'font-bold text-yellow-600' : ''}>
                     {hoursWorked}
                     {exceedsDailyLimit && (
@@ -957,14 +936,7 @@ function AttendanceFrManager() {
                   </Table.Cell>
                   <Table.Cell>
                     <div className="flex space-x-2">
-                      <Button
-                        size="xs"
-                        color="blue"
-                        onClick={() => handleEditClick(employee)}
-                        aria-label="Editar"
-                      >
-                        <FaUserEdit />
-                      </Button>
+
                       <Button
                         size="xs"
                         color="failure"
@@ -1047,18 +1019,18 @@ function AttendanceFrManager() {
         <Modal.Body className="space-y-4">
           <div>
             <Label htmlFor="editEmpId" value="ID Empleado" />
-            <TextInput 
-              id="editEmpId" 
-              value={editData.empId || ''} 
-              disabled 
+            <TextInput
+              id="editEmpId"
+              value={editData.empId || ''}
+              disabled
             />
           </div>
           <div>
             <Label htmlFor="editDate" value="Fecha" />
-            <TextInput 
-              id="editDate" 
-              value={editData.date ? new Date(editData.date).toLocaleDateString('es-PE') : ''} 
-              disabled 
+            <TextInput
+              id="editDate"
+              value={editData.date ? new Date(editData.date).toLocaleDateString('es-PE') : ''}
+              disabled
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -1107,7 +1079,7 @@ function AttendanceFrManager() {
                 const hours = Math.floor(minutes / 60);
                 const mins = minutes % 60;
                 const exceedsLimit = minutes > 8 * 60;
-                
+
                 return (
                   <span className={exceedsLimit ? 'text-yellow-600 font-bold' : ''}>
                     {hours}h {mins}m
@@ -1126,8 +1098,8 @@ function AttendanceFrManager() {
             <Button color="gray" onClick={handleCloseEditModal}>
               Cancelar
             </Button>
-            <Button 
-              color="success" 
+            <Button
+              color="success"
               onClick={() => handleSubmitEdit(editData)}
               disabled={!editData.inTime || !editData.outTime}
             >

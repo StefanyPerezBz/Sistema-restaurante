@@ -201,79 +201,6 @@ function ViewAttendance() {
     });
   };
 
-  // Marcar todos los empleados como ausentes
-  const markAllAbsent = () => {
-    const unmarkedEmployees = employees.filter(emp => 
-      !attendanceRecords.some(r => r.empId === emp.empId && r.inTime === "00:00")
-    );
-
-    if (unmarkedEmployees.length === 0) {
-      Swal.fire({
-        title: 'Información',
-        text: 'Todos los empleados ya están marcados como ausentes',
-        icon: 'info',
-        confirmButtonText: 'Entendido',
-        customClass: {
-          container: 'swal-responsive',
-          popup: 'swal-responsive-popup',
-          title: 'swal-responsive-title',
-          confirmButton: 'swal-responsive-confirm'
-        }
-      });
-      return;
-    }
-
-    Swal.fire({
-      title: 'Confirmar Ausencias',
-      html: `¿Marcar a <strong>${unmarkedEmployees.length}</strong> empleado(s) como ausente(s)?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, marcar todos',
-      cancelButtonText: 'Cancelar',
-      showLoaderOnConfirm: true,
-      customClass: {
-        container: 'swal-responsive',
-        popup: 'swal-responsive-popup',
-        title: 'swal-responsive-title',
-        htmlContainer: 'swal-responsive-html',
-        confirmButton: 'swal-responsive-confirm',
-        cancelButton: 'swal-responsive-cancel'
-      },
-      preConfirm: () => {
-        const attendanceData = unmarkedEmployees.map(employee => ({
-          empId: employee.empId,
-          empName: employee.empName,
-          position: employee.position,
-          date: currentDate,
-          inTime: "00:00",
-          outTime: "00:00"
-        }));
-
-        return axios.post(`http://localhost:8080/attendances`, attendanceData)
-          .then(response => response.data)
-          .catch(error => {
-            Swal.showValidationMessage('Error al marcar ausentes');
-            console.error('Error:', error);
-          });
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Éxito',
-          text: `${unmarkedEmployees.length} empleados marcados como ausentes`,
-          icon: 'success',
-          confirmButtonText: 'Aceptar',
-          customClass: {
-            container: 'swal-responsive',
-            popup: 'swal-responsive-popup',
-            title: 'swal-responsive-title',
-            confirmButton: 'swal-responsive-confirm'
-          }
-        });
-        fetchData();
-      }
-    });
-  };
 
   // Exportar PDF de todos los empleados
   const exportAllPDF = () => {
@@ -413,14 +340,6 @@ function ViewAttendance() {
                 className="flex-1 text-xs sm:text-sm"
               >
                 Exportar PDF
-              </Button>
-              <Button 
-                color="blue" 
-                onClick={markAllAbsent}
-                disabled={employees.length === attendanceRecords.filter(r => r.inTime === "00:00").length}
-                className="flex-1 text-xs sm:text-sm"
-              >
-                Marcar Todos
               </Button>
             </div>
           </div>
